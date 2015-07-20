@@ -17,6 +17,19 @@
   Das stimmt dann wieder mit den Werten die bei der Programmierung gesendet werden überein.
 */
 
+//struct to simplify 
+typedef struct  {
+  int blitz;
+  int p1;
+  int p2;
+  int art;
+  int function;
+  int time;
+  int seq;
+  int port;
+}aux_pin_struct;
+
+
 #define CVdecadr 0          //Dekoderadresse
 #define CVdecadrmin 1       //kleinste Dekoderadresse
 #define CVdecadrmax 111     //größte kurze Dekoderadresse

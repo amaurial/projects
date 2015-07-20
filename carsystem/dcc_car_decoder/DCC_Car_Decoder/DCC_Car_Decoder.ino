@@ -131,6 +131,12 @@ int aux6time = 0;           //Zeiten zwisschen den Blinksequenzen
 int rlichtfunktion = CVdefaultrlichtfunktion;     //Funktionstaste (bitweise F11 bis F4)
 int rlichtZeit = CVdefaultrlichtZeit;        //Geschwindigkeit des Rundumlicht.
 
+
+#define AUXPINS_SIZE 6
+#define CVSIZE 29
+aux_pin_struct AUXPINS[AUXPINS_SIZE];
+boolean f[CVSIZE];
+
 //Port1:
 int aux1funktion = CVdefaultaux1funktion;       //Auf welche Funktionstasten reagiert wird. (bitweise F11 bis F4).
 int sirenefunktion = CVdefaultsirenefunktion;         //Abhängigkeit von einer 2. Funktion, kann zB. nur mit Rundlicht betrieben werden.
@@ -319,7 +325,63 @@ void setup()
   sbi( SMCR,SM1 );     // power down mode
   cbi( SMCR,SM2 );     // power down mode
   
+  startVariables();
+  
 }
+
+//****************************************************************  
+void startVariables(){
+    
+    //default ones
+    int i=0;
+    for (i=0;i<AUXPINS_SIZE;i++){
+      AUXPINS[i].time = 0;
+      AUXPINS[i].seq = 0;      
+      AUXPINS[i].port = 12+i; //ports 12 to 17
+    }
+  
+    AUXPINS[0].function = CVdefaultaux1funktion;
+    AUXPINS[0].blitz = CVdefaultaux1blitz;   
+    AUXPINS[0].p1 = CVdefaultaux1p1;
+    AUXPINS[0].p2 = CVdefaultaux1p2; 
+    AUXPINS[0].art = 0; 
+  
+    AUXPINS[1].function = CVdefaultaux2funktion;
+    AUXPINS[1].blitz = CVdefaultaux2blitz;   
+    AUXPINS[1].p1 = CVdefaultaux2p1;
+    AUXPINS[1].p2 = CVdefaultaux2p2; 
+    AUXPINS[1].art = 2;
+
+    AUXPINS[2].function = CVdefaultaux3funktion;
+    AUXPINS[2].blitz = CVdefaultaux3blitz;   
+    AUXPINS[2].p1 = CVdefaultaux3p1;
+    AUXPINS[2].p2 = CVdefaultaux3p2; 
+    AUXPINS[2].art = 3;
+  
+    AUXPINS[3].function = CVdefaultaux4funktion;
+    AUXPINS[3].blitz = CVdefaultaux4blitz;   
+    AUXPINS[3].p1 = CVdefaultaux4p1;
+    AUXPINS[3].p2 = CVdefaultaux4p2;  
+    AUXPINS[3].art = 1;
+  
+    AUXPINS[4].function = CVdefaultaux5funktion;
+    AUXPINS[4].blitz = CVdefaultaux5blitz;   
+    AUXPINS[4].p1 = CVdefaultaux5p1;
+    AUXPINS[4].p2 = CVdefaultaux5p2; 
+    AUXPINS[4].art = 3;
+
+    AUXPINS[5].function = CVdefaultaux6funktion;
+    AUXPINS[5].blitz = CVdefaultaux6blitz;   
+    AUXPINS[5].p1 = CVdefaultaux6p1;
+    AUXPINS[5].p2 = CVdefaultaux6p2;     
+    AUXPINS[5].art = 1;
+    
+    for (i=0;i<CVSIZE;i++){
+       f[i]=false;
+    }
+    
+}  
+
 
 //****************************************************************  
 //Programmablauf 
@@ -577,61 +639,95 @@ void dccauswertung() {
     bitWrite(dccAdr,1,data[15]);  //Bit 1 * 2
     bitWrite(dccAdr,0,data[16]);  //Bit 0 (1)
   }  //Ende lange Adresse
+  int i,j;
   //3.1 Stimmt Adresse mit der des Decoders überein?
   if (dccAdr == decAdr) {
     //4. Datenlänge Prüfen. So kann das Datenformat ermittelt werden.
     if (datalength == 26 || (verschub == 9 && datalength == 35)) {  //1-Byte Adr + 0Bit + 1-Byte Data + 0-Bit + 1-Byte CRC + End-Bit (Basisformat)
        //5.1. Abfragen der Bits, diese Bestimmen welche Daten empfangen wurden.
        if (data[9+verschub] == 1 && data[10+verschub] == 0 && data[11+verschub] == 0) {    //Auswertung der Funktionen F0 bis F4
+         
          if (data[12+verschub] == 1)    //F0 aktivieren
-           f0 = true;
-         else f0 = false;
+           f[0] = true;
+         else f[0] = false;
+         
+         //activate F1 to F4         
+         j = 16;
+         for (i = 1;i<5;i++){
+             if (data[j+verschub] == 1)
+               f[i] = true;
+             else f[i] = false;  
+             j--;           
+         }
+       /*
+         
          if (data[16+verschub] == 1)    //F1 aktivieren
-           f1 = true;
-         else f1 = false;
+           f[1] = true;
+         else f[1] = false;
          if (data[15+verschub] == 1)    //F2 aktivieren
-           f2 = true;
-         else f2 = false;
+           f[2] = true;
+         else f[2] = false;
          if (data[14+verschub] == 1)    //F3 aktivieren
-           f3 = true;
-         else f3 = false;
+           f[3] = true;
+         else f[3] = false;
          if (data[13+verschub] == 1)    //F4 aktivieren
-           f4 = true;
-         else f4 = false;
+           f[4] = true;
+         else f[4] = false;
+         */
          //keine weitern Daten vorhanden
          return; 
          //Auswertung Beenden.
        }  //Ende der Auswertung Funktion F0 bis F4
        if (data[9+verschub] == 1 && data[10+verschub] == 0 && data[11+verschub] == 1 && data[12+verschub] == 1) {    //Auswertung der Funktionen F5 bis F8
+         //activate F5 to F8 
+         j = 16;
+         for (i = 5;i<9;i++){
+             if (data[j+verschub] == 1)
+               f[i] = true;      
+             else f[i] = false; 
+             j--;      
+         }
+         /*
          if (data[16+verschub] == 1)    //F5 aktivieren
-           f5 = true;
-         else f5 = false;
+           f[5] = true;
+         else f[5] = false;
          if (data[15+verschub] == 1)    //F6 aktivieren
-           f6 = true;
-         else f6 = false;
+           f[6] = true;
+         else f[6] = false;
          if (data[14+verschub] == 1)    //F7 aktivieren
-           f7 = true;
-         else f7 = false;
+           f[7] = true;
+         else f[7] = false;
          if (data[13+verschub] == 1)    //F8 aktivieren
-           f8 = true;
-         else f8 = false;
+           f[8] = true;
+         else f[8] = false;
+         */
          //keine weitern Daten vorhanden
          return; 
          //Auswertung Beenden.
        }  //Ende der Auswertung Funktion F5 bis F8
        if (data[9+verschub] == 1 && data[10+verschub] == 0 && data[11+verschub] == 1 && data[12+verschub] == 0) {    //Auswertung der Funktionen F9 bis F12
+         //activate F9 to F12 
+         j = 16;
+         for (i = 9;i<13;i++){
+             if (data[j+verschub] == 1)
+               f[i] = true;      
+             else f[i] = false;    
+             j--;   
+         }
+         /*
          if (data[16+verschub] == 1)    //F9 aktivieren
-           f9 = true;
-         else f9 = false;
+           f[9] = true;
+         else f[9] = false;
          if (data[15+verschub] == 1)    //F10 aktivieren
-           f10 = true;
-         else f10 = false;
+           f[10] = true;
+         else f[10] = false;
          if (data[14+verschub] == 1)    //F11 aktivieren
-           f11 = true;
-         else f11 = false;
+           f[11] = true;
+         else f[11] = false;
          if (data[13+verschub] == 1)    //F12 aktivieren
-           f12 = true;
-         else f12 = false;
+           f[12] = true;
+         else f[12] = false;
+         */
          //keine weitern Daten vorhanden
          return; 
          //Auswertung Beenden.
@@ -692,60 +788,81 @@ void dccauswertung() {
       } //Ende 128 Fahrstufen  
         //Funktion F13 bis F20 im Expansion Byte lesen        
       if (data[9+verschub] == 1 && data[10+verschub] == 1 && data[11+verschub] == 0 && data[12+verschub] == 1 && data[13+verschub] == 1 && data[14+verschub] == 1 && data[15+verschub] == 1 && data[16+verschub] == 0) {
+        //activate F13 to F20 
+        j = 25;
+         for (i = 13;i<21;i++){
+             if (data[j+verschub] == 1)
+               f[i] = true;      
+             else f[i] = false;    
+             j--;   
+         }
+        /*
         if (data[25+verschub] == 1)    //F13 aktivieren
-          f13 = true;
-        else f13 = false;
+          f[13] = true;
+        else f[13] = false;
         if (data[24+verschub] == 1)    //F14 aktivieren
-          f14 = true;
-        else f14 = false;
+          f[14] = true;
+        else f[14] = false;
         if (data[23+verschub] == 1)    //F15 aktivieren
-          f15 = true;
-        else f15 = false;
+          f[15] = true;
+        else f[15] = false;
         if (data[22+verschub] == 1)    //F16 aktivieren
-          f16 = true;
-        else f16 = false;
+          f[16] = true;
+        else f[16] = false;
         if (data[21+verschub] == 1)    //F17 aktivieren
-          f17 = true;
-        else f17 = false;
+          f[17] = true;
+        else f[17] = false;
         if (data[20+verschub] == 1)    //F18 aktivieren
-          f18 = true;
-        else f18 = false;
+          f[18] = true;
+        else f[18] = false;
         if (data[19+verschub] == 1)    //F19 aktivieren
-          f19 = true;
-        else f19 = false;
+          f[19] = true;
+        else f[19] = false;
         if (data[18+verschub] == 1)    //F20 aktivieren
-          f20 = true;
-        else f20 = false;
+          f[20] = true;
+        else f[20] = false;
+        */
         //keine weitern Daten vorhanden
         return; 
         //Auswertung Beenden.
       } //Ende F13-F20
         //Funktion F21 bis F28 im Expansion Byte lesen        
       if (data[9+verschub] == 1 && data[10+verschub] == 1 && data[11+verschub] == 0 && data[12+verschub] == 1 && data[13+verschub] == 1 && data[14+verschub] == 1 && data[15+verschub] == 1 && data[16+verschub] == 1) {
+        
+        //activate F21 to F28 
+        j = 25;
+         for (i = 21;i<29;i++){
+             if (data[j+verschub] == 1)
+               f[i] = true;      
+             else f[i] = false;    
+             j--;   
+         }
+        /*
         if (data[25+verschub] == 1)    //F21 aktivieren
-          f21 = true;
-        else f21 = false;
+          f[21] = true;
+        else f[21] = false;
         if (data[24+verschub] == 1)    //F22 aktivieren
-          f22 = true;
-        else f22 = false;
+          f[22] = true;
+        else f[22] = false;
         if (data[23+verschub] == 1)    //F23 aktivieren
-          f23 = true;
-        else f23 = false;
+          f[23] = true;
+        else f[23] = false;
         if (data[22+verschub] == 1)    //F24 aktivieren
-          f24 = true;
-        else f24 = false;
+          f[24] = true;
+        else f[24] = false;
         if (data[21+verschub] == 1)    //F25 aktivieren
-          f25 = true;
-        else f25 = false;
+          f[25] = true;
+        else f[25] = false;
         if (data[20+verschub] == 1)    //F26 aktivieren
-          f26 = true;
-        else f26 = false;
+          f[26] = true;
+        else f[26] = false;
         if (data[19+verschub] == 1)    //F27 aktivieren
-          f27 = true;
-        else f27 = false;
+          f[27] = true;
+        else f[27] = false;
         if (data[18+verschub] == 1)    //F28 aktivieren
-          f28 = true;
-        else f28 = false;
+          f[28] = true;
+        else f[28] = false;
+        */
         //keine weitern Daten vorhanden
         return; 
         //Auswertung Beenden.
@@ -815,8 +932,8 @@ void setausgaenge() {
     //Zeit in der DCC Signale erfasst werden müssen ist abgelaufen.
     if (sollspeed > 0 || istspeed > 0) {  //Prüfen ob Auto fährt
       //Warnblinkanlage einschalten.
-      f1 = true;
-      f2 = true;
+      f[1] = true;
+      f[2] = true;
     }
     //Auto anhalten damit kein Schaden entsteht.
     sollspeed = 0;
@@ -839,7 +956,7 @@ void setausgaenge() {
   //3. Blinker ansteuern
   if (0 == flash % blinktakt) {      //Blinkfequenz für Blinker links und rechts
     binkzustand = !binkzustand;
-    if (((f1 == true) && (f2 == true)) || ((akkuwert < blinkAkkuleer) && (akkuwarnunginaktiv == false))) {  //Warnblinkanlage ((blinkAkkuleer * 4) / 2.03 = Volt)
+    if (((f[1] == true) && (f[2] == true)) || ((akkuwert < blinkAkkuleer) && (akkuwarnunginaktiv == false))) {  //Warnblinkanlage ((blinkAkkuleer * 4) / 2.03 = Volt)
       if (binkzustand == true) {
         analogWrite(F1Pin, binkhelligkeit);     //Blinker links setzten
         analogWrite(F2Pin, binkhelligkeit);    //Blinker rechts setzten
@@ -850,13 +967,13 @@ void setausgaenge() {
       }
     }
     else {
-      if (((f1 == true) && (blinkerinvertiert == false)) || ((f2 == true) && (blinkerinvertiert == true))) {  //blinken links oder invertiert
+      if (((f[1] == true) && (blinkerinvertiert == false)) || ((f[2] == true) && (blinkerinvertiert == true))) {  //blinken links oder invertiert
         if (binkzustand == true)
           analogWrite(F1Pin, binkhelligkeit);     //Blinker links setzten
         else digitalWrite(F1Pin, LOW);    //Blinker links löschen  
       }
       else digitalWrite(F1Pin, LOW);    //Blinker links löschen, falls gerade bei HIGHT abgeschaltet
-      if (((f2 == true) && (blinkerinvertiert == false)) || ((f1 == true) && (blinkerinvertiert == true))) {  //blinken rechts oder invertiert
+      if (((f[2] == true) && (blinkerinvertiert == false)) || ((f[1] == true) && (blinkerinvertiert == true))) {  //blinken rechts oder invertiert
         if (binkzustand == true)
           analogWrite(F2Pin, binkhelligkeit);     //Blinker rechts setzten
         else digitalWrite(F2Pin, LOW);    //Blinker rechts löschen  
@@ -867,8 +984,8 @@ void setausgaenge() {
 
   //______________________________________________________________________
   //4.Abblendlicht ansteuern
-  if (f0 == true) {  //Abblendlicht ist aktiv.
-    if (f3 == true) {  //Lichtautomatik ist aktiv
+  if (f[0] == true) {  //Abblendlicht ist aktiv.
+    if (f[3] == true) {  //Lichtautomatik ist aktiv
       int val = analogRead(ldrPin);    // read the input ldrPin
       if (val > (ldrlichtaus*4)) {    //schwelle für Licht AUS (Standard = 630)
         if (licht == true && (diff(ldrdelay,flash) > ldrdelayaus))  //Warten für 10 * 200 = 2000ms bis Status geändert wird
@@ -1061,6 +1178,25 @@ int setPort(int pin, int funktion, int art, int seq, int blitz, int p1, int p2) 
   return seq;
 }
 
+int setPort(aux_pin_struct *auxpinp) {
+  if (check(auxpinp->function) == true) {    //Prüfen ob die Funktion für den Ausgang AKTIV ist
+    if (art > 0) {    //Auswahl von kein- bis dreifachblitz.
+      auxtime = einsatz(auxpinp);    //Blitzfequenz bestimmen
+      auxpinp->seq = auxpinp->seq + 1;  //eine Sequenz weitergehen
+      if (auxpinp->seq > (((auxpinp->art) * 2) - 1) )  //Anzahl der Sequenzen erreicht, Doppelblitz
+        auxpinp->seq = 0;     //von vorne beginnen 
+      return auxpinp->seq;
+    }
+    digitalWrite(auxpinp->port,HIGH);    //kein Blinken (blau1art == 0)
+    auxtime = flash + 20;
+    return auxpinp->seq;  
+  }
+  digitalWrite(auxpinp->port,LOW);    //Abschalten des Ausgang
+  auxtime = flash + 20;          //Speicher der Flash Werte damit Wiedereinschalten klappt
+  return auxpinp->seq;
+}
+
+
 //****************************************************************  
 //Funktion zur Ansteuerung der Sirene
 void setSirene(int pin, int art) {
@@ -1106,21 +1242,21 @@ boolean check(int funktionen) {
     bit 6 = F10
     bit 7 = F11
   */
-  if (f4 == true && bitRead(funktionen,0) == 1)  //Reaktion auf F4
+  if (f[4] == true && bitRead(funktionen,0) == 1)  //Reaktion auf F4
     return true;    //Funktion ist aktiv - Ausgang EIN
-  if (f5 == true && bitRead(funktionen,1) == 1)  //Reaktion auf F5
+  if (f[5] == true && bitRead(funktionen,1) == 1)  //Reaktion auf F5
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f6 == true && bitRead(funktionen,2) == 1)  //Reaktion auf F6
+  if (f[6] == true && bitRead(funktionen,2) == 1)  //Reaktion auf F6
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f7 == true && bitRead(funktionen,3) == 1)  //Reaktion auf F7
+  if (f[7] == true && bitRead(funktionen,3) == 1)  //Reaktion auf F7
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f8 == true && bitRead(funktionen,4) == 1)  //Reaktion auf F8
+  if (f[8] == true && bitRead(funktionen,4) == 1)  //Reaktion auf F8
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f9 == true && bitRead(funktionen,5) == 1)  //Reaktion auf F9
+  if (f[9] == true && bitRead(funktionen,5) == 1)  //Reaktion auf F9
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f10 == true && bitRead(funktionen,6) == 1)  //Reaktion auf F10
+  if (f[10] == true && bitRead(funktionen,6) == 1)  //Reaktion auf F10
     return  true;    //Funktion ist aktiv - Ausgang EIN
-  if (f11 == true && bitRead(funktionen,7) == 1)  //Reaktion auf F11
+  if (f[11] == true && bitRead(funktionen,7) == 1)  //Reaktion auf F11
     return  true;    //Funktion ist aktiv - Ausgang EIN
   return false;      //Rückgabe, die Funktion ist inaktiv!
 }
@@ -1157,6 +1293,43 @@ int einsatz(int ausgang, int seq, int time, int blitz, int pause1, int pause2) {
     if (seq >= 5) {    //Pause
       digitalWrite(ausgang,LOW);
       output = flash + pause2;  //neue LED Zeit bestimmen
+      return output;
+  }
+  return output;  
+}
+
+//****************************************************************  
+//Steuerung der Ausgänge für Einsatz
+int einsatz(aux_pin_struct *auxp) {
+  int output = time;    //Rückgabe der alten Zeit
+    if (auxp->seq == 0) {    //1. Blitz
+      digitalWrite(auxp->port,HIGH);
+      output = flash + auxp->blitz;    //neue LED Zeit bestimmen
+      return output;
+    }
+    if (auxp->seq == 1) {    //Pause
+      digitalWrite(auxp->port,LOW);
+      output = flash + auxp->p1;  //neue LED Zeit bestimmen
+      return output;
+    }
+    if (auxp->seq == 2) {    //2. Blitz
+      digitalWrite(auxp->port,HIGH);
+      output = flash + auxp->blitz;  //neue LED Zeit bestimmen
+      return output;
+    }
+    if (auxp->seq == 3) {    //Pause
+      digitalWrite(auxp->port,LOW);
+      output = flash + auxp->p2;  //neue LED Zeit bestimmen
+      return output;
+    }
+    if (auxp->seq == 4) {    //3. Blitz
+      digitalWrite(auxp->port,HIGH);
+      output = flash + auxp->blitz;  //neue LED Zeit bestimmen
+      return output;
+    }
+    if (auxp->seq >= 5) {    //Pause
+      digitalWrite(auxp->port,LOW);
+      output = flash + auxp->p2;  //neue LED Zeit bestimmen
       return output;
   }
   return output;  

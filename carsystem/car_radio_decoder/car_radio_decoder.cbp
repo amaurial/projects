@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="car_radio_decoder" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/car_radio_decoder" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/car_radio_decoder" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="RadioHead/RHCRC.cpp" />
+		<Unit filename="RadioHead/RHCRC.h" />
+		<Unit filename="RadioHead/RHDatagram.cpp" />
+		<Unit filename="RadioHead/RHDatagram.h" />
+		<Unit filename="RadioHead/RHGenericDriver.cpp" />
+		<Unit filename="RadioHead/RHGenericDriver.h" />
+		<Unit filename="RadioHead/RHGenericSPI.cpp" />
+		<Unit filename="RadioHead/RHGenericSPI.h" />
+		<Unit filename="RadioHead/RHHardwareSPI.cpp" />
+		<Unit filename="RadioHead/RHHardwareSPI.h" />
+		<Unit filename="RadioHead/RHMesh.cpp" />
+		<Unit filename="RadioHead/RHMesh.h" />
+		<Unit filename="RadioHead/RHNRFSPIDriver.cpp" />
+		<Unit filename="RadioHead/RHNRFSPIDriver.h" />
+		<Unit filename="RadioHead/RHReliableDatagram.cpp" />
+		<Unit filename="RadioHead/RHReliableDatagram.h" />
+		<Unit filename="RadioHead/RHRouter.cpp" />
+		<Unit filename="RadioHead/RHRouter.h" />
+		<Unit filename="RadioHead/RHSPIDriver.cpp" />
+		<Unit filename="RadioHead/RHSPIDriver.h" />
+		<Unit filename="RadioHead/RHSoftwareSPI.cpp" />
+		<Unit filename="RadioHead/RHSoftwareSPI.h" />
+		<Unit filename="RadioHead/RHTcpProtocol.h" />
+		<Unit filename="RadioHead/RH_ASK.cpp" />
+		<Unit filename="RadioHead/RH_ASK.h" />
+		<Unit filename="RadioHead/RH_NRF24.cpp" />
+		<Unit filename="RadioHead/RH_NRF24.h" />
+		<Unit filename="RadioHead/RH_NRF905.cpp" />
+		<Unit filename="RadioHead/RH_NRF905.h" />
+		<Unit filename="RadioHead/RH_RF22.cpp" />
+		<Unit filename="RadioHead/RH_RF22.h" />
+		<Unit filename="RadioHead/RH_RF24.cpp" />
+		<Unit filename="RadioHead/RH_RF24.h" />
+		<Unit filename="RadioHead/RH_RF69.cpp" />
+		<Unit filename="RadioHead/RH_RF69.h" />
+		<Unit filename="RadioHead/RH_RF95.cpp" />
+		<Unit filename="RadioHead/RH_RF95.h" />
+		<Unit filename="RadioHead/RH_Serial.cpp" />
+		<Unit filename="RadioHead/RH_Serial.h" />
+		<Unit filename="RadioHead/RH_TCP.cpp" />
+		<Unit filename="RadioHead/RH_TCP.h" />
+		<Unit filename="RadioHead/RHutil/atomic.h" />
+		<Unit filename="RadioHead/RHutil/simulator.h" />
+		<Unit filename="RadioHead/RadioHead.h" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/HardwareSPI.cpp" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/HardwareSPI.h" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/HardwareSerial.cpp" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/HardwareSerial.h" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/wirish.cpp" />
+		<Unit filename="RadioHead/STM32ArduinoCompat/wirish.h" />
+		<Unit filename="RadioHead/radio_config_Si4460.h" />
+		<Unit filename="RadioHead/tools/simMain.cpp" />
+		<Unit filename="csrd.cpp" />
+		<Unit filename="csrd.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
