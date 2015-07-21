@@ -87,6 +87,7 @@
 		<Unit filename="csrd.cpp" />
 		<Unit filename="csrd.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="radio_protocol.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
