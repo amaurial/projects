@@ -7,6 +7,8 @@
 #define RP_OPERATION    2
 #define RP_READ         3
 
+#define PARAMETERS_SIZE         10
+
 #define RP_OP_BLINK_LEFT        1
 #define RP_OP_BLINK_RIGHT       2
 #define RP_OP_FRONT_LIGHT       3
@@ -24,9 +26,9 @@
 #define RP_PARAM_ID                 0
 #define RP_PARAM_GROUP              1
 #define RP_PARAM_BLINK_RATE         2
-#define RP_PARAM_NORMAL_SPEED       3
-#define RP_PARAM_CURR_SPEED         4
-
+#define RP_PARAM_BLINK_TIME         3
+#define RP_PARAM_NORMAL_SPEED       4
+#define RP_PARAM_CURR_SPEED         5
 #define RP_PARAM_BATTERY_THRESHOLD  6   // the content is in percentage
 #define RP_PARAM_SOUND_ON           7
 #define RP_PARAM_SPEED_STEP         8

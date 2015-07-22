@@ -1,11 +1,13 @@
 #ifndef __CSRD__H
 #define __CSRD__H
 
-#include "arduino.h"
-#include <SPI.h>
-#include <RH_RF69.h>
+#include "Arduino.h"
+//#include <RH_RF69.h>
+//#include <RHReliableDatagram.h>
 #include "radio_protocol.h"
 #define MESSAGE_SIZE 8
+
+#define CSRD_DEBUG
 
 // Singleton instance of the radio driver
 RH_RF69 rf69;
@@ -13,8 +15,8 @@ RH_RF69 rf69;
 class CSRD {
 
 public:
-    CSR();
-    init();
+    CSRD();
+    void init();
 
     void sendMessage(char *buffer,uint16_t len);
     uint16_t getMessage(char *buffer);
@@ -38,11 +40,23 @@ public:
     uint8_t getWriteValue();
 
 
+    void resetToDefault();
+    uint8_t getLength(){return length;};
+
 protected:
 
 private:
     char buffer[MESSAGE_SIZE];
-}
+    RH_RF69 driver;
+    uint8_t params[PARAMETERS_SIZE];
+    uint16_t nodenumber;
+    uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer
+    uint8_t length;
+
+    void saveDefaultToMemory();
+    bool saveParam(uint8_t param,uint8_t value);
+
+};
 
 
 
