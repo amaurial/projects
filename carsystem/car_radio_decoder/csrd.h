@@ -4,6 +4,8 @@
 #include "arduino.h"
 #include <SPI.h>
 #include <RH_RF69.h>
+#include "radio_protocol.h"
+#define MESSAGE_SIZE 8
 
 // Singleton instance of the radio driver
 RH_RF69 rf69;
@@ -14,7 +16,7 @@ public:
     CSR();
     init();
 
-    sendMessage(char *buffer,uint16_t len);
+    void sendMessage(char *buffer,uint16_t len);
     uint16_t getMessage(char *buffer);
     bool readMessage();
 
@@ -39,7 +41,7 @@ public:
 protected:
 
 private:
-
+    char buffer[MESSAGE_SIZE];
 }
 
 
