@@ -14,7 +14,7 @@ class CSRD {
 
 public:
     CSRD();
-    void init(RH_RF69 *driver,RHReliableDatagram *manager);
+    void init(RH_RF69 *driver,RHReliableDatagram *manager,uint8_t *buf,int RH_RF69_MAX_MESSAGE_LEN);
 
     void sendMessage(char *buffer,uint16_t len);
     uint16_t getMessage(char *buffer);
@@ -43,6 +43,8 @@ public:
 
     uint16_t getNodeNumber(){return nodenumber;};
 
+    bool isRadioOn();
+    uint16_t getSender(){return origin;};
 protected:
 
 private:
@@ -51,8 +53,11 @@ private:
     RHReliableDatagram *manager;
     uint8_t params[PARAMETERS_SIZE];
     uint16_t nodenumber;
+    uint16_t origin;
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer
     uint8_t length;
+    int radioBuffSize;
+    uint8_t *buf;
 
     void saveDefaultToMemory();
     bool saveParam(uint8_t param,uint8_t value);

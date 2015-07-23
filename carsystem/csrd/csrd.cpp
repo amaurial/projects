@@ -5,9 +5,11 @@ CSRD::CSRD(){
     resetToDefault();
 }
 
-void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
+void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager,uint8_t *buf,int buffSize){
     this->driver=driver;
     this->manager=manager;
+    radioBuffSize=buffSize;
+    this->buf=buf;
 }
 
 void CSRD::sendMessage(char *buffer,uint16_t len){
@@ -21,14 +23,16 @@ uint16_t CSRD::getMessage(char *buffer){
     return 0;
 
 }
+
+
 bool CSRD::readMessage(){
 
 if (manager->available())
   {
     // Wait for a message addressed to us from the client
-    uint8_t len = sizeof(buf);
+
     uint8_t from;
-    if (manager->recvfromAck(buf, &len, &from))
+    if (manager->recvfromAck(buf, &length, &from))
     {
         #ifndef CSRD_DEBUG
           Serial.print("got request from : 0x");
@@ -38,7 +42,7 @@ if (manager->available())
         #endif // CSRD_DEBUG
 
         //we expect 8 bytes
-        if (len>MESSAGE_SIZE){
+        if (length>MESSAGE_SIZE){
             #ifndef CSRD_DEBUG
               Serial.print("message bigger than expected: ");
               Serial.println(len);
@@ -46,8 +50,8 @@ if (manager->available())
             return false;
         }
         memset(buffer,'\0',MESSAGE_SIZE);
-        memcpy(buffer,buf,len);
-        length=len;
+        memcpy(buffer,buf,length);
+        origin=from;
     }
   }
 

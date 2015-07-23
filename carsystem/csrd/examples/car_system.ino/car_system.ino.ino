@@ -21,18 +21,41 @@
 
 CSRD car;
 RH_RF69 driver;
-RHReliableDatagram manager(driver, car.getNodeNumber());
+RHReliableDatagram manager(driver, car.getNodeNumber(),radioBuffer,RH_RF69_MAX_MESSAGE_LEN);
+byte i=0;
+byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 
 void setup(){
-  car.init(&driver,&manager);  
+  car.init(&driver,&manager); 
+  i=0; 
+  Serial.begin(115200);
 }
 
 void loop(){
-  if (car.readMessage()){
-    
+  
+  if (i>254){
+    i=0;
+  }
+  setBuffer();
+
+  if (car.isRadioOn()){
+    server.sendMessage(buffer,8);
+  }
+  if (car.readMessage()){    
     
   }
+  sleep(200);
+  i++;
 }
-
+void setBuffer(){
+  buffer[0]=i;
+  buffer[1]=0;
+  buffer[2]=0;
+  buffer[3]=0;
+  buffer[4]=0;
+  buffer[5]=0;
+  buffer[6]=0;
+  buffer[7]=i;
+}
 
 
