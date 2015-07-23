@@ -2,12 +2,12 @@
 
 
 CSRD::CSRD(){
+    resetToDefault();
 }
 
-void CSRD::init(){
-    resetToDefault();
-    RH_RF69 driver;
-    RHReliableDatagram manager(driver, nodenumber);
+void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
+    this->driver=driver;
+    this->manager=manager;
 }
 
 void CSRD::sendMessage(char *buffer,uint16_t len){
@@ -15,7 +15,7 @@ void CSRD::sendMessage(char *buffer,uint16_t len){
 }
 uint16_t CSRD::getMessage(char *buffer){
     if (readMessage()){
-        memcpy(buffer,this.buffer,MESSAGE_SIZE);
+        memcpy(buffer,this->buffer,MESSAGE_SIZE);
         return length;
     }
     return 0;
@@ -23,12 +23,12 @@ uint16_t CSRD::getMessage(char *buffer){
 }
 bool CSRD::readMessage(){
 
-if (manager.available())
+if (manager->available())
   {
     // Wait for a message addressed to us from the client
     uint8_t len = sizeof(buf);
     uint8_t from;
-    if (manager.recvfromAck(buf, &len, &from))
+    if (manager->recvfromAck(buf, &len, &from))
     {
         #ifndef CSRD_DEBUG
           Serial.print("got request from : 0x");
@@ -47,7 +47,7 @@ if (manager.available())
         }
         memset(buffer,'\0',MESSAGE_SIZE);
         memcpy(buffer,buf,len);
-        lenght=len;
+        length=len;
     }
   }
 
@@ -62,7 +62,7 @@ bool CSRD::isBroadcast(){
 
 uint8_t CSRD::getGroup(){
     if (isOperation()||isBroadcast()){
-        return buffer[2]
+        return buffer[2];
     }
 }
 
@@ -129,7 +129,7 @@ void CSRD::resetToDefault(){
     nodenumber=333;
     params[RP_PARAM_GROUP]=1;
     params[RP_PARAM_BLINK_RATE]=20;
-    params[RP_PARAM_BLINK_TIME]=50;
+    params[RP_PARAM_BLINK_TIME_UNIT]=50;
     params[RP_PARAM_NORMAL_SPEED]=50;
     params[RP_PARAM_CURR_SPEED]=50;
     params[RP_PARAM_BATTERY_THRESHOLD]=30;
@@ -137,6 +137,7 @@ void CSRD::resetToDefault(){
     params[RP_PARAM_SPEED_STEP]=5;
     params[RP_PARAM_SPEED_COMPENSATION]=RP_ON;
     params[RP_PARAM_FREQUENCY]=0; //0=433MHz 1=868MHz 2=915MHz
+    params[RP_PARAM_BREAK_RATE]=20; //0=433MHz 1=868MHz 2=915MHz
 }
 
 void CSRD::saveDefaultToMemory(){

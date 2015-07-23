@@ -2,21 +2,19 @@
 #define __CSRD__H
 
 #include "Arduino.h"
-//#include <RH_RF69.h>
-//#include <RHReliableDatagram.h>
+#include <RH_RF69.h>
+#include <RHReliableDatagram.h>
 #include "radio_protocol.h"
 #define MESSAGE_SIZE 8
 
 #define CSRD_DEBUG
 
-// Singleton instance of the radio driver
-RH_RF69 rf69;
 
 class CSRD {
 
 public:
     CSRD();
-    void init();
+    void init(RH_RF69 *driver,RHReliableDatagram *manager);
 
     void sendMessage(char *buffer,uint16_t len);
     uint16_t getMessage(char *buffer);
@@ -43,11 +41,14 @@ public:
     void resetToDefault();
     uint8_t getLength(){return length;};
 
+    uint16_t getNodeNumber(){return nodenumber;};
+
 protected:
 
 private:
     char buffer[MESSAGE_SIZE];
-    RH_RF69 driver;
+    RH_RF69 *driver;
+    RHReliableDatagram *manager;
     uint8_t params[PARAMETERS_SIZE];
     uint16_t nodenumber;
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer

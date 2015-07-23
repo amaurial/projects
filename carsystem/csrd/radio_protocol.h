@@ -7,7 +7,7 @@
 #define RP_OPERATION    2
 #define RP_READ         3
 
-#define PARAMETERS_SIZE         10
+#define PARAMETERS_SIZE         11
 
 #define RP_OP_BLINK_LEFT        1
 #define RP_OP_BLINK_RIGHT       2
@@ -23,10 +23,10 @@
 #define RP_OFF          2
 #define RP_FILLER       254
 
-#define RP_PARAM_ID                 0
+#define RP_PARAM_ID                 0 //this one is not counted as parameter to the array, because it is a 2 byte number
 #define RP_PARAM_GROUP              1
-#define RP_PARAM_BLINK_RATE         2
-#define RP_PARAM_BLINK_TIME         3
+#define RP_PARAM_BLINK_RATE         2 //the multiplier to the basic time unit. ex blink interval=RP_PARAM_BLINK_TIME_UNIT*RP_PARAM_BLINK_RATE
+#define RP_PARAM_BLINK_TIME_UNIT    3 //the basic time unit for blinking delay
 #define RP_PARAM_NORMAL_SPEED       4
 #define RP_PARAM_CURR_SPEED         5
 #define RP_PARAM_BATTERY_THRESHOLD  6   // the content is in percentage
@@ -34,6 +34,7 @@
 #define RP_PARAM_SPEED_STEP         8
 #define RP_PARAM_SPEED_COMPENSATION 9
 #define RP_PARAM_FREQUENCY          10
+#define RP_PARAM_BREAK_RATE         11 //the total break delay time is RP_PARAM_BLINK_TIME_UNIT*RP_PARAM_BREAK_DELAY
 
 
 /*message format
