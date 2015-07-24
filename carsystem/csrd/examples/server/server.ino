@@ -14,7 +14,7 @@ byte i;
 
 void setup(){
   i=0;
-  server.init(&driver,&manager,radioBuffer,RH_RF69_MAX_MESSAGE_LEN);  
+  server.init(&driver,&manager);  
   Serial.begin(115200);
 }
 
@@ -23,11 +23,12 @@ void loop(){
   if (i>254){
     i=0;
   }
-
-  
-  
-  if (server.getMessage(buffer)){    
-      
+  if (server.getMessage(buffer)){
+      Serial.print("from client ");
+      Serial.print(server.getSender());
+      Serial.print(": ");
+      Serial.println(buffer);
+              
       setBuffer();
       server.sendMessage(buffer,8);
   }

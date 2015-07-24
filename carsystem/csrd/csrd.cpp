@@ -5,11 +5,11 @@ CSRD::CSRD(){
     resetToDefault();
 }
 
-void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager,uint8_t *buf,int buffSize){
+void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
     this->driver=driver;
     this->manager=manager;
-    radioBuffSize=buffSize;
-    this->buf=buf;
+    radioBuffSize=RH_RF69_MAX_MESSAGE_LEN;
+    //this->buf=buf;
 }
 
 void CSRD::sendMessage(char *buffer,uint16_t len){
@@ -23,7 +23,6 @@ uint16_t CSRD::getMessage(char *buffer){
     return 0;
 
 }
-
 
 bool CSRD::readMessage(){
 
@@ -55,6 +54,10 @@ if (manager->available())
     }
   }
 
+}
+
+bool CSRD::isRadioOn(){
+    return manager->available();
 }
 
 bool CSRD::isBroadcast(){

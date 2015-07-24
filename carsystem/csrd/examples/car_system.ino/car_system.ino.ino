@@ -2,8 +2,8 @@
 #include "Arduino.h"
 #include <SPI.h>
 #include <csrd.h>
-#include <RH_RF69.h>
 #include <RHReliableDatagram.h>
+#include <RH_RF69.h>
 
 //PINS
 #define FRONT_LIGHT               A1
@@ -19,11 +19,14 @@
 #define IR_SENDER_PIN             D10 //AUX3
 
 
+byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 CSRD car;
 RH_RF69 driver;
-RHReliableDatagram manager(driver, car.getNodeNumber(),radioBuffer,RH_RF69_MAX_MESSAGE_LEN);
+RHReliableDatagram manager(driver, car.getNodeNumber());
+
 byte i=0;
-byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
+byte j=0;
+char buffer[8];
 
 void setup(){
   car.init(&driver,&manager); 
@@ -39,12 +42,19 @@ void loop(){
   setBuffer();
 
   if (car.isRadioOn()){
-    server.sendMessage(buffer,8);
+    car.sendMessage(buffer,8);
   }
-  if (car.readMessage()){    
-    
-  }
-  sleep(200);
+
+  for (j=0;j<10;j++){
+    if (car.getMessage(buffer)>0){    
+      Serial.print("from server: ");
+      Serial.println(buffer);
+      break;
+    }
+    delay(15);
+  }  
+  
+  delay(200);
   i++;
 }
 void setBuffer(){
