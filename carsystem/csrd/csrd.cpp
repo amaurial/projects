@@ -1,23 +1,66 @@
 #include "csrd.h"
 
+uint8_t key[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
 
 CSRD::CSRD(){
     resetToDefault();
 }
 
-void CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
+bool CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
+
+    #ifdef CSRD_DEBUG
+        Serial.println("CSRD Initialization.");
+    #endif // CSRD_DEBUG
     this->driver=driver;
     this->manager=manager;
+    if (this->manager!=NULL){
+        #ifdef CSRD_DEBUG
+            Serial.println("Using manager.");
+        #endif // CSRD_DEBUG
+        if (!this->manager->init()){
+        #ifdef CSRD_DEBUG
+            Serial.println("Radio failed.");
+        #endif // CSRD_DEBUG
+            return false;
+        }
+    }
+    else{
+        #ifdef CSRD_DEBUG
+            Serial.println("Using radio std.");
+        #endif // CSRD_DEBUG
+        if (!driver->init()){
+            #ifdef CSRD_DEBUG
+                Serial.println("Radio start failed.");
+            #endif // CSRD_DEBUG
+            return false;
+        }
+        if (!driver->setFrequency(915)){
+            #ifdef CSRD_DEBUG
+                Serial.println("Radio freq set failed.");
+            #endif // CSRD_DEBUG
+            return false;
+        }
+
+        driver->setEncryptionKey(key);
+    }
     radioBuffSize=RH_RF69_MAX_MESSAGE_LEN;
-    //this->buf=buf;
+    return true;
 }
 
-void CSRD::sendMessage(char *buffer,uint16_t len){
-
+bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
+    if (this->manager!=NULL){
+        return manager->sendtoWait(sbuffer, len, serverAddr);
+    }else{
+        driver->send(sbuffer, len);
+        driver->waitPacketSent();
+        return true;
+    }
 }
-uint16_t CSRD::getMessage(char *buffer){
+
+uint8_t CSRD::getMessage(uint8_t *mbuffer){
     if (readMessage()){
-        memcpy(buffer,this->buffer,MESSAGE_SIZE);
+        memcpy(mbuffer,this->buffer,MESSAGE_SIZE);
         return length;
     }
     return 0;
@@ -26,38 +69,69 @@ uint16_t CSRD::getMessage(char *buffer){
 
 bool CSRD::readMessage(){
 
-if (manager->available())
-  {
+
     // Wait for a message addressed to us from the client
-
-    uint8_t from;
-    if (manager->recvfromAck(buf, &length, &from))
+    if (isRadioOn())
     {
-        #ifndef CSRD_DEBUG
-          Serial.print("got request from : 0x");
-          Serial.print(from, HEX);
-          Serial.print(": ");
-          Serial.println((char*)buf);
-        #endif // CSRD_DEBUG
+        uint8_t from;
+        uint8_t len=radioBuffSize;
 
-        //we expect 8 bytes
-        if (length>MESSAGE_SIZE){
-            #ifndef CSRD_DEBUG
-              Serial.print("message bigger than expected: ");
-              Serial.println(len);
-            #endif // CSRD_DEBUG
-            return false;
+        if (this->manager!=NULL){
+
+                if (this->manager->recvfromAck(buf, &len, &from))
+                {
+                    #ifdef CSRD_DEBUG
+                      Serial.print("got request from : 0x");
+                      Serial.print(from, HEX);
+                      Serial.print(": ");
+                      Serial.print(" size: ");
+                      Serial.println(length);
+                      Serial.println((char*)buf);
+                    #endif // CSRD_DEBUG
+
+                    //we expect 8 bytes
+                    if (length>MESSAGE_SIZE){
+                        #ifdef CSRD_DEBUG
+                          Serial.print("message bigger than expected: ");
+                          Serial.println(length);
+                        #endif // CSRD_DEBUG
+                        return false;
+                    }
+                    length=len;
+                    if (length>0){
+                        memset(buffer,'\0',MESSAGE_SIZE);
+                        memcpy(buffer,buf,MESSAGE_SIZE);
+                        origin=from;
+                        return true;
+                    }
+                }
+            }
+
+        else {
+            if (this->driver->recv(buf,&len)){
+                length=len;
+                if (length>0){
+                    memset(buffer,'\0',MESSAGE_SIZE);
+                    memcpy(buffer,buf,MESSAGE_SIZE);
+                    origin=from;
+                    return true;
+                }
+            }
         }
-        memset(buffer,'\0',MESSAGE_SIZE);
-        memcpy(buffer,buf,length);
-        origin=from;
-    }
-  }
 
+  }
+    return false;
 }
 
 bool CSRD::isRadioOn(){
-    return manager->available();
+    #ifdef CSRD_DEBUG
+        //Serial.print("radio status: ");
+        //Serial.println(manager->available());
+    #endif // CSRD_DEBUG
+    if (manager!=NULL){
+        return this->manager->available();
+    }
+    return this->driver->available();
 }
 
 bool CSRD::isBroadcast(){

@@ -1,9 +1,9 @@
 
 #include "Arduino.h"
-#include <SPI.h>
 #include <csrd.h>
 #include <RHReliableDatagram.h>
 #include <RH_RF69.h>
+#include <SPI.h>
 
 //PINS
 #define FRONT_LIGHT               A1
@@ -22,16 +22,25 @@
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 CSRD car;
 RH_RF69 driver;
-RHReliableDatagram manager(driver, car.getNodeNumber());
+//RHReliableDatagram manager(driver, 33);
 
 byte i=0;
 byte j=0;
-char buffer[8];
+uint8_t sbuffer[MESSAGE_SIZE];
+uint8_t recbuffer[MESSAGE_SIZE];
+long st;
+long count;
 
 void setup(){
-  car.init(&driver,&manager); 
-  i=0; 
   Serial.begin(115200);
+  //car.init(&driver,&manager); 
+  //if (!car.init(&driver,&manager)){
+  if (!car.init(&driver,NULL)){
+    Serial.println("FAILED");
+  }
+  i=0; 
+  count=0;
+  st=millis();
 }
 
 void loop(){
@@ -39,33 +48,52 @@ void loop(){
   if (i>254){
     i=0;
   }
-  setBuffer();
 
-  if (car.isRadioOn()){
-    car.sendMessage(buffer,8);
+  
+  if ((millis()-st)>5000){
+    Serial.print("msg/s:");
+    Serial.println(count/5);
+    count=0;
+    st=millis();
   }
+  
+    
+   setBuffer();
+   //Serial.println("Sending to the server");
+   car.sendMessage(sbuffer,MESSAGE_SIZE,1); 
 
   for (j=0;j<10;j++){
-    if (car.getMessage(buffer)>0){    
-      Serial.print("from server: ");
-      Serial.println(buffer);
+    if (car.getMessage(recbuffer)>0){    
+      //Serial.print("from server: ");
+      //Serial.print(car.getSender());
+      //Serial.print(" size: ");
+      //Serial.println(car.getLength());
+      //printBuffer();
+      //Serial.println();
+      count++;
+      i++;
       break;
     }
-    delay(15);
-  }  
-  
-  delay(200);
-  i++;
+    delay(1);
+  }    
 }
 void setBuffer(){
-  buffer[0]=i;
-  buffer[1]=0;
-  buffer[2]=0;
-  buffer[3]=0;
-  buffer[4]=0;
-  buffer[5]=0;
-  buffer[6]=0;
-  buffer[7]=i;
+  sbuffer[0]=i;
+  sbuffer[1]=40;
+  sbuffer[2]=40;
+  sbuffer[3]=40;
+  sbuffer[4]=40;
+  sbuffer[5]=40;
+  sbuffer[6]=40;
+  sbuffer[7]=i;
+}
+
+void printBuffer(){
+  int a;
+  for (a=0;a<MESSAGE_SIZE;a++){
+    Serial.print(recbuffer[a],HEX);
+    Serial.print(" ");
+  }
 }
 
 

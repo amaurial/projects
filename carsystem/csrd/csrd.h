@@ -7,17 +7,17 @@
 #include "radio_protocol.h"
 #define MESSAGE_SIZE 8
 
-#define CSRD_DEBUG
+//#define CSRD_DEBUG 1
 
 
 class CSRD {
 
 public:
     CSRD();
-    void init(RH_RF69 *driver,RHReliableDatagram *manager);
+    bool init(RH_RF69 *driver,RHReliableDatagram *manager);
 
-    void sendMessage(char *buffer,uint16_t len);
-    uint16_t getMessage(char *buffer);
+    bool sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr);
+    uint8_t getMessage(uint8_t *mbuffer);
     bool readMessage();
 
     bool isBroadcast();

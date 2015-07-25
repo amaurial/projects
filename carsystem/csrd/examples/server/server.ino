@@ -6,16 +6,25 @@
 
 CSRD server;
 RH_RF69 driver;
-RHReliableDatagram manager(driver, 1);
+//RHReliableDatagram manager(driver, 1);
 
-char buffer[8];
+uint8_t sbuffer[MESSAGE_SIZE];
+uint8_t recbuffer[MESSAGE_SIZE];
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 byte i;
+long st;
+long count;
 
 void setup(){
-  i=0;
-  server.init(&driver,&manager);  
   Serial.begin(115200);
+  i=0;
+  //server.init(&driver,&manager);    
+  //if (!server.init(&driver,&manager)){
+  if (!server.init(&driver,NULL)){
+    Serial.println("FAILED");
+  }
+  count=0;
+  st=millis();
 }
 
 void loop(){
@@ -23,26 +32,52 @@ void loop(){
   if (i>254){
     i=0;
   }
-  if (server.getMessage(buffer)){
-      Serial.print("from client ");
-      Serial.print(server.getSender());
-      Serial.print(": ");
-      Serial.println(buffer);
-              
-      setBuffer();
-      server.sendMessage(buffer,8);
+
+  if (i>254){
+      i=0;
+    }
+
+  
+  if ((millis()-st)>5000){
+    Serial.print("msg/s:");
+    Serial.println(count/5);
+    count=0;
+    st=millis();
   }
-  i++;
+ 
+  
+  if (server.isRadioOn()){
+    if (server.getMessage(recbuffer)){
+       // Serial.print("from client ");
+       // Serial.print(server.getSender());
+        //Serial.print(": ");
+       // printBuffer();
+        //Serial.println();       
+                
+        setBuffer();
+        server.sendMessage(sbuffer,MESSAGE_SIZE,server.getSender());
+        count++;
+        i++;;
+    }
+   
+  }
 }
 
 void setBuffer(){
-  buffer[0]=i;
-  buffer[1]=0;
-  buffer[2]=0;
-  buffer[3]=0;
-  buffer[4]=0;
-  buffer[5]=0;
-  buffer[6]=0;
-  buffer[7]=i;
+  sbuffer[0]=i;
+  sbuffer[1]=44;
+  sbuffer[2]=44;
+  sbuffer[3]=44;
+  sbuffer[4]=44;
+  sbuffer[5]=44;
+  sbuffer[6]=44;
+  sbuffer[7]=i;
+}
+void printBuffer(){
+  int a;
+  for (a=0;a<MESSAGE_SIZE;a++){
+    Serial.print(recbuffer[a],HEX);
+    Serial.print(" ");
+  }
 }
 
