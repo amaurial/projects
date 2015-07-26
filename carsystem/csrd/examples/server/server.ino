@@ -23,6 +23,7 @@ void setup(){
   if (!server.init(&driver,NULL)){
     Serial.println("FAILED");
   }
+  driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
   count=0;
   st=millis();
 }

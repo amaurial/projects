@@ -35,9 +35,10 @@ void setup(){
   Serial.begin(115200);
   //car.init(&driver,&manager); 
   //if (!car.init(&driver,&manager)){
-  if (!car.init(&driver,NULL)){
+  if (!car.init(&driver,NULL)){    
     Serial.println("FAILED");
   }
+  driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
   i=0; 
   count=0;
   st=millis();
