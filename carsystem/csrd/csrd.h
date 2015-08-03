@@ -9,6 +9,26 @@
 
 //#define CSRD_DEBUG 1
 
+//states
+typedef enum states {
+   OFF=0,
+   ON,
+   STOPING,
+   ACCELERATING,
+   BLINKING
+};
+
+//which part
+typedef enum objects_enum {
+  LEFT_LIGHT=0,
+  RIGHT_LIGHT,
+  BREAK_LIGHT,
+  SIRENE_LIGHT,
+  FRONT_LIGHT,
+  MOTOR,
+  IR_RECEIVE,
+  IR_SEND  
+};
 
 class CSRD {
 
