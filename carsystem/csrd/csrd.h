@@ -15,7 +15,20 @@ typedef enum states {
    ON,
    STOPING,
    ACCELERATING,
-   BLINKING
+   BLINKING,
+   EMERGENCY,
+   NORMAL
+};
+
+//status
+typedef enum STATUS {
+   ACTIVE=0,
+   INACTIVE,
+   CHARGING,
+   PANNE,
+   REGISTERED,
+   NOT_REGISTERED,
+   WAITING_REGISTRATION
 };
 
 //which part
@@ -23,11 +36,12 @@ typedef enum objects_enum {
   LEFT_LIGHT=0,
   RIGHT_LIGHT,
   BREAK_LIGHT,
+  REAR_BREAK_LIGHT,
   SIRENE_LIGHT,
   FRONT_LIGHT,
   MOTOR,
   IR_RECEIVE,
-  IR_SEND  
+  IR_SEND
 };
 
 class CSRD {
@@ -38,37 +52,51 @@ public:
 
     bool sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr);
     uint8_t getMessage(uint8_t *mbuffer);
+    uint8_t getMessageBuffer(uint8_t *mbuffer);
     bool readMessage();
 
     bool isBroadcast();
-    uint8_t getGroup();
-
     bool isAddressed();
-    uint16_t getAddress();
-
+    bool isStatus();
     bool isOperation();
-    uint8_t getAction();
-    uint8_t getValue();
-
     bool isRead();
-    uint8_t getReadParam();
-
     bool isWrite();
-    uint8_t getWriteParam();
-    uint8_t getWriteValue();
 
+    uint8_t getGroup();
+    uint8_t getElement();
+    uint8_t getState();
+    uint8_t getStatus();
+    uint16_t getAddress();
+    uint8_t getParamIdx();
+    uint8_t getVal0();
+    uint8_t getVal1();
+    uint8_t getVal2();
+
+    bool sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
+    bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
+
+    bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
+    bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
+    bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
+
+    bool sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2);
+    bool sendEmergencyBroadcast(uint8_t serverAddr,uint8_t group);
+    bool sendEmergency(uint8_t serverAddr,uint16_t nodeid);
+    bool sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group);
+    bool sendBackToNormal(uint8_t serverAddr,uint16_t nodeid);
 
     void resetToDefault();
     uint8_t getLength(){return length;};
 
-    uint16_t getNodeNumber(){return nodenumber;};
+    uint16_t getNodeNumber();
 
     bool isRadioOn();
     uint16_t getSender(){return origin;};
+    states convertFromInt(uint8_t s);
 protected:
 
 private:
-    char buffer[MESSAGE_SIZE];
+    uint8_t buffer[MESSAGE_SIZE];
     RH_RF69 *driver;
     RHReliableDatagram *manager;
     uint8_t params[PARAMETERS_SIZE];
@@ -77,10 +105,6 @@ private:
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer
     uint8_t length;
     int radioBuffSize;
-
-    void saveDefaultToMemory();
-    bool saveParam(uint8_t param,uint8_t value);
-
 };
 
 

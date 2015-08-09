@@ -57,6 +57,131 @@ bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
         return true;
     }
 }
+bool CSRD::sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_STATUS;
+    buf[1]=RP_INITIALREG;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=status;
+    buf[5]=val0;
+    buf[6]=val1;
+    buf[7]=val2;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2){
+    uint8_t buf[MESSAGE_SIZE];
+
+    buf[0]=RP_BROADCAST;
+    buf[1]=RP_OPERATION;
+    buf[2]=group;
+    buf[3]=element;
+    buf[4]=state;
+    buf[5]=val0;
+    buf[6]=val1;
+    buf[7]=val2;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+
+}
+bool CSRD::sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_BROADCAST;
+    buf[1]=RP_WRITE;
+    buf[2]=group;
+    buf[3]=element;
+    buf[4]=param_idx;
+    buf[5]=val0;
+    buf[6]=val1;
+    buf[7]=val2;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+bool CSRD::sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_WRITE;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=param_idx;
+    buf[6]=val0;
+    buf[7]=val1;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+bool CSRD::sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_READ;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=param_idx;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_OPERATION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=state;
+    buf[6]=val0;
+    buf[7]=val1;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendEmergencyBroadcast(uint8_t serverAddr,uint8_t group){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_BROADCAST;
+    buf[1]=RP_OPERATION;
+    buf[2]=group;
+    buf[3]=255;
+    buf[4]=EMERGENCY;
+    buf[5]=0;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+bool CSRD::sendEmergency(uint8_t serverAddr,uint16_t nodeid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_OPERATION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=255;
+    buf[5]=EMERGENCY;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_BROADCAST;
+    buf[1]=RP_OPERATION;
+    buf[2]=group;
+    buf[3]=255;
+    buf[4]=NORMAL;
+    buf[5]=0;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+bool CSRD::sendBackToNormal(uint8_t serverAddr,uint16_t nodeid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_OPERATION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=255;
+    buf[5]=NORMAL;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
 
 uint8_t CSRD::getMessage(uint8_t *mbuffer){
     if (readMessage()){
@@ -64,7 +189,10 @@ uint8_t CSRD::getMessage(uint8_t *mbuffer){
         return length;
     }
     return 0;
-
+}
+uint8_t CSRD::getMessageBuffer(uint8_t *mbuffer){
+    memcpy(mbuffer,this->buffer,MESSAGE_SIZE);
+    return MESSAGE_SIZE;
 }
 
 bool CSRD::readMessage(){
@@ -141,13 +269,6 @@ bool CSRD::isBroadcast(){
     return false;
 }
 
-uint8_t CSRD::getGroup(){
-    if (isOperation()||isBroadcast()){
-        return buffer[2];
-    }
-}
-
-
 bool CSRD::isAddressed(){
     if (buffer[0]==RP_ADDRESSED){
         return true;
@@ -155,7 +276,11 @@ bool CSRD::isAddressed(){
     return false;
 }
 
-uint16_t CSRD::getAddress(){
+bool CSRD::isStatus(){
+    if (buffer[0]==RP_STATUS){
+        return true;
+    }
+    return false;
 }
 
 bool CSRD::isOperation(){
@@ -164,36 +289,19 @@ bool CSRD::isOperation(){
         return true;
     }
     return false;
-
-}
-uint8_t CSRD::getAction(){
-
-    if (!isOperation()){
-        return RP_FILLER;
-    }
-
-    if (isAddressed()){
-        return buffer[4];
-    }
-    return buffer[3];
-}
-uint8_t CSRD::getValue(){
-
 }
 
 bool CSRD::isRead(){
+    if (isBroadcast()){
+        return false;
+    }
     if (buffer[1]==RP_READ){
         return true;
     }
     return false;
 }
-uint8_t CSRD::getReadParam(){
-}
 
 bool CSRD::isWrite(){
-    if (isBroadcast()){
-        return false;
-    }
 
     if (buffer[1]==RP_WRITE){
         return true;
@@ -201,18 +309,68 @@ bool CSRD::isWrite(){
     return false;
 }
 
-uint8_t CSRD::getWriteParam(){
+uint8_t CSRD::getElement(){
+    if (isAddressed()){
+        return buffer[4];
+    }
+    return buffer[3];
 }
-uint8_t CSRD::getWriteValue(){
+
+uint16_t CSRD::getNodeNumber(){
+    if (isBroadcast()){
+        return RP_FILLER;
+    }
+   return word(buffer[2],buffer[3]);
 }
+
+uint8_t CSRD::getStatus(){
+    if (isBroadcast() || isAddressed()){
+        return RP_FILLER;
+    }
+   return buffer[5];
+}
+
+uint8_t CSRD::getState(){
+
+    if (!isOperation()){
+        return RP_FILLER;
+    }
+    if (isAddressed()){
+        return buffer[5];
+    }
+    return buffer[4];
+}
+
+uint8_t CSRD::getGroup(){
+    if (isBroadcast()){
+        return buffer[2];
+    }
+    return RP_FILLER;
+}
+
+uint8_t CSRD::getVal0(){
+    if (isAddressed()){
+        return buffer[6];
+    }
+    return buffer[5];
+}
+uint8_t CSRD::getVal1(){
+    if (isAddressed()){
+        return buffer[7];
+    }
+    return buffer[6];
+}
+uint8_t CSRD::getVal2(){
+    if (isAddressed()){
+        return RP_FILLER;
+    }
+    return buffer[7];
+}
+
 
 void CSRD::resetToDefault(){
     nodenumber=333;
     params[RP_PARAM_GROUP]=1;
-    params[RP_PARAM_BLINK_RATE]=20;
-    params[RP_PARAM_BLINK_TIME_UNIT]=50;
-    params[RP_PARAM_NORMAL_SPEED]=50;
-    params[RP_PARAM_CURR_SPEED]=50;
     params[RP_PARAM_BATTERY_THRESHOLD]=30;
     params[RP_PARAM_SOUND_ON]=RP_OFF;
     params[RP_PARAM_SPEED_STEP]=5;
@@ -220,11 +378,31 @@ void CSRD::resetToDefault(){
     params[RP_PARAM_FREQUENCY]=0; //0=433MHz 1=868MHz 2=915MHz
     params[RP_PARAM_BREAK_RATE]=20; //0=433MHz 1=868MHz 2=915MHz
 }
+states CSRD::convertFromInt(uint8_t s){
+  switch (s){
+    case(0):
+      return OFF;
+      break;
+    case(1):
+      return ON;
+      break;
+    case(2):
+      return STOPING;
+      break;
+    case(3):
+      return ACCELERATING;
+      break;
+    case(4):
+      return BLINKING;
+      break;
+    case(5):
+      return EMERGENCY;
+      break;
+    case(6):
+      return NORMAL;
+      break;
+    default:
+      return OFF;
 
-void CSRD::saveDefaultToMemory(){
-    uint8_t i;
-
-    for (i=0;i<PARAMETERS_SIZE;i++){
-    }
-
+  }
 }
