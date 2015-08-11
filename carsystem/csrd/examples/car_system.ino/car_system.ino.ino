@@ -7,6 +7,9 @@
 #include <EEPROM.h>
 #include <SoftPWM.h>
 
+//uncomment for debug message
+#define DEBUG_CAR 1;
+
 //PINS
 #define FRONT_LIGHT_PIN           A1
 #define LEFT_LIGHT_PIN            7//5
@@ -27,6 +30,7 @@
 #define EPROM_SIZE                512
 
 typedef struct ELEMENTS *ELEMENT; 
+
 //pointer to the functions that will control the parts
 //actual state,next state, parameters,type,num parameters
 typedef void(*controllers)(ELEMENT);
@@ -43,9 +47,7 @@ typedef struct ELEMENTS{
   long auxTime; 
   byte port;  
 };
-
-
-
+//number of elements
 #define NUM_ELEMENTS 9
 struct ELEMENTS elements[NUM_ELEMENTS];
 
@@ -56,22 +58,34 @@ RH_RF69 driver;
 
 //car message lib
 CSRD car;
-long actime;
 
+//aux vars
 byte i=0;
 byte j=0;
-uint8_t sbuffer[MESSAGE_SIZE];
-uint8_t recbuffer[MESSAGE_SIZE];
+long actime;
 long st;
 long count;
+
+//incomming and outcomming buffer
+uint8_t sbuffer[MESSAGE_SIZE];
+uint8_t recbuffer[MESSAGE_SIZE];
+
+//node status
 STATUS status;
+
+//node number and group
 uint16_t nodeid=333;
 uint8_t group=1;
-bool newMessage=false;
 uint8_t serverStation=1;
+
+//message flag
+bool newMessage=false;
+
+//time variables
 long refresh_registration;
 long last_registration;
 
+//functions to control the elements
 void controlBreakLeds(ELEMENTS * element);
 void controlBlinkLed(ELEMENTS * element);
 void controlFrontLight(ELEMENTS * element);
@@ -85,7 +99,7 @@ void setup(){
   SoftPWMBegin();
   initElements();
   //Serial.println("SETUP");
-  //car.init(&driver,&manager); 
+  
   //if (!car.init(&driver,&manager)){
   if (!car.init(&driver,NULL)){    
     Serial.println("FAILED");
@@ -93,14 +107,18 @@ void setup(){
     elements[SIRENE_LIGHT].next=BLINKING;
   }
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
+  
   i=0; 
   count=0;  
   setPins();
+  
   //testPins();
 
   status=NOT_REGISTERED;
+  
   randomSeed(analogRead(0));
   refresh_registration=random(1,3000);
+  
   //Serial.println("START");
 }
 
@@ -120,17 +138,21 @@ void loop(){
   }
 
   if (status==WAITING_REGISTRATION && newMessage){   
-    /* 
-    Serial.print("registration message?: \t");
-    Serial.print(car.isStatus());
-    Serial.print("\t");
-    Serial.print(car.getNodeNumber());
-    Serial.print("\t");
-    Serial.println(car.getStatus());
-    */
+    #ifdef DEBUG_CAR
+      /* 
+      Serial.print("registration message?: \t");
+      Serial.print(car.isStatus());
+      Serial.print("\t");
+      Serial.print(car.getNodeNumber());
+      Serial.print("\t");
+      Serial.println(car.getStatus());
+      */
+    #endif
     if (car.isStatus() && car.getNodeNumber()==serverStation && car.getStatus()==ACTIVE){
       status=ACTIVE;
-      Serial.println("STATUS ACTIVE");
+      #ifdef DEBUG_CAR
+        Serial.println("STATUS ACTIVE");
+      #endif
     }       
   }
   
@@ -139,7 +161,10 @@ void loop(){
     status=WAITING_REGISTRATION;
     refresh_registration=random(1,3000);
     last_registration=millis();
-    Serial.println("STATUS WAITING REGISTRATION");
+    #ifdef DEBUG_CAR
+        Serial.println("STATUS WAITING REGISTRATION");
+    #endif
+    
   }
 
   if (newMessage && status == ACTIVE){
@@ -197,53 +222,21 @@ void loop(){
       }
     }
   }
-
-  //delay(1000);
-   /*
-  if (i>254){
-    i=0;
-  } 
-
- 
-  if ((millis()-st)>5000){
-    Serial.print("msg/s:");
-    Serial.println(count/5);
-    count=0;
-    st=millis();
-  }
   
-    
-   setBuffer();
-   //Serial.println("Sending to the server");
-   car.sendMessage(sbuffer,MESSAGE_SIZE,1); 
-
-  for (j=0;j<10;j++){
-    if (car.getMessage(recbuffer)>0){    
-      //Serial.print("from server: ");
-      //Serial.print(car.getSender());
-      //Serial.print(" size: ");
-      //Serial.println(car.getLength());
-      //printBuffer();
-      //Serial.println();
-      count++;
-      i++;
-      break;
-    }
-    delay(1);
-  }    
-  */
 }
 
 void dumpMessage(){
-  int i=0;
-  Serial.println("Dumping");
-  car.getMessageBuffer(recbuffer);
-  for (i=0;i<MESSAGE_SIZE;i++){
-    Serial.print (recbuffer[i]);
-    Serial.print ("   ");
-  }
-  Serial.println();
-  
+
+  #ifdef DEBUG_CAR
+    int i=0;
+    Serial.println("Dumping");
+    car.getMessageBuffer(recbuffer);
+    for (i=0;i<MESSAGE_SIZE;i++){
+      Serial.print (recbuffer[i]);
+      Serial.print ("   ");
+    }
+    Serial.println();
+  #endif
 }
 
 
@@ -393,25 +386,6 @@ void initElements(){
   //load params
   elements[i].params[0]=100; //max bright %  
   elements[i].total_params=1;  
-}
-
-void setBuffer(){
-  sbuffer[0]=i;
-  sbuffer[1]=40;
-  sbuffer[2]=40;
-  sbuffer[3]=40;
-  sbuffer[4]=40;
-  sbuffer[5]=40;
-  sbuffer[6]=40;
-  sbuffer[7]=i;
-}
-
-void printBuffer(){
-  int a;
-  for (a=0;a<MESSAGE_SIZE;a++){
-    Serial.print(recbuffer[a],HEX);
-    Serial.print(" ");
-  }
 }
 
 void setPins(){
@@ -606,13 +580,7 @@ void controlMotor(ELEMENTS * element){
       //SoftPWMSetPercent(element->port,0);  
       //SoftPWMSetPercent(element->port,0);         
     }
-    /*
-    else{
-      diff=element->auxTime-t;
-      perc=diff / element->auxTime;
-      analogWrite(element->port,255*perc);
-    }
-    */
+    
   }
 
   if (element->state == ACCELERATING){    
@@ -621,14 +589,7 @@ void controlMotor(ELEMENTS * element){
       aux=(byte)255*(element->params[0]/100);
       analogWrite(element->port,aux);       
     }
-    /*
-    else{
-      diff = element->auxTime - t;
-      perc= diff / element->auxTime;
-      aux=(byte)(255*element->params[0]/100)*(1-perc);
-      analogWrite(element->port,aux);      
-    }
-    */
+    
   }
   
 }
