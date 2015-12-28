@@ -29,7 +29,7 @@ long turnonffWait=10000;
 void setup(){
   Serial.begin(115200);
   i=0;
-  //server.init(&driver,&manager);    
+   
   //if (!server.init(&driver,&manager)){
   if (!server.init(&driver,NULL)){
     Serial.println("FAILED");
@@ -38,7 +38,7 @@ void setup(){
   count=0;
   carsIdx=0;
   status=ACTIVE;
-  Serial.println("START");
+  Serial.println("START SERVER");
 }
 
 void loop(){

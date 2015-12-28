@@ -12,16 +12,16 @@
 
 //PINS
 #define FRONT_LIGHT_PIN           A1
-#define LEFT_LIGHT_PIN            7//5
-#define RIGHT_LIGHT_PIN           8//10
+#define LEFT_LIGHT_PIN            5
+#define RIGHT_LIGHT_PIN           4
 #define SIRENE_LIGHT_PIN          5 //AUX1
 #define BREAK_LIGHT_PIN           3//13
 #define REAR_BREAK_LIGHT_PIN      11
-#define MOTOR_PIN                 4//A4
+#define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A3
 #define BATTERY_PIN               A5
 #define IR_RECEIVE_PIN            6 //AUX2
-#define IR_SEND_PIN               10 //AUX3
+#define IR_SEND_PIN               A6 //AUX3
 
 #define MAXPARAMS                 5
 
@@ -92,8 +92,35 @@ void controlFrontLight(ELEMENTS * element);
 void controlMotor(ELEMENTS * element);
 void controlAux(ELEMENTS * element);
 
+void printStatus(){
+  switch (status){
+    case WAITING_REGISTRATION:
+      Serial.println("status WAITING_REGISTRATION");
+    break;
+    case ACTIVE:
+      Serial.println("status ACTIVE");
+    break;
+    case NOT_REGISTERED:
+      Serial.println("status NOT_REGISTERED");
+    break;
+    case INACTIVE:
+      Serial.println("status INACTIVE");
+    break;
+    case CHARGING:
+      Serial.println("status CHARGING");
+    break;
+    case PANNE:
+      Serial.println("status PANNE");
+    break;
+    case REGISTERED:
+      Serial.println("status REGISTERED");
+    break;
+  }
+  
+}
+
 void setup(){
-  Serial.begin(115200);
+  Serial.begin(19200);
   delay(100);
   
   SoftPWMBegin();
@@ -119,7 +146,7 @@ void setup(){
   randomSeed(analogRead(0));
   refresh_registration=random(1,3000);
   
-  //Serial.println("START");
+  Serial.println("START CLIENT");
 }
 
 void loop(){
@@ -131,22 +158,29 @@ void loop(){
       elements[i].controller(&elements[i]);
     }
   }
-
+  #ifdef DEBUG_CAR       
+    //Serial.println("Reading message from server");
+  #endif
   newMessage = car.readMessage();
   if (newMessage){
     dumpMessage();
   }
 
+  #ifdef DEBUG_CAR       
+    //Serial.println("Continue the FSM");
+    //printStatus();
+  #endif
+
   if (status==WAITING_REGISTRATION && newMessage){   
     #ifdef DEBUG_CAR
-      /* 
+       
       Serial.print("registration message?: \t");
       Serial.print(car.isStatus());
       Serial.print("\t");
       Serial.print(car.getNodeNumber());
       Serial.print("\t");
       Serial.println(car.getStatus());
-      */
+      
     #endif
     if (car.isStatus() && car.getNodeNumber()==serverStation && car.getStatus()==ACTIVE){
       status=ACTIVE;
@@ -157,6 +191,9 @@ void loop(){
   }
   
   if (status==NOT_REGISTERED || ( status==WAITING_REGISTRATION && (actime-last_registration)>refresh_registration)){
+    #ifdef DEBUG_CAR
+        Serial.println("Sending initial registration data");
+    #endif
     car.sendInitialRegisterMessage(serverStation,nodeid,ACTIVE,0,0,0);
     status=WAITING_REGISTRATION;
     refresh_registration=random(1,3000);
@@ -392,7 +429,8 @@ void setPins(){
   //pinMode(LEFT_LIGHT_PIN,OUTPUT);
   //pinMode(RIGHT_LIGHT_PIN,OUTPUT);
   //pinMode(BREAK_LIGHT_PIN,OUTPUT);
-  //pinMode(SIRENE_LIGHT_PIN,OUTPUT);    
+  //pinMode(SIRENE_LIGHT_PIN,OUTPUT);   
+  //pinMode(2,INPUT);
   
 }
 
@@ -483,7 +521,7 @@ void controlBreakLeds(ELEMENTS * element){
   
 }
 void controlBlinkLed(ELEMENTS * element){
-  //Serial.println("controlBlinkLedLeft");
+  //Serial.println("controlBlinkLed");
   long t;
   byte aux;
   t=millis();

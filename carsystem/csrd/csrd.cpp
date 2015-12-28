@@ -50,10 +50,22 @@ bool CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
 
 bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
     if (this->manager!=NULL){
+        #ifdef CSRD_DEBUG
+                Serial.println("Send message by the manager.");
+            #endif // CSRD_DEBUG
         return manager->sendtoWait(sbuffer, len, serverAddr);
     }else{
+        #ifdef CSRD_DEBUG
+                Serial.println("Send message by the driver.");
+        #endif // CSRD_DEBUG
         driver->send(sbuffer, len);
+        #ifdef CSRD_DEBUG
+                Serial.println("Packages in buffer.Wait to send");
+        #endif // CSRD_DEBUG
         driver->waitPacketSent();
+        #ifdef CSRD_DEBUG
+                Serial.println("Sent");
+        #endif // CSRD_DEBUG
         return true;
     }
 }
