@@ -222,7 +222,7 @@ void loop(){
       }
     }
     if (car.isOperation()){
-      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(groupId) )){
+      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) )){
         int e=car.getElement();
         states s = car.convertFromInt(car.getState());
         if (e!=255){
