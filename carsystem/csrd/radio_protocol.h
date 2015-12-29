@@ -23,6 +23,7 @@
 #define RP_AC_BREAK             7
 #define RP_AC_ACCELERATE        8
 #define RP_AC_GET_ALL_PARAMS    9
+#define RP_AC_REGISTER          10
 
 #define RP_PARAM_GROUP              1
 #define RP_PARAM_BATTERY_THRESHOLD  2

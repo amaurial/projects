@@ -96,6 +96,20 @@ bool CSRD::sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t eleme
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 
 }
+
+bool CSRD::sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group){
+uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_BROADCAST;
+    buf[1]=RP_ACTION;
+    buf[2]=group;
+    buf[3]=RP_AC_REGISTER;
+    buf[4]=0;
+    buf[5]=0;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
 bool CSRD::sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
@@ -303,6 +317,14 @@ bool CSRD::isOperation(){
     return false;
 }
 
+bool CSRD::isAction(){
+
+    if (buffer[1]==RP_ACTION){
+        return true;
+    }
+    return false;
+}
+
 bool CSRD::isRead(){
     if (isBroadcast()){
         return false;
@@ -317,6 +339,20 @@ bool CSRD::isWrite(){
 
     if (buffer[1]==RP_WRITE){
         return true;
+    }
+    return false;
+}
+
+bool CSRD::isBroadcastRegister(){
+    if (isBroadcast() && isAction() && buffer[3] == RP_AC_REGISTER){
+        return true;
+    }
+    return false;
+}
+
+bool CSRD::isMyGroup(uint8_t mygroup){
+    if (getGroup() == 0 || getGroup() == mygroup){
+	return true;
     }
     return false;
 }

@@ -92,6 +92,9 @@ void controlFrontLight(ELEMENTS * element);
 void controlMotor(ELEMENTS * element);
 void controlAux(ELEMENTS * element);
 
+/*
+Print nice status messages
+*/
 void printStatus(){
   switch (status){
     case WAITING_REGISTRATION:
@@ -162,9 +165,11 @@ void loop(){
     //Serial.println("Reading message from server");
   #endif
   newMessage = car.readMessage();
-  if (newMessage){
-    dumpMessage();
-  }
+  #ifdef DEBUG_CAR
+  	if (newMessage){
+    	   dumpMessage();
+  	}
+  #endif
 
   #ifdef DEBUG_CAR       
     //Serial.println("Continue the FSM");
@@ -172,16 +177,15 @@ void loop(){
   #endif
 
   if (status==WAITING_REGISTRATION && newMessage){   
-    #ifdef DEBUG_CAR
-       
+    #ifdef DEBUG_CAR       
       Serial.print("registration message?: \t");
       Serial.print(car.isStatus());
       Serial.print("\t");
       Serial.print(car.getNodeNumber());
       Serial.print("\t");
-      Serial.println(car.getStatus());
-      
+      Serial.println(car.getStatus());      
     #endif
+
     if (car.isStatus() && car.getNodeNumber()==serverStation && car.getStatus()==ACTIVE){
       status=ACTIVE;
       #ifdef DEBUG_CAR
@@ -190,7 +194,9 @@ void loop(){
     }       
   }
   
-  if (status==NOT_REGISTERED || ( status==WAITING_REGISTRATION && (actime-last_registration)>refresh_registration)){
+  if ( status==NOT_REGISTERED ||
+     ( status==WAITING_REGISTRATION && (actime-last_registration)>refresh_registration) ||
+     (car.isBroadcastRegister() && car.isMyGroup(group) )){
     #ifdef DEBUG_CAR
         Serial.println("Sending initial registration data");
     #endif
@@ -203,10 +209,11 @@ void loop(){
     #endif
     
   }
-
+  
+  //set the car next operation
   if (newMessage && status == ACTIVE){
     if (car.isOperation()){
-      if (car.getNodeNumber() == nodeid || car.isBroadcast()){
+      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) )){
         int e=car.getElement();
         uint8_t s=car.getState();        
           if (e < NUM_ELEMENTS){
@@ -215,7 +222,7 @@ void loop(){
       }
     }
     if (car.isOperation()){
-      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && (car.getGroup() == group || car.getGroup() == 0) )){
+      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(groupId) )){
         int e=car.getElement();
         states s = car.convertFromInt(car.getState());
         if (e!=255){

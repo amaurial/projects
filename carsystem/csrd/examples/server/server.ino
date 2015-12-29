@@ -25,6 +25,9 @@ uint8_t carsIdx=0;
 int turnOn=0;
 long turnonffTime;
 long turnonffWait=10000;
+long request_register_time = 30000;   // time to send a request for registration if no car is registered
+int  request_register_time_step = 2;  // multiplier of request_register_time to request all cars to register.
+long last_request_register_time = 0;
 
 void setup(){
   Serial.begin(115200);
@@ -38,6 +41,8 @@ void setup(){
   count=0;
   carsIdx=0;
   status=ACTIVE;
+  last_request_register_time = millis();
+  server.sendBroadcastRequestRegister(0,serverId);
   Serial.println("START SERVER");
 }
 
@@ -141,6 +146,13 @@ void loop(){
    
   }
   */
+}
+
+void sendRequestRegister(){
+  long t = millis();
+  if ((t - last_request_register_time) > (request_register_time * request_register_time_step)){
+     server.sendBroadcastRequestRegister(0,serverId);
+  }
 }
 
 void dumpMessage(){
