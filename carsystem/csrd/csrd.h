@@ -17,7 +17,8 @@ typedef enum states {
    ACCELERATING,
    BLINKING,
    EMERGENCY,
-   NORMAL
+   NORMAL,
+   LOWBATTERY
 };
 
 //status
@@ -64,16 +65,17 @@ public:
     bool isWrite();
     bool isBroadcastRegister();
     bool isMyGroup(uint8_t mygroup);
+    bool isLowBattery(uint8_t serverAddr);
 
     uint8_t getGroup();
     uint8_t getElement();
     uint8_t getState();
     uint8_t getStatus();
-    uint16_t getAddress();
     uint8_t getParamIdx();
     uint8_t getVal0();
     uint8_t getVal1();
     uint8_t getVal2();
+    uint16_t getNodeNumber();
 
     bool sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group);
@@ -88,11 +90,11 @@ public:
     bool sendEmergency(uint8_t serverAddr,uint16_t nodeid);
     bool sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group);
     bool sendBackToNormal(uint8_t serverAddr,uint16_t nodeid);
-
+    
+    bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();
     uint8_t getLength(){return length;};
 
-    uint16_t getNodeNumber();
 
     bool isRadioOn();
     uint16_t getSender(){return origin;};

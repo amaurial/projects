@@ -209,6 +209,19 @@ bool CSRD::sendBackToNormal(uint8_t serverAddr,uint16_t nodeid){
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
+bool CSRD::sendLowBattery(uint8_t serverAddr,uint16_t nodeid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_OPERATION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=255;
+    buf[5]=LOWBATTERY;
+    buf[6]=serverAddr;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
 uint8_t CSRD::getMessage(uint8_t *mbuffer){
     if (readMessage()){
         memcpy(mbuffer,this->buffer,MESSAGE_SIZE);
@@ -355,6 +368,13 @@ bool CSRD::isMyGroup(uint8_t mygroup){
 	return true;
     }
     return false;
+}
+
+bool CSRD::isLowBattery(uint8_t serveraddr){
+   if ((getVal0() == serveraddr) && (getState() == LOWBATTERY)){
+      return true;
+   }
+   return false;
 }
 
 uint8_t CSRD::getElement(){
