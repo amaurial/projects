@@ -8,7 +8,7 @@
 #include <SoftPWM.h>
 
 //uncomment for debug message
-#define DEBUG_CAR 1;
+//#define DEBUG_CAR 1;
 
 //PINS
 #define FRONT_LIGHT_PIN           A1
@@ -159,82 +159,151 @@ void setup() {
 
 void loop() {
 
-  actime = millis();
+    actime = millis();
 
-  if (status == ACTIVE) {
-    for (i = 0; i < NUM_ELEMENTS; i++) {
-      elements[i].controller(&elements[i]);
+    //carry the active actions
+    if (status == ACTIVE) {
+      for (i = 0; i < NUM_ELEMENTS; i++) {
+        elements[i].controller(&elements[i]);
+      }
+    } 
+
+    newMessage = car.readMessage();
+  
+    if (newMessage) {
+      //#ifdef DEBUG_CAR
+        dumpMessage();
+      //#endif
+      confirmRegistrationMessage();
     }
-  }
-#ifdef DEBUG_CAR
-  //Serial.println("Reading message from server");
-#endif
-  newMessage = car.readMessage();
-#ifdef DEBUG_CAR
-  if (newMessage) {
-    dumpMessage();
-  }
-#endif
+ 
+    //send registration message
+    sendRegistrationMessage();
+    
+    if (newMessage){
+      checkMsgRestoreDefault();        
+      checkMsgWriteParameter();
+      if (status == ACTIVE){
+        setNextOperation();
+      }
+    }  
+}
 
-#ifdef DEBUG_CAR
-  //Serial.println("Continue the FSM");
-  //printStatus();
-#endif
+void dumpMessage() {
 
-  if (status == WAITING_REGISTRATION && newMessage) {
-#ifdef DEBUG_CAR
-    Serial.print("registration message?: \t");
-    Serial.print(car.isStatus());
-    Serial.print("\t");
-    Serial.print(car.getNodeNumber());
-    Serial.print("\t");
-    Serial.println(car.getStatus());
-#endif
+//#ifdef DEBUG_CAR
+  int i = 0;
+  Serial.println("New Message");
+  car.getMessageBuffer(recbuffer);
+  for (i = 0; i < MESSAGE_SIZE; i++) {
+    Serial.print (recbuffer[i]);
+    Serial.print ("   ");
+  }
+  Serial.println();
+//#endif
+}
+
+//restore default parameters
+void checkMsgRestoreDefault(){  
+    if (car.isRestoreDefaultConfig(nodeid)){
+       #ifdef DEBUG_CAR
+            Serial.println("Restore default values");
+      #endif
+       setDefaultParams();
+       setInitParams();
+    }
+}
+
+//confirm we received a registration
+void confirmRegistrationMessage(){
+  if (status == WAITING_REGISTRATION) {
+      #ifdef DEBUG_CAR
+          Serial.print("registration message?: \t");
+          Serial.print(car.isStatus());
+          Srial.print("\t");
+          Serial.println(car.getStatus());
+          Serial.print("\t");
+          Serial.print(car.getNodeNumber());
+      #endif
 
     if (car.isStatus() && car.getNodeNumber() == serverStation && car.getStatus() == ACTIVE) {
       status = ACTIVE;
-#ifdef DEBUG_CAR
-      Serial.println("STATUS ACTIVE");
-#endif
+      //#ifdef DEBUG_CAR
+            Serial.println("STATUS ACTIVE");
+      //#endif
     }
   }
 
-  if ( status == NOT_REGISTERED ||
+}
+
+//send initial registration message
+void sendRegistrationMessage(){
+   
+   if ( status == NOT_REGISTERED ||
        ( status == WAITING_REGISTRATION && (actime - last_registration) > refresh_registration) ||
-       (car.isBroadcastRegister() && car.isMyGroup(group) )) {
-#ifdef DEBUG_CAR
-    Serial.println("Sending initial registration data");
-#endif
-    car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
-    status = WAITING_REGISTRATION;
-    refresh_registration = random(1, 3000);
-    last_registration = millis();
-#ifdef DEBUG_CAR
-    Serial.println("STATUS WAITING REGISTRATION");
-#endif
-
+       (newMessage && car.isBroadcastRegister() && car.isMyGroup(group) )) {
+          
+          #ifdef DEBUG_CAR
+             Serial.println();
+             Serial.println("Need to register?");
+             printStatus();
+             Serial.print("new message: ");
+             Serial.println(newMessage);
+             Serial.print("broadcast reg: ");
+             Serial.println(car.isBroadcastRegister());
+             Serial.print("is my group: ");
+             Serial.println(car.isMyGroup(group));
+             Serial.print("refresh registration time: ");
+             Serial.print(actime - last_registration);
+             Serial.print("\t");
+             Serial.println(refresh_registration);   
+             Serial.println();
+              Serial.println("Sending initial registration data");
+          #endif
+      //send message. change the status
+      car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
+      status = WAITING_REGISTRATION;
+      //set timer
+      refresh_registration = random(200, 3000);
+      last_registration = millis();
+     
+      #ifdef DEBUG_CAR
+          Serial.println("STATUS WAITING REGISTRATION");
+      #endif
   }
+}
 
-  //set the car next operation
-  if (newMessage && status == ACTIVE) {
-    /*
-    if (car.isOperation()) {
-      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) )) {
-        int e = car.getElement();
-        uint8_t s = car.getState();
-        if (e < NUM_ELEMENTS) {
-          elements[e].next = car.convertFromInt(s);
-        }
-      }
+//save parameter
+void checkMsgWriteParameter(){  
+    if (car.isWrite()){
+       if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
+          if (car.getElement() != 0xff){
+             uint8_t e = car.getElement();
+             uint8_t p = car.getParamIdx();
+             uint8_t v = car.getVal0();
+             if (e < NUM_ELEMENTS){
+                if (p <= elements[e].total_params){
+                   elements[e].params[p]=v;
+                   saveParameterToEprom(elements[e].params , elements[e].total_params , e);
+                }
+             }             
+          }
+          else{
+            //board parameters            
+          }
+       }
     }
-    */
-    if (car.isOperation()) {
+}
+
+//set next operation
+void setNextOperation(){
+  if (car.isOperation()) {
       if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) )) {
         int e = car.getElement();
         states s = car.convertFromInt(car.getState());
         if (e != 255) {
           if (e < NUM_ELEMENTS) {
-            elements[e].next = s;
+            elements[e].next = s;            
           }
         }
         else {
@@ -272,22 +341,6 @@ void loop() {
 
       }
     }
-  }
-
-}
-
-void dumpMessage() {
-
-#ifdef DEBUG_CAR
-  int i = 0;
-  Serial.println("Dumping");
-  car.getMessageBuffer(recbuffer);
-  for (i = 0; i < MESSAGE_SIZE; i++) {
-    Serial.print (recbuffer[i]);
-    Serial.print ("   ");
-  }
-  Serial.println();
-#endif
 }
 
 void checkBattery(){
@@ -309,14 +362,14 @@ void setDefaultParams(){
   uint8_t params[MAXPARAMS];
   
   //MOTOR
-  params[0] = 100;//max speed %
+  params[0] = 50;//max speed %
   params[1] = 250;//base breaking time ms
   params[2] = 10;//breaking time(ms)=this*params[1]
   params[3] = 10;//acc time(ms)=this*params[1].time to reach the max speed after start
   saveParameterToEprom(params , 4 , MOTOR);
 
   //front light
-  params[0] = 100; //max bright %  
+  params[0] = 50; //max bright %  
   saveParameterToEprom(params , 1 , FRONT_LIGHT);
 
   //break light
@@ -363,22 +416,46 @@ void setDefaultParams(){
   saveParameterToEprom(params , 1 , IR_SEND);
 }
 
+void setInitParams(){
+  int i = 0;
+  for (i = 0; i < NUM_ELEMENTS; i++) {
+      getParameterFromEprom(elements[i].params,elements[i].total_params,i);
+      #ifdef DEBUG_CAR
+        int j=0;
+        Serial.print("params element: ");
+        Serial.print(i);
+        Serial.print("\t");
+        for (j=0;j<elements[i].total_params;j++){
+          Serial.print(elements[i].params[j]);
+          Serial.print("\t");
+        }
+        Serial.println();
+      #endif
+  }
+}
+
 void initElements() {
   int i = MOTOR;
   int aux, aux1;
+
+  elements[MOTOR].total_params = 4;
+  elements[FRONT_LIGHT].total_params = 1;
+  elements[BREAK_LIGHT].total_params = 4;
+  elements[LEFT_LIGHT].total_params = 4;
+  elements[RIGHT_LIGHT].total_params = 4;
+  elements[SIRENE_LIGHT].total_params = 4;
+  elements[REAR_BREAK_LIGHT].total_params = 4;
+  elements[IR_RECEIVE].total_params = 1;
+  elements[IR_SEND].total_params = 1;
+  setInitParams();
+  
   //motor
   elements[i].state = OFF;
   elements[i].next = OFF;
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
-  elements[i].port = MOTOR_PIN;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max speed %
-  //elements[i].params[1] = 250; //base breaking time ms
-  //elements[i].params[2] = 10; //breaking time(ms)=this*params[1]
-  //elements[i].params[3] = 10; //acc time(ms)=this*params[1].time to reach the max speed after start
-  elements[i].total_params = 4;
+  elements[i].port = MOTOR_PIN;  
+  //elements[i].total_params = 4;
   aux = elements[i].params[1] * elements[i].params[2];
   aux1 = elements[i].params[1] * elements[i].params[3];
   SoftPWMSet(MOTOR_PIN, 0);
@@ -392,11 +469,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = FRONT_LIGHT;
   elements[i].port = FRONT_LIGHT_PIN;
-  elements[i].controller = &controlFrontLight;
-  //load params
-  getParameterFromEprom(elements[i].params,1,i);
-  //elements[i].params[0] = 100; //max bright %
-  elements[i].total_params = 1;
+  elements[i].controller = &controlFrontLight;  
+  //elements[i].total_params = 1;
   aux = 100;
   aux1 = 100;
   SoftPWMSet(FRONT_LIGHT_PIN, 0);
@@ -407,16 +481,9 @@ void initElements() {
   elements[i].state = OFF;
   elements[i].next = OFF;
   elements[i].obj = BREAK_LIGHT;
-  elements[i].port = BREAK_LIGHT_PIN;
-  //elements[i].controller=&controlBreakLeds;
-  elements[i].controller = &controlBlinkLed;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max bright %
-  //elements[i].params[1] = 30; //base blink
-  //elements[i].params[2] = 30; //blink time=this*base blink
-  //elements[i].params[3] = 20; //blink time emergency=this*base blink
-  elements[i].total_params = 4;
+  elements[i].port = BREAK_LIGHT_PIN;  
+  elements[i].controller = &controlBlinkLed;  
+  //elements[i].total_params = 4;
   aux = elements[i].params[1];
   SoftPWMSet(BREAK_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(BREAK_LIGHT_PIN, aux, aux);
@@ -428,14 +495,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = LEFT_LIGHT;
   elements[i].port = LEFT_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max bright %
-  //elements[i].params[1] = 20; //base blink
-  //elements[i].params[2] = 20; //blink time=this*base blink
-  //elements[i].params[3] = 10; //blink time emergency=this*base blink
-  elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;  
+  //elements[i].total_params = 4;
   aux = elements[i].params[1];
   SoftPWMSet(LEFT_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(LEFT_LIGHT_PIN, aux, aux);
@@ -446,14 +507,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = RIGHT_LIGHT;
   elements[i].port = RIGHT_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max bright %
-  //elements[i].params[1] = 20; //base blink
-  //elements[i].params[2] = 20; //blink time=this*base blink
-  //elements[i].params[3] = 10; //blink time emergency=this*base blink
-  elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;  
+  //elements[i].total_params = 4;
   aux = elements[i].params[1];
   SoftPWMSet(RIGHT_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(RIGHT_LIGHT_PIN, aux, aux);
@@ -464,14 +519,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = SIRENE_LIGHT;
   elements[i].port = SIRENE_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max bright %
-  //elements[i].params[1] = 20; //base blink
-  //elements[i].params[2] = 20; //blink time=this*base blink
-  //elements[i].params[3] = 3; //blink time emergency=this*base blink
-  elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed; 
+  //elements[i].total_params = 4;
   aux = elements[i].params[1];
   SoftPWMSet(SIRENE_LIGHT, 0);
   SoftPWMSetFadeTime(SIRENE_LIGHT, aux, aux);
@@ -482,14 +531,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = REAR_BREAK_LIGHT;
   elements[i].port = REAR_BREAK_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;
-  //load params
-  getParameterFromEprom(elements[i].params,4,i);
-  //elements[i].params[0] = 100; //max bright %
-  //elements[i].params[1] = 30; //base blink
-  //elements[i].params[2] = 30; //blink time=this*base blink
-  //elements[i].params[3] = 20; //blink time emergency=this*base blink
-  elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;  
+  //elements[i].total_params = 4;
   aux = elements[i].params[1];
   SoftPWMSet(REAR_BREAK_LIGHT, 0);
   SoftPWMSetFadeTime(REAR_BREAK_LIGHT, aux, aux);
@@ -500,11 +543,8 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = IR_RECEIVE;
   elements[i].port = IR_RECEIVE_PIN;
-  elements[i].controller = &controlAux;
-  //load params
-  getParameterFromEprom(elements[i].params,1,i);
-  //elements[i].params[0] = 100; //max bright %
-  elements[i].total_params = 1;
+  elements[i].controller = &controlAux;  
+  //elements[i].total_params = 1;
 
   //IR_SEND
   i = IR_SEND;
@@ -512,11 +552,10 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = IR_SEND;
   elements[i].port = IR_SEND_PIN;
-  elements[i].controller = &controlAux;
-  //load params
-  getParameterFromEprom(elements[i].params,1,i);
-  //elements[i].params[0] = 100; //max bright %
-  elements[i].total_params = 1;
+  elements[i].controller = &controlAux; 
+  //elements[i].total_params = 1;
+
+  
 }
 
 void setPins() {
@@ -747,6 +786,9 @@ void getParameterFromEprom(byte *params, byte numParams, byte obj) {
   int startpos = MEMORY_REF + (MAXPARAMS * obj);
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
+    //#ifdef DEBUG_CAR
+          Serial.println("Failed to get eprom. eprom size");
+      //#endif
     return;
   }
 
@@ -760,6 +802,9 @@ void getParameterFromEprom(byte *params, byte numParams, byte obj) {
 void saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
+    //#ifdef DEBUG_CAR
+          Serial.println("Failed to save to eprom maxparam");
+      //#endif
     return;
   }
   int i = 0;
@@ -767,6 +812,9 @@ void saveParameterToEprom(byte *params, byte numParams, byte obj) {
   int startpos = MEMORY_REF + (MAXPARAMS * obj);
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
+    //#ifdef DEBUG_CAR
+          Serial.println("Failed to save to eprom. eprom size");
+      //#endif
     return;
   }
 

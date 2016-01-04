@@ -10,7 +10,8 @@
 #define RP_READ         2
 #define RP_ACTION       3
 
-#define RP_INITIALREG   0
+#define RP_INITIALREG          0
+#define RP_REPORT_STATUS       1
 
 #define PARAMETERS_SIZE         11
 
@@ -43,7 +44,7 @@
 8 bytes
 <A><B><C><D><E><F><G><H>
 
-A indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages ( RP_STATUS normally from client to server)
+"A" indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages ( RP_STATUS normally from client to server)
 
 If Broadcast
     B indicates the type of action: store value (RP_WRITE) or perform some operation RP_OPERATION
@@ -58,8 +59,8 @@ If Broadcast
             E is the next state
             F G H are general values
         case action
-            F is the action
-            G is the action param
+            E is the action
+            F,G,H is the action param
 
 If addressed message
     B indicates the type of action: store value (RP_WRITE), perform some operation RP_OPERATION or read parameter RP_READ

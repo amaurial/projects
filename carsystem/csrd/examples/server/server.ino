@@ -25,8 +25,8 @@ uint8_t carsIdx=0;
 int turnOn=0;
 long turnonffTime;
 long turnonffWait=10000;
-long request_register_time = 30000;   // time to send a request for registration if no car is registered
-int  request_register_time_step = 2;  // multiplier of request_register_time to request all cars to register.
+long request_register_time = 5000;   // time to send a request for registration if no car is registered
+int  request_register_time_step = 30;  // multiplier of request_register_time to request all cars to register.
 long last_request_register_time = 0;
 
 void setup(){
@@ -42,8 +42,9 @@ void setup(){
   carsIdx=0;
   status=ACTIVE;
   last_request_register_time = millis();
-  server.sendBroadcastRequestRegister(0,serverId);
   Serial.println("START SERVER");
+  Serial.println("Send broadcast register");
+  server.sendBroadcastRequestRegister(0,serverId);  
 }
 
 void loop(){
@@ -52,14 +53,16 @@ void loop(){
   newMessage = server.readMessage();
 
   if (newMessage && server.isStatus()){
+    Serial.println("New message");
     dumpMessage();
+    Serial.println();
     int nn=insertNode(server.getNodeNumber(),server.getSender());    
-    
-    server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,0,0,0);
-
     Serial.print("Confirming registration for ");
-    Serial.println(cars[nn]);    
+    Serial.println(cars[nn]);
+    server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
     
+    Serial.println("Message to restore eprom values ");
+    server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
   }
 
   if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {
@@ -73,10 +76,10 @@ void loop(){
           Serial.println(" ON");
           server.sendAddressedOPMessage(
             senders[i],cars[i],MOTOR,ON,0,0);//motor on
-           delay(10);
-           server.sendAddressedOPMessage(
-            senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
-          turnOn=1;
+           //delay(10);
+           //server.sendAddressedOPMessage(
+           // senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
+          turnOn=3;
         break;
       
         case (1):
@@ -99,9 +102,9 @@ void loop(){
           Serial.println(" OFF");
           server.sendAddressedOPMessage(
             senders[i],cars[i],MOTOR,OFF,0,0);//motor on
-           delay(10);
-           server.sendAddressedOPMessage(
-            senders[i],cars[i],SIRENE_LIGHT,OFF,0,0);//sirene light on
+           //delay(10);
+           //server.sendAddressedOPMessage(
+           // senders[i],cars[i],SIRENE_LIGHT,OFF,0,0);//sirene light on
           turnOn=0;
         break;
       }
@@ -109,7 +112,7 @@ void loop(){
     }
     turnonffTime=millis();
   }
-  
+  sendRequestRegister();
   
 
 /*
@@ -151,7 +154,13 @@ void loop(){
 void sendRequestRegister(){
   long t = millis();
   if ((t - last_request_register_time) > (request_register_time * request_register_time_step)){
+     Serial.println("Send broadcast register");
      server.sendBroadcastRequestRegister(0,serverId);
+     last_request_register_time = millis();
+  }
+  else if(carsIdx == 0 && (t - last_request_register_time > request_register_time)){
+     server.sendBroadcastRequestRegister(0,serverId);
+     last_request_register_time = millis();
   }
 }
 

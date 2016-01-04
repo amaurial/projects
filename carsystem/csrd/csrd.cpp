@@ -79,6 +79,25 @@ bool CSRD::sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     buf[5]=val0;
     buf[6]=val1;
     buf[7]=val2;
+    #ifdef CSRD_DEBUG
+        Serial.println("sendInitialRegisterMessage");
+    #endif // CSRD_DEBUG
+    //Serial.print("CSRD:sendInitialRegisterMessage message to: ");
+    //Serial.println(serverAddr);
+    //dumpBuffer(buf);
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_STATUS;
+    buf[1]=RP_REPORT_STATUS;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=status;
+    buf[5]=serverAddr;
+    buf[6]=0;
+    buf[7]=0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
@@ -102,8 +121,8 @@ uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_ACTION;
     buf[2]=group;
-    buf[3]=RP_AC_REGISTER;
-    buf[4]=0;
+    buf[3]=0xff;
+    buf[4]=RP_AC_REGISTER;
     buf[5]=0;
     buf[6]=0;
     buf[7]=0;
@@ -156,6 +175,9 @@ bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t ele
     buf[5]=state;
     buf[6]=val0;
     buf[7]=val1;
+    //Serial.print("CSRD::sendAddressedOPMessage message to: ");
+    //Serial.println(serverAddr);
+    //dumpBuffer(buf);
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
@@ -212,7 +234,7 @@ bool CSRD::sendBackToNormal(uint8_t serverAddr,uint16_t nodeid){
 bool CSRD::sendLowBattery(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_ADDRESSED;
-    buf[1]=RP_OPERATION;
+    buf[1]=RP_ACTION;
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=255;
@@ -220,6 +242,19 @@ bool CSRD::sendLowBattery(uint8_t serverAddr,uint16_t nodeid){
     buf[6]=serverAddr;
     buf[7]=0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_ACTION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=255;
+    buf[5]=RESTORE_DEFAULT_PARAMS;
+    buf[6]=serverAddr;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,nodeAddr);
 }
 
 uint8_t CSRD::getMessage(uint8_t *mbuffer){
@@ -357,7 +392,7 @@ bool CSRD::isWrite(){
 }
 
 bool CSRD::isBroadcastRegister(){
-    if (isBroadcast() && isAction() && buffer[3] == RP_AC_REGISTER){
+    if (isBroadcast() && isAction() && buffer[4] == RP_AC_REGISTER){
         return true;
     }
     return false;
@@ -372,6 +407,13 @@ bool CSRD::isMyGroup(uint8_t mygroup){
 
 bool CSRD::isLowBattery(uint8_t serveraddr){
    if ((getVal0() == serveraddr) && (getState() == LOWBATTERY)){
+      return true;
+   }
+   return false;
+}
+
+bool CSRD::isRestoreDefaultConfig(uint16_t myid){
+   if (isAddressed() && isAction() && (getNodeNumber() == myid) && (getAction() == RESTORE_DEFAULT_PARAMS)){
       return true;
    }
    return false;
@@ -395,7 +437,7 @@ uint8_t CSRD::getStatus(){
     if (isBroadcast() || isAddressed()){
         return RP_FILLER;
     }
-   return buffer[5];
+   return buffer[4];
 }
 
 uint8_t CSRD::getState(){
@@ -409,11 +451,30 @@ uint8_t CSRD::getState(){
     return buffer[4];
 }
 
+uint8_t CSRD::getAction(){
+
+    if (!isAction()){
+        return RP_FILLER;
+    }
+    if (isAddressed()){
+        return buffer[5];
+    }
+    return buffer[4];
+}
+
 uint8_t CSRD::getGroup(){
     if (isBroadcast()){
         return buffer[2];
     }
     return RP_FILLER;
+}
+
+
+uint8_t CSRD::getParamIdx(){
+    if (isAddressed()){
+        return buffer[5];
+    }
+    return buffer[4];
 }
 
 uint8_t CSRD::getVal0(){
@@ -473,4 +534,12 @@ states CSRD::convertFromInt(uint8_t s){
       return OFF;
 
   }
+}
+void CSRD::dumpBuffer(uint8_t *pbuf){
+    Serial.println("CSRD buffer:");
+    for (int8_t i=0;i<8;i++){
+        Serial.print(pbuf[i]);
+        Serial.print("\t");
+    }
+    Serial.println();
 }

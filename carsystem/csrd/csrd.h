@@ -17,8 +17,12 @@ typedef enum states {
    ACCELERATING,
    BLINKING,
    EMERGENCY,
-   NORMAL,
-   LOWBATTERY
+   NORMAL
+};
+
+typedef enum ACTIONS{
+   LOWBATTERY=0,
+   RESTORE_DEFAULT_PARAMS
 };
 
 //status
@@ -66,6 +70,7 @@ public:
     bool isBroadcastRegister();
     bool isMyGroup(uint8_t mygroup);
     bool isLowBattery(uint8_t serverAddr);
+    bool isRestoreDefaultConfig(uint16_t myid);
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -76,6 +81,8 @@ public:
     uint8_t getVal1();
     uint8_t getVal2();
     uint16_t getNodeNumber();
+    uint16_t getSender(){return origin;};
+    uint8_t getAction();
 
     bool sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group);
@@ -90,14 +97,16 @@ public:
     bool sendEmergency(uint8_t serverAddr,uint16_t nodeid);
     bool sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group);
     bool sendBackToNormal(uint8_t serverAddr,uint16_t nodeid);
-    
+    bool sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr);
+    bool sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status);
+
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();
     uint8_t getLength(){return length;};
 
 
     bool isRadioOn();
-    uint16_t getSender(){return origin;};
+
     states convertFromInt(uint8_t s);
 protected:
 
@@ -111,6 +120,7 @@ private:
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer
     uint8_t length;
     int radioBuffSize;
+    void dumpBuffer(uint8_t *pbuf);
 };
 
 
