@@ -16,13 +16,13 @@ long st;
 long count;
 STATUS status;
 uint16_t cars[128];
-int senders[128];
+uint8_t senders[128];
 long register_time_interval = 1000;
 long last_register_sent;
 uint16_t serverId=1;
 bool newMessage=false;
 uint8_t carsIdx=0;
-int turnOn=0;
+uint8_t turnOn=0;
 long turnonffTime;
 long turnonffWait=10000;
 long request_register_time = 5000;   // time to send a request for registration if no car is registered
@@ -31,6 +31,7 @@ long last_request_register_time = 0;
 
 void setup(){
   Serial.begin(115200);
+  Serial.setTimeout(500);
   i=0;
    
   //if (!server.init(&driver,&manager)){
@@ -216,4 +217,97 @@ void printBuffer(){
     Serial.print(" ");
   }
 }
+
+bool getSerialCommand(){
+   uint8_t serbuf[12];   
+   uint16_t id=0;
+   uint16_t val=0;   
+   byte snid[3];
+
+   if (Serial.available() > 0) {
+       Serial.readBytesUntil('#', serbuf, 12);
+       if (serbuf[0] == 'B'){
+          if (serbuf[1] == 'W') {
+              //example: BW60100 -> B=broadcast W=write 6=element_motor 0=param_index 100=speed%
+	      //bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
+              snid[0]=serbuf[4];
+	      snid[1]=serbuf[5];	
+              snid[2]=serbuf[6];
+              return server.sendBroadcastWriteMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
+          }
+          if (serbuf[1] == 'R') {
+               //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
+               //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
+	       return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
+	  }          
+          if (serbuf[1] == 'O') {
+              //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
+	      //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
+              return server.sendAddressedOPMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),0,0);
+          }          
+          if (serbuf[1] == 'C') {
+               return true; //need to implement
+          }                    
+       } 
+
+       if (serbuf[0] == 'A'){
+          if (serbuf[1] == 'W') {
+              //example: BW33360100 -> B=broadcast W=write 333=node 6=element_motor 0=param_index 100=speed%
+	      //bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
+              snid[0]=serbuf[2];
+	      snid[1]=serbuf[3];	
+              snid[2]=serbuf[4];
+              id=getNN(snid);
+              snid[0]=serbuf[7];
+	      snid[1]=serbuf[8];	
+              snid[2]=serbuf[9];
+              return server.sendBroadcastWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),getNN(snid),0);
+          }
+          if (serbuf[1] == 'R') {
+               //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
+               //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
+	       return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
+	  }          
+          if (serbuf[1] == 'O') {
+              //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
+	      //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
+              return server.sendAddressedOPMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),0,0);
+          }          
+          if (serbuf[1] == 'C') {
+               return true; //need to implement
+          }                    
+       } 
+  
+   }
+   return false;
+}
+
+uint16_t getNN(byte *snn){
+    String inString = "";
+    for (byte a=0;a<3;a++){
+	inString += (char)snn[a];
+    }
+    return inString.toInt();
+}
+
+byte charToInt(byte v){
+    return v - '0';
+}
+
+void sendSerBroadCast(){
+
+//bool sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
