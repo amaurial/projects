@@ -116,6 +116,20 @@ bool CSRD::sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t eleme
 
 }
 
+bool CSRD::sendBroadcastActionMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2){
+    uint8_t buf[MESSAGE_SIZE];
+
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_ACTION;
+    buf[2]=group;
+    buf[3]=element;
+    buf[4]=action;
+    buf[5]=val0;
+    buf[6]=val1;
+    buf[7]=val2;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
 bool CSRD::sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group){
 uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
@@ -173,6 +187,22 @@ bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t ele
     buf[3]=lowByte(nodeid);
     buf[4]=element;
     buf[5]=state;
+    buf[6]=val0;
+    buf[7]=val1;
+    //Serial.print("CSRD::sendAddressedOPMessage message to: ");
+    //Serial.println(serverAddr);
+    //dumpBuffer(buf);
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
+bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_ADDRESSED;
+    buf[1]=RP_ACTION;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=action;
     buf[6]=val0;
     buf[7]=val1;
     //Serial.print("CSRD::sendAddressedOPMessage message to: ");

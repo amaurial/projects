@@ -817,11 +817,14 @@ void saveParameterToEprom(byte *params, byte numParams, byte obj) {
       //#endif
     return;
   }
-
-  for (i = 0; i < numParams; i++) {
+  Serial.print("saving p:");
+  for (i = 0; i < numParams; i++) {    
+    Serial.print(i);
+    Serial.print("\t");
     EEPROM.write(startpos + i, params[i]);
     params[i] = val;
   }
+  Serial.println();
 }
 
 
