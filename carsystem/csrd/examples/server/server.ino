@@ -19,7 +19,7 @@ uint16_t cars[128];
 uint8_t senders[128];
 long register_time_interval = 1000;
 long last_register_sent;
-uint16_t serverId=1;
+uint8_t serverId=1;
 bool newMessage=false;
 uint8_t carsIdx=0;
 uint8_t turnOn=0;
@@ -63,8 +63,8 @@ void loop(){
     Serial.println(cars[nn]);
     server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
     
-    Serial.println("Message to restore eprom values ");
-    server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
+    //Serial.println("Message to restore eprom values ");
+    //server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
   }
 
   if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {
@@ -73,40 +73,40 @@ void loop(){
     for (i=0;i<carsIdx;i++){
       switch (turnOn){
         case (0):
-          Serial.print("Changing status for  ");
-          Serial.print(cars[i]);
-          Serial.println(" ON");
-          server.sendAddressedOPMessage(
-            senders[i],cars[i],MOTOR,ON,0,0);//motor on
+          //Serial.print("Changing status for  ");
+          //Serial.print(cars[i]);
+          //Serial.println(" ON");
+          //server.sendAddressedOPMessage(
+           // senders[i],cars[i],MOTOR,ON,0,0);//motor on
            //delay(10);
            //server.sendAddressedOPMessage(
-           // senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
-          turnOn=3;
+           //senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
+          turnOn=1;
         break;
       
         case (1):
-          Serial.print("Changing status for  ");
-          Serial.print(cars[i]);
-          Serial.println(" EMERGENCY");
-          server.sendEmergencyBroadcast(serverId,1);
+          //Serial.print("Changing status for  ");
+          //Serial.print(cars[i]);
+          //Serial.println(" EMERGENCY");
+          //server.sendEmergencyBroadcast(serverId,1);
           turnOn=2;
         break;
         case (2):
-          Serial.print("Changing status for  ");
-          Serial.print(cars[i]);
-          Serial.println(" NORMAL");
-          server.sendBackToNormalBroadcast(serverId,1);
+          //Serial.print("Changing status for  ");
+          //Serial.print(cars[i]);
+          //Serial.println(" NORMAL");
+          //server.sendBackToNormalBroadcast(serverId,1);
           turnOn=3;
         break;
         case (3):
-          Serial.print("Changing status for  ");
-          Serial.print(cars[i]);
-          Serial.println(" OFF");
-          server.sendAddressedOPMessage(
-            senders[i],cars[i],MOTOR,OFF,0,0);//motor on
+          //Serial.print("Changing status for  ");
+          //Serial.print(cars[i]);
+          //Serial.println(" OFF");
+          //server.sendAddressedOPMessage(
+            //senders[i],cars[i],MOTOR,OFF,0,0);//motor on
            //delay(10);
            //server.sendAddressedOPMessage(
-           // senders[i],cars[i],SIRENE_LIGHT,OFF,0,0);//sirene light on
+            //senders[i],cars[i],SIRENE_LIGHT,OFF,0,0);//sirene light on
           turnOn=0;
         break;
       }
@@ -243,16 +243,15 @@ bool getSerialCommand(){
                //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
                //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
                //Serial.println("C BR");
-               
-	            return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
+               return true;
+	            //return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
 	        } 
                    
           if (serbuf[1] == 'O') {
               //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
-	            //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
-              //Serial.println("C BO");
+	            //Serial.println("C BO");
               
-              return server.sendAddressedOPMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),0,0);
+              return server.sendBroadcastOPMessage(serverId, 0, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
           }  
                   
           if (serbuf[1] == 'C') {
@@ -280,21 +279,21 @@ bool getSerialCommand(){
               //Serial.print("PARAM:");
               //Serial.println(getNN(snid));
                
-              return server.sendBroadcastWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),getNN(snid),0);
+              return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),getNN(snid),0);
           }
           if (serbuf[1] == 'R') {
                //example: AR33360 -> A=addressed R=read 333=node 6=element_motor 0=param0
                //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
               //Serial.println("C AR");
                
-	            return sendAddressedReadMessage(0,serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
+	            return server.sendAddressedReadMessage(serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
 	        }          
           if (serbuf[1] == 'O') {
               //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
 	            //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
               //Serial.println("C AO");
                
-              return server.sendAddressedOPMessage(0,serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
+              return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
           }          
           if (serbuf[1] == 'C') {
             //Serial.println("C AC");

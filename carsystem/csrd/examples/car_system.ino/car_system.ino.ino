@@ -14,13 +14,13 @@
 #define FRONT_LIGHT_PIN           A1
 #define LEFT_LIGHT_PIN            5
 #define RIGHT_LIGHT_PIN           4
-#define SIRENE_LIGHT_PIN          5 //AUX1
+#define SIRENE_LIGHT_PIN          A2 //AUX1
 #define BREAK_LIGHT_PIN           3//13
-#define REAR_BREAK_LIGHT_PIN      11
+#define REAR_BREAK_LIGHT_PIN      A7//AUX2
 #define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A3
 #define BATTERY_PIN               A5
-#define IR_RECEIVE_PIN            6 //AUX2
+#define IR_RECEIVE_PIN            6 //AUX4
 #define IR_SEND_PIN               A6 //AUX3
 
 #define MAXPARAMS                 5
@@ -191,8 +191,7 @@ void loop() {
 
 void dumpMessage() {
 
-//#ifdef DEBUG_CAR
-  int i = 0;
+//#ifdef DEBUG_CAR  
   Serial.println("New Message");
   car.getMessageBuffer(recbuffer);
   for (i = 0; i < MESSAGE_SIZE; i++) {
@@ -289,7 +288,7 @@ void checkMsgWriteParameter(){
              }             
           }
           else{
-            //board parameters            
+            //TODO board parameters            
           }
        }
     }
@@ -362,7 +361,7 @@ void setDefaultParams(){
   uint8_t params[MAXPARAMS];
   
   //MOTOR
-  params[0] = 50;//max speed %
+  params[0] = 100;//max speed %
   params[1] = 250;//base breaking time ms
   params[2] = 10;//breaking time(ms)=this*params[1]
   params[3] = 10;//acc time(ms)=this*params[1].time to reach the max speed after start
@@ -421,7 +420,7 @@ void setInitParams(){
   for (i = 0; i < NUM_ELEMENTS; i++) {
       getParameterFromEprom(elements[i].params,elements[i].total_params,i);
       #ifdef DEBUG_CAR
-        int j=0;
+        
         Serial.print("params element: ");
         Serial.print(i);
         Serial.print("\t");
@@ -455,22 +454,20 @@ void initElements() {
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
   elements[i].port = MOTOR_PIN;  
-  //elements[i].total_params = 4;
   aux = elements[i].params[1] * elements[i].params[2];
   aux1 = elements[i].params[1] * elements[i].params[3];
   SoftPWMSet(MOTOR_PIN, 0);
   SoftPWMSetFadeTime(MOTOR_PIN, aux, aux1);
-  //SoftPWMSetPercent(MOTOR_PIN,elements[i].params[0]);
-  //delay(2*aux);
-
+  
   //front light
   i = FRONT_LIGHT;
   elements[i].state = OFF;
   elements[i].next = OFF;
   elements[i].obj = FRONT_LIGHT;
   elements[i].port = FRONT_LIGHT_PIN;
-  elements[i].controller = &controlFrontLight;  
-  //elements[i].total_params = 1;
+  //elements[i].controller = &controlFrontLight;  
+  elements[i].controller = &controlBlinkLed;  
+  
   aux = 100;
   aux1 = 100;
   SoftPWMSet(FRONT_LIGHT_PIN, 0);
@@ -482,8 +479,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = BREAK_LIGHT;
   elements[i].port = BREAK_LIGHT_PIN;  
-  elements[i].controller = &controlBlinkLed;  
-  //elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
   SoftPWMSet(BREAK_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(BREAK_LIGHT_PIN, aux, aux);
@@ -495,8 +491,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = LEFT_LIGHT;
   elements[i].port = LEFT_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;  
-  //elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
   SoftPWMSet(LEFT_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(LEFT_LIGHT_PIN, aux, aux);
@@ -507,8 +502,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = RIGHT_LIGHT;
   elements[i].port = RIGHT_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;  
-  //elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
   SoftPWMSet(RIGHT_LIGHT_PIN, 0);
   SoftPWMSetFadeTime(RIGHT_LIGHT_PIN, aux, aux);
@@ -519,8 +513,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = SIRENE_LIGHT;
   elements[i].port = SIRENE_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed; 
-  //elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
   SoftPWMSet(SIRENE_LIGHT, 0);
   SoftPWMSetFadeTime(SIRENE_LIGHT, aux, aux);
@@ -531,8 +524,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = REAR_BREAK_LIGHT;
   elements[i].port = REAR_BREAK_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;  
-  //elements[i].total_params = 4;
+  elements[i].controller = &controlBlinkLed;    
   aux = elements[i].params[1];
   SoftPWMSet(REAR_BREAK_LIGHT, 0);
   SoftPWMSetFadeTime(REAR_BREAK_LIGHT, aux, aux);
@@ -543,8 +535,7 @@ void initElements() {
   elements[i].next = OFF;
   elements[i].obj = IR_RECEIVE;
   elements[i].port = IR_RECEIVE_PIN;
-  elements[i].controller = &controlAux;  
-  //elements[i].total_params = 1;
+  elements[i].controller = &controlAux;    
 
   //IR_SEND
   i = IR_SEND;
@@ -607,13 +598,11 @@ void controlBreakLeds(ELEMENTS * element) {
 
   if (element->state == ON && element->next == OFF) {
     element->state = OFF;
-    //analogWrite(element->port,0);
     SoftPWMSetPercent(element->port, 0);
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
     aux = (byte)255 * (element->params[0] / 100);
-    //analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 
@@ -628,22 +617,18 @@ void controlBreakLeds(ELEMENTS * element) {
       element->auxTime = t + element->params[1] * element->params[2];
       if (element->tempState == OFF) {
         element->tempState = ON;
-        //aux=(byte)255*(element->params[0]/100);
         aux = element->params[0];
       }
       else {
         element->tempState = OFF;
         aux = 0;
       }
-      //analogWrite(element->port,aux);
       SoftPWMSetPercent(element->port, aux);
     }
   }
 
   if (element->next == ON) {
     element->state = ON;
-    //aux=(byte)255*(element->params[0]/100);
-    //analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
   if (element->next == ON) {
@@ -665,8 +650,6 @@ void controlBlinkLed(ELEMENTS * element) {
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
-    //aux=(byte)255*(element->params[0]/100);
-    // analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 
@@ -681,27 +664,22 @@ void controlBlinkLed(ELEMENTS * element) {
       element->auxTime = t + element->params[1] * element->params[2];
       if (element->tempState == OFF) {
         element->tempState = ON;
-        //aux=(byte)255*(element->params[0]/100);
         aux = element->params[0];
       }
       else {
         element->tempState = OFF;
         aux = 0;
       }
-      //analogWrite(element->port,aux);
       SoftPWMSetPercent(element->port, aux);
     }
   }
 
   if (element->next == ON) {
     element->state = ON;
-    //aux=(byte)255*(element->params[0]/100);
-    //analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
   if (element->next == OFF) {
     element->state = OFF;
-    //analogWrite(element->port,0);
     SoftPWMSetPercent(element->port, 0);
   }
 }
@@ -709,49 +687,37 @@ void controlBlinkLed(ELEMENTS * element) {
 
 void controlFrontLight(ELEMENTS * element) {
   //Serial.println("controlFrontLight");
-  //byte aux;
 
   if (element->state == ON && element->next == OFF) {
     element->state = OFF;
-    //analogWrite(element->port,0);
     SoftPWMSetPercent(element->port, 0);
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
-    //aux=(byte)255*(element->params[0]/100);
-    //analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 }
 void controlMotor(ELEMENTS * element) {
-  //float perc;
   long t;
   byte aux;
-  //float diff;
 
   //Serial.println("controlMotor");
   t = millis();
   if (element->state == ON && element->next == OFF) {
     element->state = STOPING;
     element->auxTime = t + element->params[1] * element->params[2];
-    //aux=(byte)255*(element->params[0]/100);
-    //analogWrite(element->port,aux);
     SoftPWMSetPercent(element->port, 0);
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ACCELERATING;
     element->auxTime = t + element->params[1] * element->params[3];
-    //analogWrite(element->port,0);
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 
   if (element->state == STOPING) {
     if (t > element->auxTime) {
       element->state = OFF;
-      //SoftPWMSetPercent(element->port,0);
-      //SoftPWMSetPercent(element->port,0);
     }
-
   }
 
   if (element->state == ACCELERATING) {
@@ -760,9 +726,7 @@ void controlMotor(ELEMENTS * element) {
       aux = (byte)255 * (element->params[0] / 100);
       analogWrite(element->port, aux);
     }
-
   }
-
 }
 
 
@@ -786,25 +750,34 @@ void getParameterFromEprom(byte *params, byte numParams, byte obj) {
   int startpos = MEMORY_REF + (MAXPARAMS * obj);
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
-    //#ifdef DEBUG_CAR
+    #ifdef DEBUG_CAR
           Serial.println("Failed to get eprom. eprom size");
-      //#endif
+    #endif
     return;
   }
-
+  //Serial.print("getting element:");
+  //Serial.print(obj);
+  //Serial.println();
   for (i = 0; i < numParams; i++) {
     val = EEPROM.read(startpos + i);
     params[i] = val;
+    //Serial.print(i);
+    //Serial.print("\t");
+    //Serial.print(val);
+    //Serial.print(" pos:");
+    //Serial.print(startpos + i);
+    //Serial.print("\t");
   }
+  //Serial.println();
 }
 
 
 void saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
-    //#ifdef DEBUG_CAR
+    #ifdef DEBUG_CAR
           Serial.println("Failed to save to eprom maxparam");
-      //#endif
+     #endif
     return;
   }
   int i = 0;
@@ -812,19 +785,25 @@ void saveParameterToEprom(byte *params, byte numParams, byte obj) {
   int startpos = MEMORY_REF + (MAXPARAMS * obj);
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
-    //#ifdef DEBUG_CAR
+    #ifdef DEBUG_CAR
           Serial.println("Failed to save to eprom. eprom size");
-      //#endif
+    #endif
     return;
   }
-  Serial.print("saving p:");
+  //Serial.print("saving element:");
+  //Serial.print(obj);
+  //Serial.println();
   for (i = 0; i < numParams; i++) {    
-    Serial.print(i);
-    Serial.print("\t");
-    EEPROM.write(startpos + i, params[i]);
-    params[i] = val;
+    //Serial.print(i);
+    //Serial.print("\t");
+    //Serial.print(params[i]);
+    //Serial.print(" pos:");
+    //Serial.print(startpos + i);
+    //Serial.print("\t");
+ 
+    EEPROM.write(startpos + i, params[i]);    
   }
-  Serial.println();
+  //Serial.println();
 }
 
 
