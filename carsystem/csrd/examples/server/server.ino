@@ -63,8 +63,8 @@ void loop(){
     Serial.println(cars[nn]);
     server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
     
-    //Serial.println("Message to restore eprom values ");
-    //server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
+    Serial.println("Message to restore eprom values ");
+    server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
   }
 
   if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {

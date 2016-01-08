@@ -47,6 +47,7 @@ typedef struct ELEMENTS {
   controllers controller;
   long auxTime;
   byte port;
+  byte actual_pwm_val;
 };
 //number of elements
 #define NUM_ELEMENTS 9
@@ -280,10 +281,22 @@ void checkMsgWriteParameter(){
              uint8_t e = car.getElement();
              uint8_t p = car.getParamIdx();
              uint8_t v = car.getVal0();
+             int aux, aux1;
+             
              if (e < NUM_ELEMENTS){
                 if (p <= elements[e].total_params){
                    elements[e].params[p]=v;
                    saveParameterToEprom(elements[e].params , elements[e].total_params , e);
+                   
+                   if (e == MOTOR){
+                      aux = elements[e].params[1] * elements[e].params[2];
+                      aux1 = elements[e].params[1] * elements[e].params[3];
+                      setPWM(e,elements[e].actual_pwm_val,aux,aux1);
+                   }
+                   else{
+                      aux = elements[e].params[1] * elements[e].params[2];                      
+                      setPWM(e,elements[e].actual_pwm_val,aux,aux);
+                   }                   
                 }
              }             
           }
@@ -296,50 +309,55 @@ void checkMsgWriteParameter(){
 
 //set next operation
 void setNextOperation(){
-  if (car.isOperation()) {
-      if (car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) )) {
-        int e = car.getElement();
-        states s = car.convertFromInt(car.getState());
-        if (e != 255) {
-          if (e < NUM_ELEMENTS) {
-            elements[e].next = s;            
-          }
-        }
-        else {
-          switch (s) {
-            case (EMERGENCY):
-              //save actual state
-              for (i = 0; i < NUM_ELEMENTS; i++) {
-                elements[i].tempState = elements[i].state;
-              }
-              elements[(uint8_t)LEFT_LIGHT].next = BLINKING;
-              elements[(uint8_t)RIGHT_LIGHT].next = BLINKING;
-              elements[(uint8_t)SIRENE_LIGHT].next = BLINKING;
-              elements[(uint8_t)BREAK_LIGHT].next = BLINKING;
-              elements[(uint8_t)REAR_BREAK_LIGHT].next = BLINKING;
-              elements[(uint8_t)FRONT_LIGHT].next = BLINKING;
-              elements[(uint8_t)MOTOR].next = OFF;
 
-              break;
-            case (NORMAL):
-              //get last state
-              //save actual state
-              for (i = 0; i < NUM_ELEMENTS; i++) {
-                elements[i].next = elements[i].tempState;
-              }
-              if (elements[MOTOR].next == STOPING) {
-                elements[MOTOR].next = OFF;
-              }
-              if (elements[MOTOR].next == ACCELERATING) {
-                elements[MOTOR].next = ON;
-              }
-
-              break;
-          }
-        }
-
+    if (!(car.isOperation())) {
+      return;  
+    }  
+  
+    if (!(car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) ))) {
+       return;
+    }
+    
+    int e = car.getElement();
+    states s = car.convertFromInt(car.getState());
+    if (e != 255) {
+      if (e < NUM_ELEMENTS) {
+        elements[e].next = s;            
       }
     }
+    else {
+      switch (s) {
+        case (EMERGENCY):
+          //save actual state
+          for (i = 0; i < NUM_ELEMENTS; i++) {
+            elements[i].tempState = elements[i].state;
+          }
+          elements[(uint8_t)LEFT_LIGHT].next = BLINKING;
+          elements[(uint8_t)RIGHT_LIGHT].next = BLINKING;
+          elements[(uint8_t)SIRENE_LIGHT].next = BLINKING;
+          elements[(uint8_t)BREAK_LIGHT].next = BLINKING;
+          elements[(uint8_t)REAR_BREAK_LIGHT].next = BLINKING;
+          elements[(uint8_t)FRONT_LIGHT].next = BLINKING;
+          elements[(uint8_t)MOTOR].next = OFF;
+
+          break;
+        case (NORMAL):
+          //get last state
+          //save actual state
+          for (i = 0; i < NUM_ELEMENTS; i++) {
+            elements[i].next = elements[i].tempState;
+          }
+          if (elements[MOTOR].next == STOPING) {
+            elements[MOTOR].next = OFF;
+          }
+          if (elements[MOTOR].next == ACCELERATING) {
+            elements[MOTOR].next = ON;
+          }
+
+          break;
+      }
+    }  
+    
 }
 
 void checkBattery(){
@@ -368,7 +386,10 @@ void setDefaultParams(){
   saveParameterToEprom(params , 4 , MOTOR);
 
   //front light
-  params[0] = 50; //max bright %  
+  params[0] = 50; //max bright % 
+  params[1] = 20; //base blink
+  params[2] = 20; //blink time=this*base blink
+  params[3] = 10; //blink time emergency=this*base blink 
   saveParameterToEprom(params , 1 , FRONT_LIGHT);
 
   //break light
@@ -433,8 +454,13 @@ void setInitParams(){
   }
 }
 
+void setPWM(byte idx,byte init_val,int p1, int p2){      
+  SoftPWMSet(elements[idx].port, init_val);
+  SoftPWMSetFadeTime(elements[idx].port, p1, p2);
+}
+
 void initElements() {
-  int i = MOTOR;
+  i = MOTOR;
   int aux, aux1;
 
   elements[MOTOR].total_params = 4;
@@ -456,8 +482,7 @@ void initElements() {
   elements[i].port = MOTOR_PIN;  
   aux = elements[i].params[1] * elements[i].params[2];
   aux1 = elements[i].params[1] * elements[i].params[3];
-  SoftPWMSet(MOTOR_PIN, 0);
-  SoftPWMSetFadeTime(MOTOR_PIN, aux, aux1);
+  setPWM(i,0,aux,aux1);  
   
   //front light
   i = FRONT_LIGHT;
@@ -467,11 +492,8 @@ void initElements() {
   elements[i].port = FRONT_LIGHT_PIN;
   //elements[i].controller = &controlFrontLight;  
   elements[i].controller = &controlBlinkLed;  
-  
-  aux = 100;
-  aux1 = 100;
-  SoftPWMSet(FRONT_LIGHT_PIN, 0);
-  SoftPWMSetFadeTime(FRONT_LIGHT_PIN, aux, aux1);
+  aux = elements[i].params[1];
+  setPWM(i,0,aux,aux);   
 
   //break light
   i = BREAK_LIGHT;
@@ -481,8 +503,7 @@ void initElements() {
   elements[i].port = BREAK_LIGHT_PIN;  
   elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
-  SoftPWMSet(BREAK_LIGHT_PIN, 0);
-  SoftPWMSetFadeTime(BREAK_LIGHT_PIN, aux, aux);
+  setPWM(i,0,aux,aux);   
 
 
   //left light
@@ -493,8 +514,7 @@ void initElements() {
   elements[i].port = LEFT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
-  SoftPWMSet(LEFT_LIGHT_PIN, 0);
-  SoftPWMSetFadeTime(LEFT_LIGHT_PIN, aux, aux);
+  setPWM(i,0,aux,aux);   
 
   //right light
   i = RIGHT_LIGHT;
@@ -504,8 +524,7 @@ void initElements() {
   elements[i].port = RIGHT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
-  SoftPWMSet(RIGHT_LIGHT_PIN, 0);
-  SoftPWMSetFadeTime(RIGHT_LIGHT_PIN, aux, aux);
+  setPWM(i,0,aux,aux);   
 
   //sirene light
   i = SIRENE_LIGHT;
@@ -515,8 +534,7 @@ void initElements() {
   elements[i].port = SIRENE_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
   aux = elements[i].params[1];
-  SoftPWMSet(SIRENE_LIGHT, 0);
-  SoftPWMSetFadeTime(SIRENE_LIGHT, aux, aux);
+  setPWM(i,0,aux,aux);   
 
   //REAR_BREAK_LIGHT
   i = REAR_BREAK_LIGHT;
@@ -526,8 +544,7 @@ void initElements() {
   elements[i].port = REAR_BREAK_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;    
   aux = elements[i].params[1];
-  SoftPWMSet(REAR_BREAK_LIGHT, 0);
-  SoftPWMSetFadeTime(REAR_BREAK_LIGHT, aux, aux);
+  setPWM(i,0,aux,aux);   
 
   //IR_RECEIVE
   i = IR_RECEIVE;
@@ -598,11 +615,13 @@ void controlBreakLeds(ELEMENTS * element) {
 
   if (element->state == ON && element->next == OFF) {
     element->state = OFF;
+    elements->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
-    aux = (byte)255 * (element->params[0] / 100);
+    //aux = (byte)255 * (element->params[0] / 100);
+    elements->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 
@@ -623,17 +642,20 @@ void controlBreakLeds(ELEMENTS * element) {
         element->tempState = OFF;
         aux = 0;
       }
+      elements->actual_pwm_val = aux;
       SoftPWMSetPercent(element->port, aux);
     }
   }
 
   if (element->next == ON) {
     element->state = ON;
+    elements->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
   }
   if (element->next == ON) {
     element->state = OFF;
-    analogWrite(element->port, 0);
+    //analogWrite(element->port, 0);
+    elements->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
   }
 
@@ -644,18 +666,23 @@ void controlBlinkLed(ELEMENTS * element) {
   byte aux;
   t = millis();
 
-  if (element->state == ON && element->next == OFF) {
+ 
+  if (element->next == OFF) {
     element->state = OFF;
-    analogWrite(element->port, 0);
+    element->actual_pwm_val = 0;
+    SoftPWMSetPercent(element->port, 0);
+    //analogWrite(element->port, 0);        
   }
+  
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
-    SoftPWMSetPercent(element->port, element->params[0]);
+    element->actual_pwm_val = element->params[0];
+    SoftPWMSetPercent(element->port, element->params[0]); 
   }
 
   if (element->state != BLINKING && element->next == BLINKING) {
     element->state = BLINKING;
-    element->auxTime = t + element->params[1] * element->params[2];
+    element->auxTime = t + element->params[1] * element->params[2]; 
   }
 
   if (element->state == BLINKING ) {
@@ -670,18 +697,19 @@ void controlBlinkLed(ELEMENTS * element) {
         element->tempState = OFF;
         aux = 0;
       }
+      element->actual_pwm_val = aux;
       SoftPWMSetPercent(element->port, aux);
     }
+ 
   }
 
   if (element->next == ON) {
     element->state = ON;
+    element->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
+ 
   }
-  if (element->next == OFF) {
-    element->state = OFF;
-    SoftPWMSetPercent(element->port, 0);
-  }
+  
 }
 
 
@@ -690,10 +718,12 @@ void controlFrontLight(ELEMENTS * element) {
 
   if (element->state == ON && element->next == OFF) {
     element->state = OFF;
+    element->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ON;
+    element->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
   }
 }
@@ -706,25 +736,32 @@ void controlMotor(ELEMENTS * element) {
   if (element->state == ON && element->next == OFF) {
     element->state = STOPING;
     element->auxTime = t + element->params[1] * element->params[2];
+    element->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
+    return;
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ACCELERATING;
     element->auxTime = t + element->params[1] * element->params[3];
+    element->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
+    return;
   }
 
   if (element->state == STOPING) {
     if (t > element->auxTime) {
       element->state = OFF;
     }
+    return;
   }
 
   if (element->state == ACCELERATING) {
     if (t > element->auxTime) {
       element->state = ON;
-      aux = (byte)255 * (element->params[0] / 100);
-      analogWrite(element->port, aux);
+      //aux = (byte)255 * (element->params[0] / 100);
+      element->actual_pwm_val = element->params[0];
+      //analogWrite(element->port, element->params[0]);
+      SoftPWMSetPercent(element->port, element->params[0]);
     }
   }
 }
