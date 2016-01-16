@@ -84,10 +84,10 @@ public:
     uint16_t getSender(){return origin;};
     uint8_t getAction();
 
-    bool sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
-    bool sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group);
-    bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
-    bool sendBroadcastActionMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
+    bool sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
+    bool sendBroadcastRequestRegister(uint8_t group);
+    bool sendBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
+    bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
 
     bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
     bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
@@ -95,9 +95,9 @@ public:
     bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
 
     bool sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2);
-    bool sendEmergencyBroadcast(uint8_t serverAddr,uint8_t group);
+    bool sendEmergencyBroadcast(uint8_t group);
     bool sendEmergency(uint8_t serverAddr,uint16_t nodeid);
-    bool sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group);
+    bool sendBackToNormalBroadcast(uint8_t group);
     bool sendBackToNormal(uint8_t serverAddr,uint16_t nodeid);
     bool sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr);
     bool sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status);

@@ -33,7 +33,7 @@ void setup(){
   Serial.begin(115200);
   Serial.setTimeout(500);
   i=0;
-   
+
   //if (!server.init(&driver,&manager)){
   if (!server.init(&driver,NULL)){
     Serial.println("FAILED");
@@ -45,11 +45,11 @@ void setup(){
   last_request_register_time = millis();
   Serial.println("START SERVER");
   Serial.println("Send broadcast register");
-  server.sendBroadcastRequestRegister(0,serverId);  
+  server.sendBroadcastRequestRegister(serverId);
 }
 
 void loop(){
-  
+
   getSerialCommand();
 
   newMessage = server.readMessage();
@@ -58,18 +58,18 @@ void loop(){
     Serial.println("New message");
     dumpMessage();
     Serial.println();
-    int nn=insertNode(server.getNodeNumber(),server.getSender());    
+    int nn=insertNode(server.getNodeNumber(),server.getSender());
     Serial.print("Confirming registration for ");
     Serial.println(cars[nn]);
     server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
-    
-    Serial.println("Message to restore eprom values ");
-    server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);     
+
+    //Serial.println("Message to restore eprom values ");
+    //server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);
   }
 
   if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {
     int i=0;
-    
+
     for (i=0;i<carsIdx;i++){
       switch (turnOn){
         case (0):
@@ -83,19 +83,19 @@ void loop(){
            //senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
           turnOn=1;
         break;
-      
+
         case (1):
           //Serial.print("Changing status for  ");
           //Serial.print(cars[i]);
           //Serial.println(" EMERGENCY");
-          //server.sendEmergencyBroadcast(serverId,1);
+          //server.sendEmergencyBroadcast(serverId);
           turnOn=2;
         break;
         case (2):
           //Serial.print("Changing status for  ");
           //Serial.print(cars[i]);
           //Serial.println(" NORMAL");
-          //server.sendBackToNormalBroadcast(serverId,1);
+          //server.sendBackToNormalBroadcast(serverId);
           turnOn=3;
         break;
         case (3):
@@ -110,12 +110,12 @@ void loop(){
           turnOn=0;
         break;
       }
-     
+
     }
     turnonffTime=millis();
   }
   sendRequestRegister();
-  
+
 
 /*
   if (i>254){
@@ -126,29 +126,29 @@ void loop(){
       i=0;
     }
 
-  
+
   if ((millis()-st)>5000){
     Serial.print("msg/s:");
     Serial.println(count/5);
     count=0;
     st=millis();
   }
- 
-  
+
+
   if (server.isRadioOn()){
     if (server.getMessage(recbuffer)){
        // Serial.print("from client ");
        // Serial.print(server.getSender());
         //Serial.print(": ");
        // printBuffer();
-        //Serial.println();       
-                
+        //Serial.println();
+
         setBuffer();
         server.sendMessage(sbuffer,MESSAGE_SIZE,server.getSender());
         count++;
         i++;;
     }
-   
+
   }
   */
 }
@@ -157,11 +157,11 @@ void sendRequestRegister(){
   long t = millis();
   if ((t - last_request_register_time) > (request_register_time * request_register_time_step)){
      Serial.println("Send broadcast register");
-     server.sendBroadcastRequestRegister(0,serverId);
+     server.sendBroadcastRequestRegister(serverId);
      last_request_register_time = millis();
   }
   else if(carsIdx == 0 && (t - last_request_register_time > request_register_time)){
-     server.sendBroadcastRequestRegister(0,serverId);
+     server.sendBroadcastRequestRegister(serverId);
      last_request_register_time = millis();
   }
 }
@@ -174,7 +174,7 @@ void dumpMessage(){
     Serial.print ("   ");
   }
   Serial.println();
-  
+
 }
 
 uint8_t insertNode(uint16_t nn,int sender){
@@ -198,7 +198,7 @@ uint8_t insertNode(uint16_t nn,int sender){
   cars[carsIdx]=nn;
   senders[carsIdx]=sender;
   return carsIdx-1;
-  
+
 }
 
 void setBuffer(){
@@ -220,9 +220,9 @@ void printBuffer(){
 }
 
 bool getSerialCommand(){
-   uint8_t serbuf[12];   
+   uint8_t serbuf[12];
    uint16_t id=0;
-   uint16_t val=0;   
+   uint16_t val=0;
    byte snid[3];
 
    if (Serial.available() > 0) {
@@ -232,38 +232,38 @@ bool getSerialCommand(){
               //example: BW60100 -> B=broadcast W=write 6=element_motor 0=param_index 100=speed%
 	            //bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
               snid[0]=serbuf[4];
-	            snid[1]=serbuf[5];	
+	            snid[1]=serbuf[5];
               snid[2]=serbuf[6];
               //Serial.println("C BW");
-              
-              return server.sendBroadcastWriteMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
+
+              return server.sendBroadcastWriteMessage(serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
           }
-          
+
           if (serbuf[1] == 'R') {
                //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
                //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
                //Serial.println("C BR");
                return true;
 	            //return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
-	        } 
-                   
+	        }
+
           if (serbuf[1] == 'O') {
               //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
 	            //Serial.println("C BO");
-              
-              return server.sendBroadcastOPMessage(serverId, 0, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
-          }  
-                  
+
+              return server.sendBroadcastOPMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
+          }
+
           if (serbuf[1] == 'C') {
               //Serial.println("C BC");
-              
+
                return true; //need to implement
-          }                    
-       } 
+          }
+       }
 
        if (serbuf[0] == 'A'){
               snid[0]=serbuf[2];
-              snid[1]=serbuf[3];  
+              snid[1]=serbuf[3];
               snid[2]=serbuf[4];
               id=getNN(snid);
               //Serial.print("ID:");
@@ -271,36 +271,36 @@ bool getSerialCommand(){
           if (serbuf[1] == 'W') {
               //example: AW33360100 -> A=addressed W=write 333=node 6=element_motor 0=param_index 100=speed%
 	            //bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
-              
+
               snid[0]=serbuf[7];
-	            snid[1]=serbuf[8];	
+	            snid[1]=serbuf[8];
               snid[2]=serbuf[9];
               //Serial.println("C AW");
               //Serial.print("PARAM:");
               //Serial.println(getNN(snid));
-               
+
               return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),getNN(snid),0);
           }
           if (serbuf[1] == 'R') {
                //example: AR33360 -> A=addressed R=read 333=node 6=element_motor 0=param0
                //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
               //Serial.println("C AR");
-               
+
 	            return server.sendAddressedReadMessage(serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
-	        }          
+	        }
           if (serbuf[1] == 'O') {
               //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
 	            //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
               //Serial.println("C AO");
-               
+
               return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
-          }          
+          }
           if (serbuf[1] == 'C') {
             //Serial.println("C AC");
                return true; //need to implement
-          }                    
-       } 
-  
+          }
+       }
+
    }
    return false;
 }

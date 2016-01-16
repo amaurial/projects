@@ -62,11 +62,11 @@ RH_RF69 driver;
 CSRD car;
 
 //aux vars
-byte i = 0;
-byte j = 0;
 long actime;
 long st;
 long count;
+float motor_rotation;
+int msamples;
 
 //battery vars
 int bat_reads = 0;
@@ -144,10 +144,8 @@ void setup() {
   }
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
 
-  i = 0;
   count = 0;
-  setPins();
-
+  //setPins();
   //testPins();
 
   status = NOT_REGISTERED;
@@ -164,7 +162,7 @@ void loop() {
 
     //carry the active actions
     if (status == ACTIVE) {
-      for (i = 0; i < NUM_ELEMENTS; i++) {
+      for (byte i = 0; i < NUM_ELEMENTS; i++) {
         elements[i].controller(&elements[i]);
       }
     } 
@@ -188,6 +186,25 @@ void loop() {
         setNextOperation();
       }
     }  
+
+    //if (elements[MOTOR].state==ON){
+      msamples++;
+      motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/msamples;
+      if (msamples > 1000){
+        //Serial.print("motor current: ");
+        //Serial.println(motor_rotation);
+        msamples=0;
+        motor_rotation=analogRead(MOTOR_ROTATION_PIN);
+        if (motor_rotation==0){
+          //TODO
+         //send IR stop signal
+        }
+        else{
+          //send the IR moving signal
+        }
+      }
+      
+   // }
 }
 
 void dumpMessage() {
@@ -195,7 +212,7 @@ void dumpMessage() {
 //#ifdef DEBUG_CAR  
   Serial.println("New Message");
   car.getMessageBuffer(recbuffer);
-  for (i = 0; i < MESSAGE_SIZE; i++) {
+  for (byte i = 0; i < MESSAGE_SIZE; i++) {
     Serial.print (recbuffer[i]);
     Serial.print ("   ");
   }
@@ -210,6 +227,7 @@ void checkMsgRestoreDefault(){
             Serial.println("Restore default values");
       #endif
        setDefaultParams();
+       initElements();
        setInitParams();
     }
 }
@@ -284,19 +302,21 @@ void checkMsgWriteParameter(){
              int aux, aux1;
              
              if (e < NUM_ELEMENTS){
-                if (p <= elements[e].total_params){
+                if (p < elements[e].total_params){
                    elements[e].params[p]=v;
                    saveParameterToEprom(elements[e].params , elements[e].total_params , e);
-                   
+                   if (p == 0){
+                      elements[e].actual_pwm_val = v;
+                   }
                    if (e == MOTOR){
                       aux = elements[e].params[1] * elements[e].params[2];
-                      aux1 = elements[e].params[1] * elements[e].params[3];
-                      setPWM(e,elements[e].actual_pwm_val,aux,aux1);
+                      aux1 = elements[e].params[1] * elements[e].params[3];                      
                    }
-                   else{
+                   else{                      
                       aux = elements[e].params[1] * elements[e].params[2];                      
-                      setPWM(e,elements[e].actual_pwm_val,aux,aux);
-                   }                   
+                      aux=aux1;
+                   }   
+                   setPWM(e,elements[e].actual_pwm_val,aux,aux1);                
                 }
              }             
           }
@@ -329,7 +349,7 @@ void setNextOperation(){
       switch (s) {
         case (EMERGENCY):
           //save actual state
-          for (i = 0; i < NUM_ELEMENTS; i++) {
+          for (byte i = 0; i < NUM_ELEMENTS; i++) {
             elements[i].tempState = elements[i].state;
           }
           elements[(uint8_t)LEFT_LIGHT].next = BLINKING;
@@ -344,7 +364,7 @@ void setNextOperation(){
         case (NORMAL):
           //get last state
           //save actual state
-          for (i = 0; i < NUM_ELEMENTS; i++) {
+          for (byte i = 0; i < NUM_ELEMENTS; i++) {
             elements[i].next = elements[i].tempState;
           }
           if (elements[MOTOR].next == STOPING) {
@@ -356,8 +376,7 @@ void setNextOperation(){
 
           break;
       }
-    }  
-    
+    }      
 }
 
 void checkBattery(){
@@ -381,8 +400,8 @@ void setDefaultParams(){
   //MOTOR
   params[0] = 100;//max speed %
   params[1] = 250;//base breaking time ms
-  params[2] = 10;//breaking time(ms)=this*params[1]
-  params[3] = 10;//acc time(ms)=this*params[1].time to reach the max speed after start
+  params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
+  params[3] = 3;//breaking time(ms)=this*params[1]
   saveParameterToEprom(params , 4 , MOTOR);
 
   //front light
@@ -440,8 +459,7 @@ void setInitParams(){
   int i = 0;
   for (i = 0; i < NUM_ELEMENTS; i++) {
       getParameterFromEprom(elements[i].params,elements[i].total_params,i);
-      #ifdef DEBUG_CAR
-        
+      #ifdef DEBUG_CAR        
         Serial.print("params element: ");
         Serial.print(i);
         Serial.print("\t");
@@ -455,16 +473,16 @@ void setInitParams(){
 }
 
 void setPWM(byte idx,byte init_val,int p1, int p2){      
-  SoftPWMSet(elements[idx].port, init_val);
   SoftPWMSetFadeTime(elements[idx].port, p1, p2);
+  SoftPWMSet(elements[idx].port, init_val);  
 }
 
 void initElements() {
-  i = MOTOR;
+  byte i = MOTOR;
   int aux, aux1;
 
   elements[MOTOR].total_params = 4;
-  elements[FRONT_LIGHT].total_params = 1;
+  elements[FRONT_LIGHT].total_params = 4;
   elements[BREAK_LIGHT].total_params = 4;
   elements[LEFT_LIGHT].total_params = 4;
   elements[RIGHT_LIGHT].total_params = 4;
@@ -473,10 +491,15 @@ void initElements() {
   elements[IR_RECEIVE].total_params = 1;
   elements[IR_SEND].total_params = 1;
   setInitParams();
+
+  //set initial state
+  byte j;
+  for (j=0;j<NUM_ELEMENTS;j++){
+    elements[j].state = OFF;
+    elements[j].next = OFF;
+  }
   
-  //motor
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  //motor  
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
   elements[i].port = MOTOR_PIN;  
@@ -486,8 +509,6 @@ void initElements() {
   
   //front light
   i = FRONT_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
   elements[i].obj = FRONT_LIGHT;
   elements[i].port = FRONT_LIGHT_PIN;
   //elements[i].controller = &controlFrontLight;  
@@ -497,8 +518,6 @@ void initElements() {
 
   //break light
   i = BREAK_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
   elements[i].obj = BREAK_LIGHT;
   elements[i].port = BREAK_LIGHT_PIN;  
   elements[i].controller = &controlBlinkLed;   
@@ -507,9 +526,7 @@ void initElements() {
 
 
   //left light
-  i = LEFT_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = LEFT_LIGHT;  
   elements[i].obj = LEFT_LIGHT;
   elements[i].port = LEFT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
@@ -517,9 +534,7 @@ void initElements() {
   setPWM(i,0,aux,aux);   
 
   //right light
-  i = RIGHT_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = RIGHT_LIGHT; 
   elements[i].obj = RIGHT_LIGHT;
   elements[i].port = RIGHT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
@@ -527,9 +542,7 @@ void initElements() {
   setPWM(i,0,aux,aux);   
 
   //sirene light
-  i = SIRENE_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = SIRENE_LIGHT; 
   elements[i].obj = SIRENE_LIGHT;
   elements[i].port = SIRENE_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
@@ -537,9 +550,7 @@ void initElements() {
   setPWM(i,0,aux,aux);   
 
   //REAR_BREAK_LIGHT
-  i = REAR_BREAK_LIGHT;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = REAR_BREAK_LIGHT; 
   elements[i].obj = REAR_BREAK_LIGHT;
   elements[i].port = REAR_BREAK_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;    
@@ -547,22 +558,17 @@ void initElements() {
   setPWM(i,0,aux,aux);   
 
   //IR_RECEIVE
-  i = IR_RECEIVE;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = IR_RECEIVE;  
   elements[i].obj = IR_RECEIVE;
   elements[i].port = IR_RECEIVE_PIN;
   elements[i].controller = &controlAux;    
 
   //IR_SEND
-  i = IR_SEND;
-  elements[i].state = OFF;
-  elements[i].next = OFF;
+  i = IR_SEND;  
   elements[i].obj = IR_SEND;
   elements[i].port = IR_SEND_PIN;
   elements[i].controller = &controlAux; 
   //elements[i].total_params = 1;
-
   
 }
 
@@ -665,7 +671,6 @@ void controlBlinkLed(ELEMENTS * element) {
   long t;
   byte aux;
   t = millis();
-
  
   if (element->next == OFF) {
     element->state = OFF;
@@ -685,8 +690,7 @@ void controlBlinkLed(ELEMENTS * element) {
     element->auxTime = t + element->params[1] * element->params[2]; 
   }
 
-  if (element->state == BLINKING ) {
-    //Serial.println("blinking");
+  if (element->state == BLINKING ) {    
     if (t > element->auxTime) {
       element->auxTime = t + element->params[1] * element->params[2];
       if (element->tempState == OFF) {
@@ -699,16 +703,14 @@ void controlBlinkLed(ELEMENTS * element) {
       }
       element->actual_pwm_val = aux;
       SoftPWMSetPercent(element->port, aux);
-    }
- 
+    } 
   }
 
   if (element->next == ON) {
     element->state = ON;
     element->actual_pwm_val = element->params[0];
-    SoftPWMSetPercent(element->port, element->params[0]);
- 
-  }
+    SoftPWMSetPercent(element->port, element->params[0]); 
+  }  
   
 }
 
@@ -745,6 +747,11 @@ void controlMotor(ELEMENTS * element) {
     element->auxTime = t + element->params[1] * element->params[3];
     element->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
+    return;
+  }
+
+  if (element->state == ON) {    
+    SoftPWMSetPercent(element->port,element->actual_pwm_val);
     return;
   }
 

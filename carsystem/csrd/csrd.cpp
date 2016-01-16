@@ -101,7 +101,7 @@ bool CSRD::sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
-bool CSRD::sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2){
+bool CSRD::sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
 
     buf[0]=RP_BROADCAST;
@@ -112,11 +112,11 @@ bool CSRD::sendBroadcastOPMessage(uint8_t serverAddr,uint8_t group,uint8_t eleme
     buf[5]=val0;
     buf[6]=val1;
     buf[7]=val2;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 
 }
 
-bool CSRD::sendBroadcastActionMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2){
+bool CSRD::sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
 
     buf[0]=RP_ADDRESSED;
@@ -127,10 +127,10 @@ bool CSRD::sendBroadcastActionMessage(uint8_t serverAddr,uint8_t group,uint8_t e
     buf[5]=val0;
     buf[6]=val1;
     buf[7]=val2;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 
-bool CSRD::sendBroadcastRequestRegister(uint8_t serverAddr,uint8_t group){
+bool CSRD::sendBroadcastRequestRegister(uint8_t group){
 uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_ACTION;
@@ -140,10 +140,10 @@ uint8_t buf[MESSAGE_SIZE];
     buf[5]=0;
     buf[6]=0;
     buf[7]=0;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 
-bool CSRD::sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){
+bool CSRD::sendBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_WRITE;
@@ -153,7 +153,7 @@ bool CSRD::sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t el
     buf[5]=val0;
     buf[6]=val1;
     buf[7]=val2;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1){
     uint8_t buf[MESSAGE_SIZE];
@@ -211,7 +211,7 @@ bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
-bool CSRD::sendEmergencyBroadcast(uint8_t serverAddr,uint8_t group){
+bool CSRD::sendEmergencyBroadcast(uint8_t group){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_OPERATION;
@@ -221,7 +221,7 @@ bool CSRD::sendEmergencyBroadcast(uint8_t serverAddr,uint8_t group){
     buf[5]=0;
     buf[6]=0;
     buf[7]=0;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendEmergency(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
@@ -236,7 +236,7 @@ bool CSRD::sendEmergency(uint8_t serverAddr,uint16_t nodeid){
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
-bool CSRD::sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group){
+bool CSRD::sendBackToNormalBroadcast(uint8_t group){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_OPERATION;
@@ -246,7 +246,7 @@ bool CSRD::sendBackToNormalBroadcast(uint8_t serverAddr,uint8_t group){
     buf[5]=0;
     buf[6]=0;
     buf[7]=0;
-    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+    return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendBackToNormal(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
