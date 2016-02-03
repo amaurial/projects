@@ -11,17 +11,17 @@
 //#define DEBUG_CAR 1;
 
 //PINS
-#define FRONT_LIGHT_PIN           A1
+#define FRONT_LIGHT_PIN           7//A1
 #define LEFT_LIGHT_PIN            5
 #define RIGHT_LIGHT_PIN           4
 #define SIRENE_LIGHT_PIN          A2 //AUX1
 #define BREAK_LIGHT_PIN           3//13
-#define REAR_BREAK_LIGHT_PIN      A7//AUX2
+#define REAR_BREAK_LIGHT_PIN      A3//AUX2
 #define MOTOR_PIN                 A4
-#define MOTOR_ROTATION_PIN        A3
-#define BATTERY_PIN               A5
-#define IR_RECEIVE_PIN            6 //AUX4
-#define IR_SEND_PIN               A6 //AUX3
+#define MOTOR_ROTATION_PIN        A6//A3
+#define BATTERY_PIN               A7//A5
+#define IR_RECEIVE_PIN            6 //AUX3
+#define IR_SEND_PIN               A5 //AUX4
 
 #define MAXPARAMS                 5
 
@@ -129,6 +129,7 @@ void printStatus() {
 }
 
 void setup() {
+  boolean r=false;
   Serial.begin(19200);
   delay(100);
 
@@ -137,7 +138,15 @@ void setup() {
   //Serial.println("SETUP");
 
   //if (!car.init(&driver,&manager)){
-  if (!car.init(&driver, NULL)) {
+  for (byte a=0;a<10;a++){
+    if (car.init(&driver, NULL)) {
+        r=true;
+        break;
+    }
+      delay(200);
+   }
+   
+   if (r==false) {
     Serial.println("FAILED");
     //turn on the sirene to blink indicating failure
     elements[SIRENE_LIGHT].next = BLINKING;
@@ -223,12 +232,12 @@ void dumpMessage() {
 //restore default parameters
 void checkMsgRestoreDefault(){  
     if (car.isRestoreDefaultConfig(nodeid)){
-       #ifdef DEBUG_CAR
+       //#ifdef DEBUG_CAR
             Serial.println("Restore default values");
-      #endif
+      //#endif
        setDefaultParams();
        initElements();
-       setInitParams();
+       //setInitParams();
     }
 }
 
@@ -238,7 +247,7 @@ void confirmRegistrationMessage(){
       #ifdef DEBUG_CAR
           Serial.print("registration message?: \t");
           Serial.print(car.isStatus());
-          Srial.print("\t");
+          Serial.print("\t");
           Serial.println(car.getStatus());
           Serial.print("\t");
           Serial.print(car.getNodeNumber());
@@ -316,7 +325,11 @@ void checkMsgWriteParameter(){
                       aux = elements[e].params[1] * elements[e].params[2];                      
                       aux=aux1;
                    }   
-                   setPWM(e,elements[e].actual_pwm_val,aux,aux1);                
+                   setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+                   if ((e == MOTOR) && (elements[e].state == ON)) {    
+                      SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+                      return;
+                  }              
                 }
              }             
           }
@@ -394,11 +407,16 @@ void checkBattery(){
   }
 }
 
+int getSpeed(){
+  int l = analogRead(MOTOR_ROTATION_PIN);
+  
+}
+
 void setDefaultParams(){
   uint8_t params[MAXPARAMS];
   
   //MOTOR
-  params[0] = 100;//max speed %
+  params[0] = 50;//max speed %
   params[1] = 250;//base breaking time ms
   params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
   params[3] = 3;//breaking time(ms)=this*params[1]
@@ -412,46 +430,46 @@ void setDefaultParams(){
   saveParameterToEprom(params , 1 , FRONT_LIGHT);
 
   //break light
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   params[1] = 30; //base blink
   params[2] = 30; //blink time=this*base blink
   params[3] = 20; //blink time emergency=this*base blink
   saveParameterToEprom(params , 4 , BREAK_LIGHT);
 
   //left light
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   params[1] = 20; //base blink
   params[2] = 20; //blink time=this*base blink
   params[3] = 10; //blink time emergency=this*base blink
   saveParameterToEprom(params , 4 , LEFT_LIGHT);
 
   //right light
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   params[1] = 20; //base blink
   params[2] = 20; //blink time=this*base blink
   params[3] = 10; //blink time emergency=this*base blink
   saveParameterToEprom(params , 4 , RIGHT_LIGHT);
 
   //sirene light
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   params[1] = 20; //base blink
   params[2] = 20; //blink time=this*base blink
   params[3] = 3; //blink time emergency=this*base blink
   saveParameterToEprom(params , 4 , SIRENE_LIGHT);
 
   //rear break light
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   params[1] = 30; //base blink
   params[2] = 30; //blink time=this*base blink
   params[3] = 20; //blink time emergency=this*base blink
   saveParameterToEprom(params , 4 , REAR_BREAK_LIGHT);
 
   //ir receive
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   saveParameterToEprom(params , 1 , IR_RECEIVE);
 
   //ir send
-  params[0] = 100; //max bright %
+  params[0] = 50; //max bright %
   saveParameterToEprom(params , 1 , IR_SEND);
 }
 
@@ -463,7 +481,7 @@ void setInitParams(){
         Serial.print("params element: ");
         Serial.print(i);
         Serial.print("\t");
-        for (j=0;j<elements[i].total_params;j++){
+        for (byte j=0;j<elements[i].total_params;j++){
           Serial.print(elements[i].params[j]);
           Serial.print("\t");
         }
@@ -513,7 +531,7 @@ void initElements() {
   elements[i].port = FRONT_LIGHT_PIN;
   //elements[i].controller = &controlFrontLight;  
   elements[i].controller = &controlBlinkLed;  
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
   //break light
@@ -521,7 +539,7 @@ void initElements() {
   elements[i].obj = BREAK_LIGHT;
   elements[i].port = BREAK_LIGHT_PIN;  
   elements[i].controller = &controlBlinkLed;   
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
 
@@ -530,7 +548,7 @@ void initElements() {
   elements[i].obj = LEFT_LIGHT;
   elements[i].port = LEFT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
   //right light
@@ -538,7 +556,7 @@ void initElements() {
   elements[i].obj = RIGHT_LIGHT;
   elements[i].port = RIGHT_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
   //sirene light
@@ -546,7 +564,7 @@ void initElements() {
   elements[i].obj = SIRENE_LIGHT;
   elements[i].port = SIRENE_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;   
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
   //REAR_BREAK_LIGHT
@@ -554,7 +572,7 @@ void initElements() {
   elements[i].obj = REAR_BREAK_LIGHT;
   elements[i].port = REAR_BREAK_LIGHT_PIN;
   elements[i].controller = &controlBlinkLed;    
-  aux = elements[i].params[1];
+  aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
   //IR_RECEIVE
@@ -740,26 +758,21 @@ void controlMotor(ELEMENTS * element) {
     element->auxTime = t + element->params[1] * element->params[2];
     element->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
-    return;
+    //return;
   }
   if (element->state == OFF && element->next == ON) {
     element->state = ACCELERATING;
     element->auxTime = t + element->params[1] * element->params[3];
     element->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
-    return;
-  }
-
-  if (element->state == ON) {    
-    SoftPWMSetPercent(element->port,element->actual_pwm_val);
-    return;
+    //return;
   }
 
   if (element->state == STOPING) {
     if (t > element->auxTime) {
       element->state = OFF;
     }
-    return;
+    //return;
   }
 
   if (element->state == ACCELERATING) {
