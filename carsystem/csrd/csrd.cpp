@@ -436,14 +436,14 @@ bool CSRD::isMyGroup(uint8_t mygroup){
 }
 
 bool CSRD::isLowBattery(uint8_t serveraddr){
-   if ((getVal0() == serveraddr) && (getState() == LOWBATTERY)){
+   if ((getVal0() == serveraddr) && (getState() == AC_LOWBATTERY)){
       return true;
    }
    return false;
 }
 
 bool CSRD::isRestoreDefaultConfig(uint16_t myid){
-   if (isAddressed() && isAction() && (getNodeNumber() == myid) && (getAction() == RESTORE_DEFAULT_PARAMS)){
+   if (isAddressed() && isAction() && (getNodeNumber() == myid) && (getAction() == AC_RESTORE_DEFAULT_PARAMS)){
       return true;
    }
    return false;
@@ -461,6 +461,13 @@ uint16_t CSRD::getNodeNumber(){
         return RP_FILLER;
     }
    return word(buffer[2],buffer[3]);
+}
+
+uint16_t CSRD::getStatusType(){
+    if (!isStatus()){
+        return RP_FILLER;
+    }
+   return buffer[2];
 }
 
 uint8_t CSRD::getStatus(){
@@ -510,19 +517,19 @@ uint8_t CSRD::getParamIdx(){
 uint8_t CSRD::getVal0(){
     if (isAddressed()){
         return buffer[6];
-    }
+    }    
     return buffer[5];
 }
 uint8_t CSRD::getVal1(){
     if (isAddressed()){
         return buffer[7];
-    }
+    }    
     return buffer[6];
 }
 uint8_t CSRD::getVal2(){
     if (isAddressed()){
         return RP_FILLER;
-    }
+    }    
     return buffer[7];
 }
 

@@ -53,6 +53,11 @@ typedef struct ELEMENTS {
 #define NUM_ELEMENTS 9
 struct ELEMENTS elements[NUM_ELEMENTS];
 
+//dynamic values
+
+#define D_VALUES 10
+uint8_t dvalues[D_VALUES];
+
 //radio buffer
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 RH_RF69 driver;
@@ -191,6 +196,8 @@ void loop() {
     if (newMessage){
       checkMsgRestoreDefault();        
       checkMsgWriteParameter();
+      checkAction();
+      
       if (status == ACTIVE){
         setNextOperation();
       }
@@ -298,6 +305,65 @@ void sendRegistrationMessage(){
           Serial.println("STATUS WAITING REGISTRATION");
       #endif
   }
+}
+
+//save parameter
+void checkAction(){  
+    if (car.isAction()){
+       if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
+          if (car.getElement() != 0xff){
+
+	     uint8_t action=car.getAction();
+             
+             if (action == AC_SET_PARAM){
+                uint8_t e = car.getElement();
+             	uint8_t p = car.getParamIdx();
+             	uint8_t v = car.getVal0();
+		int aux, aux1;	                  
+
+		if (e < NUM_ELEMENTS){
+		    if (p < elements[e].total_params){
+			elements[e].params[p]=v;		
+			if (p == 0){ //normally is the intensity (speed, light luminosity
+			    elements[e].actual_pwm_val = v;
+			}
+			if (e == MOTOR){
+			    aux = elements[e].params[1] * elements[e].params[2];
+			    aux1 = elements[e].params[1] * elements[e].params[3];                      
+			}
+			else{                      
+			    aux = elements[e].params[1] * elements[e].params[2];                      
+			    aux=aux1;
+			}   
+			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+			if ((e == MOTOR) && (elements[e].state == ON)) {    
+			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+		            return;
+			}              
+		    }
+		}
+	    }             
+          }
+          else{
+            //TODO board parameters            
+          }
+       }
+    }
+}
+
+//save parameter
+void checkQuery(){  
+    if (car.isStatus()){
+       if ( car.getNodeNumber() == nodeid ){
+	  uint8_t sttype=car.getStatusType();
+          if (sttype == STT_QUERY_VALUE){
+              uint8_t e = car.getElement();
+              uint8_t p1 = car.getParamIdx();
+              uint8_t p1 = car.getParamIdx();
+              uint8_t p1 = car.getParamIdx();
+	  }
+	}   
+    }             
 }
 
 //save parameter

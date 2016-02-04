@@ -58,6 +58,7 @@ If Broadcast
         Case Operation
             E is the next state
             F G H are general values
+
         case action
             E is the action
             F,G,H is the action param
@@ -76,7 +77,8 @@ If addressed message
             G H are a general value
         case action
             F is the action
-            G is the action param
+            G,H is the action param
+	    
 
 Status messages
     Initial register message
@@ -94,6 +96,18 @@ Status messages
         C and D = node id
         F = status (ACTIVE,INACTIVE,CHARGING,PANNE)
         G,H = optional values
+    Query value
+        B=0x03
+	C and D = node id
+	F=param1
+	G=param2
+	H=param3
+    Answer query
+        B=0x04
+	C and D = node id
+	F=param1 value
+	G=param2 value
+	H=param3 value
 
 Action messages
 

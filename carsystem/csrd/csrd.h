@@ -21,8 +21,9 @@ typedef enum states {
 };
 
 typedef enum ACTIONS{
-   LOWBATTERY=0,
-   RESTORE_DEFAULT_PARAMS
+   AC_LOWBATTERY=0,
+   AC_RESTORE_DEFAULT_PARAMS,
+   AC_SET_PARAM
 };
 
 //status
@@ -34,6 +35,14 @@ typedef enum STATUS {
    REGISTERED,
    NOT_REGISTERED,
    WAITING_REGISTRATION
+};
+
+//status type
+typedef enum STATUS_TYPE {
+   STT_QUERY_STATUS=1,
+   STT_ANSWER_STATUS,
+   STT_QUERY_VALUE,
+   STT_ANSWER_VALUE   
 };
 
 //which part
@@ -83,6 +92,8 @@ public:
     uint16_t getNodeNumber();
     uint16_t getSender(){return origin;};
     uint8_t getAction();
+    uint8_t getStatusType();
+
 
     bool sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastRequestRegister(uint8_t group);
