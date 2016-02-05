@@ -281,7 +281,7 @@ bool CSRD::sendLowBattery(uint8_t serverAddr,uint16_t nodeid){
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=255;
-    buf[5]=LOWBATTERY;
+    buf[5]=AC_LOWBATTERY;
     buf[6]=serverAddr;
     buf[7]=0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
@@ -294,7 +294,7 @@ bool CSRD::sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t n
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=255;
-    buf[5]=RESTORE_DEFAULT_PARAMS;
+    buf[5]=AC_RESTORE_DEFAULT_PARAMS;
     buf[6]=serverAddr;
     buf[7]=0;
     return sendMessage(buf,MESSAGE_SIZE,nodeAddr);
@@ -476,7 +476,7 @@ uint16_t CSRD::getNodeNumber(){
    return word(buffer[2],buffer[3]);
 }
 
-uint16_t CSRD::getStatusType(){
+uint8_t CSRD::getStatusType(){
     if (!isStatus()){
         return RP_FILLER;
     }
@@ -530,19 +530,19 @@ uint8_t CSRD::getParamIdx(){
 uint8_t CSRD::getVal0(){
     if (isAddressed()){
         return buffer[6];
-    }    
+    }
     return buffer[5];
 }
 uint8_t CSRD::getVal1(){
     if (isAddressed()){
         return buffer[7];
-    }    
+    }
     return buffer[6];
 }
 uint8_t CSRD::getVal2(){
     if (isAddressed()){
         return RP_FILLER;
-    }    
+    }
     return buffer[7];
 }
 

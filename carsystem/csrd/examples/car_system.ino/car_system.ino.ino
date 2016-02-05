@@ -85,7 +85,7 @@ uint8_t recbuffer[MESSAGE_SIZE];
 STATUS status;
 
 //node number and group
-uint16_t nodeid = 333;
+uint16_t nodeid = 999;
 uint8_t group = 1;
 uint8_t serverStation = 1;
 
@@ -138,6 +138,14 @@ void setup() {
   Serial.begin(19200);
   delay(100);
 
+
+  //int n=getNodeIdFromEprom();
+  //if (n>999){
+  //  nodeid=999;
+  //}
+  //else{
+  //  nodeid=n;
+  //}
   SoftPWMBegin();
   initElements();
   //Serial.println("SETUP");
@@ -310,41 +318,40 @@ void sendRegistrationMessage(){
 void checkAction(){  
     if (car.isAction()){
        if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
-          if (car.getElement() != 0xff){
-
-	     uint8_t action=car.getAction();
+          if (car.getElement() != BOARD){
+	            uint8_t action=car.getAction();
              
              if (action == AC_SET_PARAM){
                 uint8_t e = car.getElement();
-             	uint8_t p = car.getParamIdx();
-             	uint8_t v = car.getVal0();
-		int aux, aux1;	                  
-
-		if (e < NUM_ELEMENTS){
-		    if (p < elements[e].total_params){
-			elements[e].params[p]=v;		
-			if (p == 0){ //normally is the intensity (speed, light luminosity
-			    elements[e].actual_pwm_val = v;
-			}
-			if (e == MOTOR){
-			    aux = elements[e].params[1] * elements[e].params[2];
-			    aux1 = elements[e].params[1] * elements[e].params[3];                      
-			}
-			else{                      
-			    aux = elements[e].params[1] * elements[e].params[2];                      
-			    aux=aux1;
-			}   
-			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
-			if ((e == MOTOR) && (elements[e].state == ON)) {    
-			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-		            return;
-			}              
-		    }
-		}
-	    }             
+             	  uint8_t p = car.getParamIdx();
+             	  uint8_t v = car.getVal0();
+          		  int aux, aux1;	                  
+          
+            		if (e < NUM_ELEMENTS){
+            		    if (p < elements[e].total_params){
+              			  elements[e].params[p]=v;		
+                			if (p == 0){ //normally is the intensity (speed, light luminosity
+                			    elements[e].actual_pwm_val = v;
+                			}
+                			if (e == MOTOR){
+                			    aux = elements[e].params[1] * elements[e].params[2];
+                			    aux1 = elements[e].params[1] * elements[e].params[3];                      
+                			}
+                			else{                      
+                			    aux = elements[e].params[1] * elements[e].params[2];                      
+                			    aux=aux1;
+                			}   
+                			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+                			if ((e == MOTOR) && (elements[e].state == ON)) {    
+                			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+                		            return;
+                			}              
+            		    }
+            		}
+	          }             
           }
           else{
-            //TODO board parameters            
+              //TODO               
           }
        }
     }
@@ -358,8 +365,8 @@ void checkQuery(){
           if (sttype == STT_QUERY_VALUE){
               uint8_t e = car.getElement();
               uint8_t p1 = car.getParamIdx();
-              uint8_t p1 = car.getParamIdx();
-              uint8_t p1 = car.getParamIdx();
+              //uint8_t p1 = car.getParamIdx();
+              //uint8_t p1 = car.getParamIdx();
 	  }
 	}   
     }             
@@ -368,9 +375,10 @@ void checkQuery(){
 //save parameter
 void checkMsgWriteParameter(){  
     if (car.isWrite()){
-       if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
-          if (car.getElement() != 0xff){
-             uint8_t e = car.getElement();
+       if ( (car.isAddressed() ) || (car.isBroadcast() && car.isMyGroup(group)) ){
+          uint8_t e = car.getElement();
+          if ((e != BOARD) && (car.getNodeNumber() == nodeid)){
+             
              uint8_t p = car.getParamIdx();
              uint8_t v = car.getVal0();
              int aux, aux1;
@@ -379,8 +387,7 @@ void checkMsgWriteParameter(){
                 if (p < elements[e].total_params){
                    elements[e].params[p]=v;
                    uint8_t result = saveParameterToEprom(elements[e].params , elements[e].total_params , e);
-		   //send ack
-		   car.sendACKMessage(serverStation, nodeid,e,result);
+		               
                    if (p == 0){
                       elements[e].actual_pwm_val = v;
                    }
@@ -393,6 +400,8 @@ void checkMsgWriteParameter(){
                       aux=aux1;
                    }   
                    setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+                   //send ack
+                   car.sendACKMessage(serverStation, nodeid,e,result);
                    if ((e == MOTOR) && (elements[e].state == ON)) {    
                       SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
                       return;
@@ -400,8 +409,15 @@ void checkMsgWriteParameter(){
                 }
              }             
           }
-          else{
-            //TODO board parameters            
+          else if (e == BOARD){
+            uint8_t p = car.getParamIdx();
+              if (p==0){//Node id
+                uint16_t n = word(car.getVal1(),car.getVal0());
+                saveNodeIdToEprom(n);
+                nodeid=n;
+                status = NOT_REGISTERED;
+                sendRegistrationMessage();
+              }           
           }
        }
     }
@@ -420,7 +436,7 @@ void setNextOperation(){
     
     int e = car.getElement();
     states s = car.convertFromInt(car.getState());
-    if (e != 255) {
+    if (e != BOARD) {
       if (e < NUM_ELEMENTS) {
         elements[e].next = s;            
       }
@@ -502,7 +518,7 @@ void setDefaultParams(){
   //params[1] = 250;//base breaking time ms
   //params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
   //params[3] = 3;//breaking time(ms)=this*params[1]
-  if (setAndCheckParam(MOTOR,4,50,250,10,10) != 0){
+  if (setAndCheckParam(MOTOR,4,50,250,10,8) != 0){
       ok = false;
   }
   

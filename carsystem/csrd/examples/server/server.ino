@@ -60,7 +60,10 @@ void loop(){
     Serial.println();
     int nn=insertNode(server.getNodeNumber(),server.getSender());
     Serial.print("Confirming registration for ");
-    Serial.println(cars[nn]);
+    Serial.print(cars[nn]);
+    Serial.print("\t");
+    Serial.println(server.getNodeNumber());
+    
     server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
 
     //Serial.println("Message to restore eprom values ");
@@ -212,7 +215,7 @@ bool getSerialCommand(){
               snid[0]=serbuf[4];
 	            snid[1]=serbuf[5];
               snid[2]=serbuf[6];
-              //Serial.println("C BW");
+              Serial.println("Send broadcast write");
 
               return server.sendBroadcastWriteMessage(serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
           }
@@ -231,6 +234,7 @@ bool getSerialCommand(){
                   if (s==255){
                     s=0;
                   }
+                   Serial.println("Send Restore");
                   return server.sendRestoreDefaultConfig(serverId,nn,s);
                 }
                
@@ -241,12 +245,31 @@ bool getSerialCommand(){
           if (serbuf[1] == 'O' || serbuf[1] == 'o') {
               //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
 	            //Serial.println("C BO");
+               Serial.println("Send broadcast operation");
               return server.sendBroadcastOPMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
           }
 
           if (serbuf[1] == 'C' || serbuf[1] == 'c') {
-              //Serial.println("C BC");
-               return true; //need to implement
+              
+              snid[0]=serbuf[5];
+              snid[1]=serbuf[6];
+              snid[2]=serbuf[7];
+              //Serial.println("C AW");
+              //Serial.print("PARAM:");
+              //Serial.println(getNN(snid));
+              uint8_t p0,p1;
+              int v=getNN(snid);
+              if (v>255){
+                p0=highByte(v);
+                p1=lowByte(v);
+              }
+              else{
+                p1=0;
+                p0=v;
+              }
+              Serial.println("Send Broadcast action");
+              
+               return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),serbuf[4],p0,p1);
           }
        }
 
@@ -267,8 +290,18 @@ bool getSerialCommand(){
               //Serial.println("C AW");
               //Serial.print("PARAM:");
               //Serial.println(getNN(snid));
-
-              return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),getNN(snid),0);
+              uint8_t p0,p1;
+              int v=getNN(snid);
+              if (v>255){
+                p1=highByte(v);
+                p0=lowByte(v);
+              }
+              else{
+                p1=0;
+                p0=v;
+              }
+               Serial.println("Send addressed write");
+              return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),p0,p1);
           }
           if (serbuf[1] == 'R' || serbuf[1] == 'r') {
                //example: AR33360 -> A=addressed R=read 333=node 6=element_motor 0=param0
@@ -281,7 +314,7 @@ bool getSerialCommand(){
               //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
 	            //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
               //Serial.println("C AO");
-
+               Serial.println("Send addressed operation");
               return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
           }
           if (serbuf[1] == 'C' || serbuf[1] == 'c') {

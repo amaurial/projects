@@ -42,7 +42,7 @@ typedef enum STATUS_TYPE {
    STT_QUERY_STATUS=1,
    STT_ANSWER_STATUS,
    STT_QUERY_VALUE,
-   STT_ANSWER_VALUE   
+   STT_ANSWER_VALUE
 };
 
 //which part
@@ -55,7 +55,8 @@ typedef enum objects_enum {
   FRONT_LIGHT,
   MOTOR,
   IR_RECEIVE,
-  IR_SEND
+  IR_SEND,
+  BOARD=9
 };
 
 class CSRD {
