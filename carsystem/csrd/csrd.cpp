@@ -101,6 +101,19 @@ bool CSRD::sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
+bool CSRD::sendACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t status){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_STATUS;
+    buf[1]=RP_REPORT_ACK;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=status;
+    buf[6]=0;
+    buf[7]=0;
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
 bool CSRD::sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
 

@@ -10,8 +10,10 @@
 #define RP_READ         2
 #define RP_ACTION       3
 
+//status messages
 #define RP_INITIALREG          0
 #define RP_REPORT_STATUS       1
+#define RP_REPORT_ACK          2
 
 #define PARAMETERS_SIZE         11
 
@@ -108,7 +110,11 @@ Status messages
 	F=param1 value
 	G=param2 value
 	H=param3 value
-
+    ACK
+        B=0x04
+        C and D = node id
+        E = element
+        F = status
 Action messages
 
 */

@@ -112,6 +112,7 @@ public:
     bool sendBackToNormal(uint8_t serverAddr,uint16_t nodeid);
     bool sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr);
     bool sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status);
+    bool sendACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t status);
 
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();

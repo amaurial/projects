@@ -244,7 +244,6 @@ void checkMsgRestoreDefault(){
       //#endif
        setDefaultParams();
        initElements();
-       //setInitParams();
     }
 }
 
@@ -379,7 +378,9 @@ void checkMsgWriteParameter(){
              if (e < NUM_ELEMENTS){
                 if (p < elements[e].total_params){
                    elements[e].params[p]=v;
-                   saveParameterToEprom(elements[e].params , elements[e].total_params , e);
+                   uint8_t result = saveParameterToEprom(elements[e].params , elements[e].total_params , e);
+		   //send ack
+		   car.sendACKMessage(serverStation, nodeid,e,result);
                    if (p == 0){
                       elements[e].actual_pwm_val = v;
                    }
@@ -478,65 +479,103 @@ int getSpeed(){
   
 }
 
-void setDefaultParams(){
-  uint8_t params[MAXPARAMS];
-  
+ uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1, uint8_t p2, uint8_t p3){
+    uint8_t params[MAXPARAMS];
+    uint8_t r;
+    params[0] = p0;//max speed %
+    params[1] = p1;//base breaking time ms
+    params[2] = p2;//acc time(ms)=this*params[1].time to reach the max speed after start
+    params[3] = p3;//breaking time(ms)=this*params[1]
+    r = saveParameterToEprom(params , num_param , element);  
+    if (r != 0 ){
+	car.sendACKMessage(serverStation, nodeid,element,r);
+        return r;
+    }
+    return 0;
+}
+
+void setDefaultParams(){  
+  uint8_t r;
+  bool ok = true;
   //MOTOR
-  params[0] = 50;//max speed %
-  params[1] = 250;//base breaking time ms
-  params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
-  params[3] = 3;//breaking time(ms)=this*params[1]
-  saveParameterToEprom(params , 4 , MOTOR);
+  //params[0] = 50;//max speed %
+  //params[1] = 250;//base breaking time ms
+  //params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
+  //params[3] = 3;//breaking time(ms)=this*params[1]
+  if (setAndCheckParam(MOTOR,4,50,250,10,10) != 0){
+      ok = false;
+  }
+  
 
   //front light
-  params[0] = 50; //max bright % 
-  params[1] = 20; //base blink
-  params[2] = 20; //blink time=this*base blink
-  params[3] = 10; //blink time emergency=this*base blink 
-  saveParameterToEprom(params , 1 , FRONT_LIGHT);
-
+  //params[0] = 50; //max bright % 
+  //params[1] = 20; //base blink
+  //params[2] = 20; //blink time=this*base blink
+  //params[3] = 10; //blink time emergency=this*base blink 
+  if (setAndCheckParam(FRONT_LIGHT,1,50,0,0,0) != 0){
+      ok = false;
+  }
+  
   //break light
-  params[0] = 50; //max bright %
-  params[1] = 30; //base blink
-  params[2] = 30; //blink time=this*base blink
-  params[3] = 20; //blink time emergency=this*base blink
-  saveParameterToEprom(params , 4 , BREAK_LIGHT);
+  //params[0] = 50; //max bright %
+  //params[1] = 30; //base blink
+  //params[2] = 30; //blink time=this*base blink
+  //params[3] = 20; //blink time emergency=this*base blink
+  if (setAndCheckParam(BREAK_LIGHT,4,50,30,30,20) != 0){
+      ok = false;
+  }  
 
   //left light
-  params[0] = 50; //max bright %
-  params[1] = 20; //base blink
-  params[2] = 20; //blink time=this*base blink
-  params[3] = 10; //blink time emergency=this*base blink
-  saveParameterToEprom(params , 4 , LEFT_LIGHT);
-
+  //params[0] = 50; //max bright %
+  //params[1] = 20; //base blink
+  //params[2] = 20; //blink time=this*base blink
+  //params[3] = 10; //blink time emergency=this*base blink  
+  if (setAndCheckParam(LEFT_LIGHT,4,50,20,20,10) != 0){
+      ok = false;
+  }
   //right light
-  params[0] = 50; //max bright %
-  params[1] = 20; //base blink
-  params[2] = 20; //blink time=this*base blink
-  params[3] = 10; //blink time emergency=this*base blink
-  saveParameterToEprom(params , 4 , RIGHT_LIGHT);
+  //params[0] = 50; //max bright %
+  //params[1] = 20; //base blink
+  //params[2] = 20; //blink time=this*base blink
+  //params[3] = 10; //blink time emergency=this*base blink  
+  if (setAndCheckParam(RIGHT_LIGHT,4,50,20,20,10) != 0){
+      ok = false;
+  }
 
   //sirene light
-  params[0] = 50; //max bright %
-  params[1] = 20; //base blink
-  params[2] = 20; //blink time=this*base blink
-  params[3] = 3; //blink time emergency=this*base blink
-  saveParameterToEprom(params , 4 , SIRENE_LIGHT);
+  //params[0] = 50; //max bright %
+  //params[1] = 20; //base blink
+  //params[2] = 20; //blink time=this*base blink
+  //params[3] = 3; //blink time emergency=this*base blink
+  if (setAndCheckParam(SIRENE_LIGHT,4,50,20,20,10) != 0){
+      ok = false;
+  }  
 
   //rear break light
-  params[0] = 50; //max bright %
-  params[1] = 30; //base blink
-  params[2] = 30; //blink time=this*base blink
-  params[3] = 20; //blink time emergency=this*base blink
-  saveParameterToEprom(params , 4 , REAR_BREAK_LIGHT);
+  //params[0] = 50; //max bright %
+  //params[1] = 30; //base blink
+  //params[2] = 30; //blink time=this*base blink
+  //params[3] = 20; //blink time emergency=this*base blink  
+  if (setAndCheckParam(REAR_BREAK_LIGHT,4,50,30,30,20) != 0){
+      ok = false;
+  }  
 
   //ir receive
-  params[0] = 50; //max bright %
-  saveParameterToEprom(params , 1 , IR_RECEIVE);
+  //params[0] = 50; //max bright %  
+  if (setAndCheckParam(IR_RECEIVE,1,50,0,0,0) != 0){
+      ok = false;
+  }
 
   //ir send
-  params[0] = 50; //max bright %
-  saveParameterToEprom(params , 1 , IR_SEND);
+  //params[0] = 50; //max bright %
+  if (setAndCheckParam(IR_SEND,1,50,0,0,0) != 0){
+      ok = false;
+  }
+
+  if (ok){
+     car.sendACKMessage(serverStation, nodeid,254,0);
+  }
+
 }
 
 void setInitParams(){
@@ -863,10 +902,10 @@ void controlMotor(ELEMENTS * element) {
  * the next part starts at multiples of MAXPARAMS
  */
 
-void getParameterFromEprom(byte *params, byte numParams, byte obj) {
+uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
-    return;
+    return 1;
   }
   int i = 0;
   byte val;
@@ -876,7 +915,7 @@ void getParameterFromEprom(byte *params, byte numParams, byte obj) {
     #ifdef DEBUG_CAR
           Serial.println("Failed to get eprom. eprom size");
     #endif
-    return;
+    return 2;
   }
   //Serial.print("getting element:");
   //Serial.print(obj);
@@ -892,16 +931,17 @@ void getParameterFromEprom(byte *params, byte numParams, byte obj) {
     //Serial.print("\t");
   }
   //Serial.println();
+return 0;
 }
 
 
-void saveParameterToEprom(byte *params, byte numParams, byte obj) {
+uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
     #ifdef DEBUG_CAR
           Serial.println("Failed to save to eprom maxparam");
      #endif
-    return;
+    return 1;
   }
   int i = 0;
   byte val = 0;
@@ -911,7 +951,7 @@ void saveParameterToEprom(byte *params, byte numParams, byte obj) {
     #ifdef DEBUG_CAR
           Serial.println("Failed to save to eprom. eprom size");
     #endif
-    return;
+    return 2;
   }
   //Serial.print("saving element:");
   //Serial.print(obj);
@@ -927,6 +967,25 @@ void saveParameterToEprom(byte *params, byte numParams, byte obj) {
     EEPROM.write(startpos + i, params[i]);    
   }
   //Serial.println();
+  return 0;
+}
+
+
+uint8_t saveNodeIdToEprom(uint16_t node) {  
+  byte val0 = highByte(node);  
+  byte val1 = lowByte(node);  
+   
+  EEPROM.write(0,val0);
+  EEPROM.write(1,val1); 
+ 
+  return 0;
+}
+
+uint16_t getNodeIdFromEprom() {  
+  byte val0 = EEPROM.read(0);
+  byte val1 = EEPROM.read(1);  
+   
+  return word(val0,val1); 
 }
 
 
