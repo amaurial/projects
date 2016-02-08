@@ -250,10 +250,12 @@ bool getSerialCommand(){
           }
 
           if (serbuf[1] == 'C' || serbuf[1] == 'c') {
-              
+              //bc260100 = bc=broadcast action 2=set param 6=motor 0=speed 100=value
               snid[0]=serbuf[5];
               snid[1]=serbuf[6];
               snid[2]=serbuf[7];
+              int v=getNN(snid);
+              
               //Serial.println("C AW");
               //Serial.print("PARAM:");
               //Serial.println(getNN(snid));
@@ -268,8 +270,8 @@ bool getSerialCommand(){
                 p0=v;
               }
               Serial.println("Send Broadcast action");
-              
-               return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),serbuf[4],p0,p1);
+                 //bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
+               return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[3]),charToInt(serbuf[2]),serbuf[4],p0,p1);
           }
        }
 
@@ -317,9 +319,37 @@ bool getSerialCommand(){
                Serial.println("Send addressed operation");
               return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
           }
-          if (serbuf[1] == 'C' || serbuf[1] == 'c') {
-            //Serial.println("C AC");
-               return true; //need to implement
+            if (serbuf[1] == 'C' || serbuf[1] == 'c') {
+                //Serial.println("C AC");
+                //ac111260100 = ac=addressed action 111=node 6=motor 0=speed 100=value
+
+                snid[0]=serbuf[2];
+                snid[1]=serbuf[3];
+                snid[2]=serbuf[4];
+                int nn=getNN(snid);
+                
+                snid[0]=serbuf[8];
+                snid[1]=serbuf[9];
+                snid[2]=serbuf[10];
+                int v=getNN(snid);
+                
+                //Serial.println("C AW");
+                //Serial.print("PARAM:");
+                //Serial.println(getNN(snid));
+                uint8_t p0,p1;
+                int v=getNN(snid);
+                if (v>255){
+                  p0=highByte(v);
+                  p1=lowByte(v);
+                }
+                else{
+                  p1=0;
+                  p0=v;
+                }
+                Serial.println("Send Broadcast action");
+                   //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
+                 return server.sendAddressedActionMessage(serverId,nn, charToInt(serbuf[6]),charToInt(serbuf[5]),serbuf[7],p0,p1);
+            }
           }
        }
 

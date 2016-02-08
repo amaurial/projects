@@ -55,8 +55,8 @@ struct ELEMENTS elements[NUM_ELEMENTS];
 
 //dynamic values
 
-#define D_VALUES 10
-uint8_t dvalues[D_VALUES];
+#define D_VALUES 5
+uint16_t dvalues[D_VALUES];
 
 //radio buffer
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
@@ -139,13 +139,13 @@ void setup() {
   delay(100);
 
 
-  //int n=getNodeIdFromEprom();
-  //if (n>999){
-  //  nodeid=999;
-  //}
-  //else{
-  //  nodeid=n;
-  //}
+  uint16_t n=getNodeIdFromEprom();
+  if (n>999){
+    nodeid=999;
+  }
+  else{
+    nodeid=n;
+  }
   SoftPWMBegin();
   initElements();
   //Serial.println("SETUP");
@@ -214,6 +214,7 @@ void loop() {
     //if (elements[MOTOR].state==ON){
       msamples++;
       motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/msamples;
+      dvalues[0] = motor_rotation;
       if (msamples > 1000){
         //Serial.print("motor current: ");
         //Serial.println(motor_rotation);
@@ -227,13 +228,14 @@ void loop() {
           //send the IR moving signal
         }
       }
+      dvalues[1] = analogRead(BATTERY_PIN);
       
    // }
 }
 
 void dumpMessage() {
 
-//#ifdef DEBUG_CAR  
+#ifdef DEBUG_CAR  
   Serial.println("New Message");
   car.getMessageBuffer(recbuffer);
   for (byte i = 0; i < MESSAGE_SIZE; i++) {
@@ -241,7 +243,7 @@ void dumpMessage() {
     Serial.print ("   ");
   }
   Serial.println();
-//#endif
+#endif
 }
 
 //restore default parameters
@@ -318,7 +320,7 @@ void sendRegistrationMessage(){
 void checkAction(){  
     if (car.isAction()){
        if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
-          if (car.getElement() != BOARD){
+          //if (car.getElement() != BOARD){
 	            uint8_t action=car.getAction();
              
              if (action == AC_SET_PARAM){
@@ -327,7 +329,7 @@ void checkAction(){
              	  uint8_t v = car.getVal0();
           		  int aux, aux1;	                  
           
-            		if (e < NUM_ELEMENTS){
+            		if (e != BOARD){
             		    if (p < elements[e].total_params){
               			  elements[e].params[p]=v;		
                 			if (p == 0){ //normally is the intensity (speed, light luminosity
@@ -344,15 +346,15 @@ void checkAction(){
                 			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
                 			if ((e == MOTOR) && (elements[e].state == ON)) {    
                 			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-                		            return;
+                		      return;
                 			}              
             		    }
             		}
-	          }             
-          }
-          else{
-              //TODO               
-          }
+               else {
+                  //TODO
+               }
+	         }             
+                    
        }
     }
 }
@@ -361,14 +363,14 @@ void checkAction(){
 void checkQuery(){  
     if (car.isStatus()){
        if ( car.getNodeNumber() == nodeid ){
-	  uint8_t sttype=car.getStatusType();
+	        uint8_t sttype=car.getStatusType();
           if (sttype == STT_QUERY_VALUE){
               uint8_t e = car.getElement();
               uint8_t p1 = car.getParamIdx();
               //uint8_t p1 = car.getParamIdx();
               //uint8_t p1 = car.getParamIdx();
-	  }
-	}   
+	         }
+	     }   
     }             
 }
 
@@ -398,14 +400,19 @@ void checkMsgWriteParameter(){
                    else{                      
                       aux = elements[e].params[1] * elements[e].params[2];                      
                       aux=aux1;
-                   }   
-                   setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+                   }
+                   SoftPWMSetFadeTime(elements[e].port, aux, aux1);   
+                   //setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
                    //send ack
                    car.sendACKMessage(serverStation, nodeid,e,result);
                    if ((e == MOTOR) && (elements[e].state == ON)) {    
                       SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
                       return;
-                  }              
+                  } 
+                  else 
+                  {
+                      SoftPWMSet(elements[e].port, elements[e].actual_pwm_val);          
+                  }
                 }
              }             
           }
@@ -518,7 +525,7 @@ void setDefaultParams(){
   //params[1] = 250;//base breaking time ms
   //params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
   //params[3] = 3;//breaking time(ms)=this*params[1]
-  if (setAndCheckParam(MOTOR,4,50,250,10,8) != 0){
+  if (setAndCheckParam(MOTOR,4,30,250,10,8) != 0){
       ok = false;
   }
   
@@ -528,7 +535,7 @@ void setDefaultParams(){
   //params[1] = 20; //base blink
   //params[2] = 20; //blink time=this*base blink
   //params[3] = 10; //blink time emergency=this*base blink 
-  if (setAndCheckParam(FRONT_LIGHT,1,50,0,0,0) != 0){
+  if (setAndCheckParam(FRONT_LIGHT,1,20,0,0,0) != 0){
       ok = false;
   }
   
@@ -537,7 +544,7 @@ void setDefaultParams(){
   //params[1] = 30; //base blink
   //params[2] = 30; //blink time=this*base blink
   //params[3] = 20; //blink time emergency=this*base blink
-  if (setAndCheckParam(BREAK_LIGHT,4,50,30,30,20) != 0){
+  if (setAndCheckParam(BREAK_LIGHT,4,20,30,30,20) != 0){
       ok = false;
   }  
 
@@ -546,7 +553,7 @@ void setDefaultParams(){
   //params[1] = 20; //base blink
   //params[2] = 20; //blink time=this*base blink
   //params[3] = 10; //blink time emergency=this*base blink  
-  if (setAndCheckParam(LEFT_LIGHT,4,50,20,20,10) != 0){
+  if (setAndCheckParam(LEFT_LIGHT,4,20,20,20,10) != 0){
       ok = false;
   }
   //right light
@@ -554,7 +561,7 @@ void setDefaultParams(){
   //params[1] = 20; //base blink
   //params[2] = 20; //blink time=this*base blink
   //params[3] = 10; //blink time emergency=this*base blink  
-  if (setAndCheckParam(RIGHT_LIGHT,4,50,20,20,10) != 0){
+  if (setAndCheckParam(RIGHT_LIGHT,4,20,20,20,10) != 0){
       ok = false;
   }
 
@@ -563,7 +570,7 @@ void setDefaultParams(){
   //params[1] = 20; //base blink
   //params[2] = 20; //blink time=this*base blink
   //params[3] = 3; //blink time emergency=this*base blink
-  if (setAndCheckParam(SIRENE_LIGHT,4,50,20,20,10) != 0){
+  if (setAndCheckParam(SIRENE_LIGHT,4,20,20,20,10) != 0){
       ok = false;
   }  
 
@@ -572,19 +579,19 @@ void setDefaultParams(){
   //params[1] = 30; //base blink
   //params[2] = 30; //blink time=this*base blink
   //params[3] = 20; //blink time emergency=this*base blink  
-  if (setAndCheckParam(REAR_BREAK_LIGHT,4,50,30,30,20) != 0){
+  if (setAndCheckParam(REAR_BREAK_LIGHT,4,20,30,30,20) != 0){
       ok = false;
   }  
 
   //ir receive
   //params[0] = 50; //max bright %  
-  if (setAndCheckParam(IR_RECEIVE,1,50,0,0,0) != 0){
+  if (setAndCheckParam(IR_RECEIVE,1,20,0,0,0) != 0){
       ok = false;
   }
 
   //ir send
   //params[0] = 50; //max bright %
-  if (setAndCheckParam(IR_SEND,1,50,0,0,0) != 0){
+  if (setAndCheckParam(IR_SEND,1,20,0,0,0) != 0){
       ok = false;
   }
 
