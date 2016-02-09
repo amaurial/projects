@@ -271,9 +271,9 @@ void confirmRegistrationMessage(){
 
     if (car.isStatus() && car.getNodeNumber() == serverStation && car.getStatus() == ACTIVE) {
       status = ACTIVE;
-      //#ifdef DEBUG_CAR
+      #ifdef DEBUG_CAR
             Serial.println("STATUS ACTIVE");
-      //#endif
+      #endif
     }
   }
 
