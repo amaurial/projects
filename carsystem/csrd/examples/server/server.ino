@@ -31,7 +31,7 @@ long last_request_register_time = 0;
 
 long last_request_battery = 0;
 int request_battery_time = 500;   
-int request_battery_time_step = 2;
+int request_battery_time_step = 6;
 
 
 void setup(){
@@ -63,12 +63,14 @@ void loop(){
     Serial.println("New message");
     dumpMessage();
     Serial.println();
-    int nn=insertNode(server.getNodeNumber(),server.getSender());
-    if (getCarIdx(server.getNodeNumber()) == 255){
+    
+    if (server.isStatus() && (server.getStatusType() == RP_INITIALREG)){
+      byte nn=insertNode(server.getNodeNumber(),server.getSender());
        Serial.print("Confirming registration for ");
        Serial.print(cars[nn]);
        Serial.print("\t");
        Serial.println(server.getNodeNumber());
+       
        server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
     }                
 
@@ -138,7 +140,7 @@ void loop(){
   }
 */
   sendRequestRegister();
-  requestBatterySpeedLevel(); 
+  //requestBatterySpeedLevel(); 
 }
 
 

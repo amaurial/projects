@@ -101,7 +101,7 @@ public:
     bool sendBroadcastRequestRegister(uint8_t group);
     bool sendBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
-    
+
     bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
     bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
     bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
@@ -136,7 +136,7 @@ private:
     uint16_t origin;
     uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];//radio buffer
     uint8_t length;
-    int radioBuffSize;
+    uint8_t radioBuffSize;
     void dumpBuffer(uint8_t *pbuf);
 };
 

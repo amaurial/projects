@@ -55,6 +55,7 @@ bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
             #endif // CSRD_DEBUG
         return manager->sendtoWait(sbuffer, len, serverAddr);
     }else{
+        //driver->setModeTx();
         #ifdef CSRD_DEBUG
                 Serial.println("Send message by the driver.");
         #endif // CSRD_DEBUG
@@ -233,7 +234,7 @@ bool CSRD::sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,ui
     buf[4]=element;
     buf[5]=p0;
     buf[6]=p1;
-    buf[7]=p2;    
+    buf[7]=p2;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
@@ -329,14 +330,14 @@ bool CSRD::readMessage(){
 
 
     // Wait for a message addressed to us from the client
-    if (isRadioOn())
-    {
+    //if (isRadioOn())
+    //{
         uint8_t from;
         uint8_t len=radioBuffSize;
 
-        if (this->manager!=NULL){
+        if (manager!=NULL){
 
-                if (this->manager->recvfromAck(buf, &len, &from))
+                if (manager->recvfromAck(buf, &len, &from))
                 {
                     #ifdef CSRD_DEBUG
                       Serial.print("got request from : 0x");
@@ -366,7 +367,8 @@ bool CSRD::readMessage(){
             }
 
         else {
-            if (this->driver->recv(buf,&len)){
+            //driver->setModeRx();
+            if (driver->recv(buf,&len)){
                 length=len;
                 if (length>0){
                     memset(buffer,'\0',MESSAGE_SIZE);
@@ -377,7 +379,7 @@ bool CSRD::readMessage(){
             }
         }
 
-  }
+  //}
     return false;
 }
 
@@ -476,7 +478,7 @@ bool CSRD::isRestoreDefaultConfig(uint16_t myid){
 }
 
 uint8_t CSRD::getElement(){
-    if (isAddressed()){
+    if (isAddressed() || isStatus()){
         return buffer[4];
     }
     return buffer[3];

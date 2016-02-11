@@ -147,7 +147,7 @@ void setup() {
     nodeid=n;
   }
   SoftPWMBegin();
-  initElements();
+  
   //Serial.println("SETUP");
 
   //if (!car.init(&driver,&manager)){
@@ -174,7 +174,7 @@ void setup() {
 
   randomSeed(analogRead(0));
   refresh_registration = random(1, 3000);
-
+  initElements();
   Serial.println("START CLIENT");
 }
 
@@ -192,9 +192,9 @@ void loop() {
     newMessage = car.readMessage();
   
     if (newMessage) {
-      //#ifdef DEBUG_CAR
+      #ifdef DEBUG_CAR
         dumpMessage();
-      //#endif
+      #endif
       confirmRegistrationMessage();
     }
  
@@ -205,6 +205,7 @@ void loop() {
       checkMsgRestoreDefault();        
       checkMsgWriteParameter();
       checkAction();
+      checkQuery();
       
       if (status == ACTIVE){
         setNextOperation();
@@ -214,7 +215,7 @@ void loop() {
     //if (elements[MOTOR].state==ON){
       msamples++;
       motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/msamples;
-      dvalues[0] = motor_rotation;
+      dvalues[1] = motor_rotation;
       if (msamples > 1000){
         //Serial.print("motor current: ");
         //Serial.println(motor_rotation);
@@ -228,7 +229,8 @@ void loop() {
           //send the IR moving signal
         }
       }
-      dvalues[1] = analogRead(BATTERY_PIN);
+      checkBattery();
+      
       
    // }
 }
@@ -249,9 +251,9 @@ void dumpMessage() {
 //restore default parameters
 void checkMsgRestoreDefault(){  
     if (car.isRestoreDefaultConfig(nodeid)){
-       //#ifdef DEBUG_CAR
+       #ifdef DEBUG_CAR
             Serial.println("Restore default values");
-      //#endif
+      #endif
        setDefaultParams();
        initElements();
     }
@@ -261,12 +263,14 @@ void checkMsgRestoreDefault(){
 void confirmRegistrationMessage(){
   if (status == WAITING_REGISTRATION) {
       #ifdef DEBUG_CAR
+      /*
           Serial.print("registration message?: \t");
           Serial.print(car.isStatus());
           Serial.print("\t");
           Serial.println(car.getStatus());
           Serial.print("\t");
           Serial.print(car.getNodeNumber());
+          */
       #endif
 
     if (car.isStatus() && car.getNodeNumber() == serverStation && car.getStatus() == ACTIVE) {
@@ -287,9 +291,10 @@ void sendRegistrationMessage(){
        (newMessage && car.isBroadcastRegister() && car.isMyGroup(group) )) {
           
           #ifdef DEBUG_CAR
+          /*
              Serial.println();
              Serial.println("Need to register?");
-             printStatus();
+             //printStatus();
              Serial.print("new message: ");
              Serial.println(newMessage);
              Serial.print("broadcast reg: ");
@@ -302,6 +307,7 @@ void sendRegistrationMessage(){
              Serial.println(refresh_registration);   
              Serial.println();
               Serial.println("Sending initial registration data");
+           */   
           #endif
       //send message. change the status
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
@@ -311,7 +317,7 @@ void sendRegistrationMessage(){
       last_registration = millis();
      
       #ifdef DEBUG_CAR
-          Serial.println("STATUS WAITING REGISTRATION");
+          //Serial.println("STATUS WAITING REGISTRATION");
       #endif
   }
 }
@@ -363,19 +369,20 @@ void checkAction(){
 void checkQuery(){  
     if (car.isStatus()){
        if ( car.getNodeNumber() == nodeid ){
-	        uint8_t sttype=car.getStatusType();
+	        uint8_t sttype=car.getStatusType();          
           if (sttype == STT_QUERY_VALUE){
               uint8_t e = car.getElement();
               uint8_t p0 = car.getVal0();
-              uint8_t p1 = car.getVal0();
-              uint8_t p2 = car.getVal0();
-
+              uint8_t p1 = car.getVal1();
+              uint8_t p2 = car.getVal2();
+              
               switch (e){
                 case BOARD:
                     //board has only 2 params
                     //bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
-                    if (p0 < 2 && p1 < 2){
-                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE,car.getSender(),nodeid, e, dvalues[p0],dvalues[p1], 255);  
+                    
+                    if ((p0 < 2) && (p1 < 2)){
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE,car.getSender(),nodeid, e, (dvalues[p0]/1023)*100, (dvalues[p1]/1024)*100, 255);  
                     }
                     else{
                       car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL,car.getSender(),nodeid, e, p0,p1,p2);  
@@ -458,7 +465,7 @@ void setNextOperation(){
     int e = car.getElement();
     states s = car.convertFromInt(car.getState());
     if (e != BOARD) {
-      if (e < NUM_ELEMENTS) {
+      if (e < NUM_ELEMENTS) {        
         elements[e].next = s;            
       }
     }
@@ -502,6 +509,7 @@ void checkBattery(){
   bat_level = (bat_level + l) / bat_reads;
 
   if (bat_reads > BAT_LEVEL_READ){
+    dvalues[0]=bat_level;
     if (bat_level >= 643){
       //send message
       car.sendLowBattery(serverStation,nodeid);
@@ -511,10 +519,6 @@ void checkBattery(){
   }
 }
 
-int getSpeed(){
-  int l = analogRead(MOTOR_ROTATION_PIN);
-  
-}
 
  uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1, uint8_t p2, uint8_t p3){
     uint8_t params[MAXPARAMS];
@@ -525,7 +529,7 @@ int getSpeed(){
     params[3] = p3;//breaking time(ms)=this*params[1]
     r = saveParameterToEprom(params , num_param , element);  
     if (r != 0 ){
-	car.sendACKMessage(serverStation, nodeid,element,r);
+	  car.sendACKMessage(serverStation, nodeid,element,r);
         return r;
     }
     return 0;
@@ -549,7 +553,7 @@ void setDefaultParams(){
   //params[1] = 20; //base blink
   //params[2] = 20; //blink time=this*base blink
   //params[3] = 10; //blink time emergency=this*base blink 
-  if (setAndCheckParam(FRONT_LIGHT,1,20,0,0,0) != 0){
+  if (setAndCheckParam(FRONT_LIGHT,4,10,20,20,20) != 0){
       ok = false;
   }
   
@@ -558,7 +562,7 @@ void setDefaultParams(){
   //params[1] = 30; //base blink
   //params[2] = 30; //blink time=this*base blink
   //params[3] = 20; //blink time emergency=this*base blink
-  if (setAndCheckParam(BREAK_LIGHT,4,20,30,30,20) != 0){
+  if (setAndCheckParam(BREAK_LIGHT,4,10,30,30,20) != 0){
       ok = false;
   }  
 
@@ -616,9 +620,12 @@ void setDefaultParams(){
 }
 
 void setInitParams(){
-  
-  for (byte i = 0; i < NUM_ELEMENTS; i++) {
-      if (getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
+  #ifdef DEBUG_CAR
+  Serial.println("Loading from eprom");
+  #endif
+  byte i = 0;
+  for (i = 0; i < NUM_ELEMENTS; i++) {
+      if ((getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
         Serial.print("Failed to load eprom for element ");
         Serial.println(i);
       }
@@ -641,8 +648,8 @@ void setPWM(byte idx,byte init_val,int p1, int p2){
 }
 
 void initElements() {
-  byte i = MOTOR;
-  int aux, aux1;
+  
+  
 
   elements[MOTOR].total_params = 4;
   elements[FRONT_LIGHT].total_params = 4;
@@ -661,7 +668,8 @@ void initElements() {
     elements[j].state = OFF;
     elements[j].next = OFF;
   }
-  
+  byte i = MOTOR;
+  int aux, aux1;
   //motor  
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
@@ -905,7 +913,7 @@ void controlMotor(ELEMENTS * element) {
     SoftPWMSetPercent(element->port, 0);
     //return;
   }
-  if (element->state == OFF && element->next == ON) {
+  if (element->state == OFF && element->next == ON) {    
     element->state = ACCELERATING;
     element->auxTime = t + element->params[1] * element->params[3];
     element->actual_pwm_val = element->params[0];
@@ -947,7 +955,7 @@ uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
   if (numParams > MAXPARAMS) {
     return 1;
   }
-  int i = 0;
+  byte i = 0;
   byte val;
   int startpos = MEMORY_REF + (MAXPARAMS * obj);
 
@@ -979,7 +987,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
     #ifdef DEBUG_CAR
-          Serial.println("Failed to save to eprom maxparam");
+         // Serial.println("Failed to save to eprom maxparam");
      #endif
     return 1;
   }
@@ -989,7 +997,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
     #ifdef DEBUG_CAR
-          Serial.println("Failed to save to eprom. eprom size");
+          //Serial.println("Failed to save to eprom. eprom size");
     #endif
     return 2;
   }
