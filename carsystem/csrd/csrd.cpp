@@ -224,6 +224,19 @@ bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
+bool CSRD::sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0]=RP_STATUS;
+    buf[1]=status_code;
+    buf[2]=highByte(nodeid);
+    buf[3]=lowByte(nodeid);
+    buf[4]=element;
+    buf[5]=p0;
+    buf[6]=p1;
+    buf[7]=p2;    
+    return sendMessage(buf,MESSAGE_SIZE,serverAddr);
+}
+
 bool CSRD::sendEmergencyBroadcast(uint8_t group){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
@@ -480,7 +493,7 @@ uint8_t CSRD::getStatusType(){
     if (!isStatus()){
         return RP_FILLER;
     }
-   return buffer[2];
+   return buffer[1];
 }
 
 uint8_t CSRD::getStatus(){
@@ -528,19 +541,19 @@ uint8_t CSRD::getParamIdx(){
 }
 
 uint8_t CSRD::getVal0(){
-    if (isAddressed()){
+    if (isAddressed() && !isStatus() ){
         return buffer[6];
     }
     return buffer[5];
 }
 uint8_t CSRD::getVal1(){
-    if (isAddressed()){
+    if (isAddressed() && !isStatus() ){
         return buffer[7];
     }
     return buffer[6];
 }
 uint8_t CSRD::getVal2(){
-    if (isAddressed()){
+    if (isAddressed() && !isStatus()){
         return RP_FILLER;
     }
     return buffer[7];

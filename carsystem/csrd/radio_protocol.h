@@ -101,15 +101,17 @@ Status messages
     Query value
         B=0x03
         C and D = node id
-	    F=param1
-	    G=param2
-	    H=param3
+        E=element
+	F=param1
+	G=param2
+	H=param3
     Answer query
         B=0x04
-	    C and D = node id
-	    F=param1 value
-	    G=param2 value
-	    H=param3 value
+	C and D = node id
+        E=element
+	F=param1 value
+	G=param2 value
+	H=param3 value
     ACK
         B=0x04
         C and D = node id

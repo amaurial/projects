@@ -366,9 +366,23 @@ void checkQuery(){
 	        uint8_t sttype=car.getStatusType();
           if (sttype == STT_QUERY_VALUE){
               uint8_t e = car.getElement();
-              uint8_t p1 = car.getParamIdx();
-              //uint8_t p1 = car.getParamIdx();
-              //uint8_t p1 = car.getParamIdx();
+              uint8_t p0 = car.getVal0();
+              uint8_t p1 = car.getVal0();
+              uint8_t p2 = car.getVal0();
+
+              switch (e){
+                case BOARD:
+                    //board has only 2 params
+                    //bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
+                    if (p0 < 2 && p1 < 2){
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE,car.getSender(),nodeid, e, dvalues[p0],dvalues[p1], 255);  
+                    }
+                    else{
+                      car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL,car.getSender(),nodeid, e, p0,p1,p2);  
+                    }                    
+                break;
+              }
+              
 	         }
 	     }   
     }             
@@ -602,9 +616,12 @@ void setDefaultParams(){
 }
 
 void setInitParams(){
-  int i = 0;
-  for (i = 0; i < NUM_ELEMENTS; i++) {
-      getParameterFromEprom(elements[i].params,elements[i].total_params,i);
+  
+  for (byte i = 0; i < NUM_ELEMENTS; i++) {
+      if (getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
+        Serial.print("Failed to load eprom for element ");
+        Serial.println(i);
+      }
       #ifdef DEBUG_CAR        
         Serial.print("params element: ");
         Serial.print(i);

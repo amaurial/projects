@@ -29,6 +29,11 @@ long request_register_time = 5000;   // time to send a request for registration 
 int  request_register_time_step = 30;  // multiplier of request_register_time to request all cars to register.
 long last_request_register_time = 0;
 
+long last_request_battery = 0;
+int request_battery_time = 500;   
+int request_battery_time_step = 2;
+
+
 void setup(){
   Serial.begin(115200);
   Serial.setTimeout(500);
@@ -59,17 +64,31 @@ void loop(){
     dumpMessage();
     Serial.println();
     int nn=insertNode(server.getNodeNumber(),server.getSender());
-    Serial.print("Confirming registration for ");
-    Serial.print(cars[nn]);
-    Serial.print("\t");
-    Serial.println(server.getNodeNumber());
-    
-    server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
+    if (getCarIdx(server.getNodeNumber()) == 255){
+       Serial.print("Confirming registration for ");
+       Serial.print(cars[nn]);
+       Serial.print("\t");
+       Serial.println(server.getNodeNumber());
+       server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
+    }                
 
-    //Serial.println("Message to restore eprom values ");
-    //server.sendRestoreDefaultConfig(serverId,cars[nn],senders[nn]);
+    if (server.isStatus()){
+       if (server.getStatusType()==STT_ANSWER_VALUE){
+           Serial.print("Status for node ");
+           Serial.println(server.getNodeNumber());
+           Serial.print("element: ");
+           Serial.print(server.getElement());
+           Serial.print("\t param 0: ");
+           Serial.print(server.getVal0());
+           Serial.print("\t param 1: ");
+           Serial.print(server.getVal1());
+           Serial.print("\t param 2: ");
+           Serial.println(server.getVal2());           
+       }
+    }    
   }
 
+  /*
   if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {
     int i=0;
 
@@ -117,9 +136,27 @@ void loop(){
     }
     turnonffTime=millis();
   }
+*/
   sendRequestRegister();
-
+  requestBatterySpeedLevel(); 
 }
+
+
+void requestBatterySpeedLevel(){
+
+  if (carsIdx == 0) return;
+
+  long t = millis();
+  if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){
+     
+     for (i=0;i<carsIdx;i++){
+	//bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
+        server.sendAddressedStatusMessage(STT_QUERY_VALUE,senders[i],cars[i],BOARD,0,1,2);       
+     }
+     last_request_battery = millis();
+  }
+}
+
 
 void sendRequestRegister(){
   long t = millis();
@@ -206,155 +243,153 @@ bool getSerialCommand(){
    uint16_t val=0;
    byte snid[3];
 
-   if (Serial.available() > 0) {
-       Serial.readBytesUntil('#', serbuf, 12);
-       if (serbuf[0] == 'B' || serbuf[0] == 'b'){
-          if (serbuf[1] == 'W' || serbuf[1] == 'w') {
-              //example: BW60100 -> B=broadcast W=write 6=element_motor 0=param_index 100=speed%
-	            //bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
-              snid[0]=serbuf[4];
-	            snid[1]=serbuf[5];
-              snid[2]=serbuf[6];
-              Serial.println("Send broadcast write");
+   if (Serial.available() == 0) return false;
 
-              return server.sendBroadcastWriteMessage(serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
-          }
+   Serial.readBytesUntil('#', serbuf, 12);
+   if (serbuf[0] == 'B' || serbuf[0] == 'b'){
+      if (serbuf[1] == 'W' || serbuf[1] == 'w') {
+          //example: BW60100 -> B=broadcast W=write 6=element_motor 0=param_index 100=speed%
+          //bool sendBroadcastWriteMessage(uint8_t serverAddr,uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
+          snid[0]=serbuf[4];
+          snid[1]=serbuf[5];
+          snid[2]=serbuf[6];
+          Serial.println("Send broadcast write");
 
-          if (serbuf[1] == 'R' || serbuf[1] == 'r') {
-               //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
-               //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
-               //Serial.println("C BR");
+          return server.sendBroadcastWriteMessage(serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
+      }
 
-                if (serbuf[2] == 'R' || serbuf[2] == 'r'){
-                  snid[0]=serbuf[3];
-                  snid[1]=serbuf[4];
-                  snid[2]=serbuf[5];
-                  int nn=getNN(snid);
-                  byte s=getSender(nn);
-                  if (s==255){
-                    s=0;
-                  }
-                   Serial.println("Send Restore");
-                  return server.sendRestoreDefaultConfig(serverId,nn,s);
-                }
-               
-               return true;
-	            //return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
-	        }
+      if (serbuf[1] == 'R' || serbuf[1] == 'r') {
+           //example: BR60 -> B=broadcast R=read 6=element_motor 0=param0
+           //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
+           //Serial.println("C BR");
 
-          if (serbuf[1] == 'O' || serbuf[1] == 'o') {
-              //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
-	            //Serial.println("C BO");
-               Serial.println("Send broadcast operation");
-              return server.sendBroadcastOPMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
-          }
-
-          if (serbuf[1] == 'C' || serbuf[1] == 'c') {
-              //bc260100 = bc=broadcast action 2=set param 6=motor 0=speed 100=value
-              snid[0]=serbuf[5];
-              snid[1]=serbuf[6];
-              snid[2]=serbuf[7];
-              int v=getNN(snid);
-              
-              //Serial.println("C AW");
-              //Serial.print("PARAM:");
-              //Serial.println(getNN(snid));
-              uint8_t p0,p1;
-              int v=getNN(snid);
-              if (v>255){
-                p0=highByte(v);
-                p1=lowByte(v);
+            if (serbuf[2] == 'R' || serbuf[2] == 'r'){
+              snid[0]=serbuf[3];
+              snid[1]=serbuf[4];
+              snid[2]=serbuf[5];
+              int nn=getNN(snid);
+              byte s=getSender(nn);
+              if (s==255){
+                s=0;
               }
-              else{
-                p1=0;
-                p0=v;
-              }
-              Serial.println("Send Broadcast action");
-                 //bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
-               return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[3]),charToInt(serbuf[2]),serbuf[4],p0,p1);
-          }
-       }
-
-       if (serbuf[0] == 'A' || serbuf[0] == 'a'){
-              snid[0]=serbuf[2];
-              snid[1]=serbuf[3];
-              snid[2]=serbuf[4];
-              id=getNN(snid);
-              //Serial.print("ID:");
-              //Serial.println(id);
-          if (serbuf[1] == 'W' || serbuf[1] == 'w') {
-              //example: AW33360100 -> A=addressed W=write 333=node 6=element_motor 0=param_index 100=speed%
-	            //bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
-
-              snid[0]=serbuf[7];
-	            snid[1]=serbuf[8];
-              snid[2]=serbuf[9];
-              //Serial.println("C AW");
-              //Serial.print("PARAM:");
-              //Serial.println(getNN(snid));
-              uint8_t p0,p1;
-              int v=getNN(snid);
-              if (v>255){
-                p1=highByte(v);
-                p0=lowByte(v);
-              }
-              else{
-                p1=0;
-                p0=v;
-              }
-               Serial.println("Send addressed write");
-              return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),p0,p1);
-          }
-          if (serbuf[1] == 'R' || serbuf[1] == 'r') {
-               //example: AR33360 -> A=addressed R=read 333=node 6=element_motor 0=param0
-               //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
-              //Serial.println("C AR");
-
-	            return server.sendAddressedReadMessage(serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
-	        }
-          if (serbuf[1] == 'O' || serbuf[1] == 'o') {
-              //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
-	            //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
-              //Serial.println("C AO");
-               Serial.println("Send addressed operation");
-              return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
-          }
-            if (serbuf[1] == 'C' || serbuf[1] == 'c') {
-                //Serial.println("C AC");
-                //ac111260100 = ac=addressed action 111=node 6=motor 0=speed 100=value
-
-                snid[0]=serbuf[2];
-                snid[1]=serbuf[3];
-                snid[2]=serbuf[4];
-                int nn=getNN(snid);
-                
-                snid[0]=serbuf[8];
-                snid[1]=serbuf[9];
-                snid[2]=serbuf[10];
-                int v=getNN(snid);
-                
-                //Serial.println("C AW");
-                //Serial.print("PARAM:");
-                //Serial.println(getNN(snid));
-                uint8_t p0,p1;
-                int v=getNN(snid);
-                if (v>255){
-                  p0=highByte(v);
-                  p1=lowByte(v);
-                }
-                else{
-                  p1=0;
-                  p0=v;
-                }
-                Serial.println("Send Broadcast action");
-                   //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
-                 return server.sendAddressedActionMessage(serverId,nn, charToInt(serbuf[6]),charToInt(serbuf[5]),serbuf[7],p0,p1);
+               Serial.println("Send Restore");
+              return server.sendRestoreDefaultConfig(serverId,nn,s);
             }
-          }
-       }
+           
+           return true;
+          //return sendAddressedReadMessage(0,serverId,charToInt(serbuf[2]),charToInt(serbuf[3]));
+      }
 
+      if (serbuf[1] == 'O' || serbuf[1] == 'o') {
+          //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
+          //Serial.println("C BO");
+           Serial.println("Send broadcast operation");
+          return server.sendBroadcastOPMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
+      }
+
+      if (serbuf[1] == 'C' || serbuf[1] == 'c') {
+          //bc260100 = bc=broadcast action 2=set param 6=motor 0=speed 100=value
+          snid[0]=serbuf[5];
+          snid[1]=serbuf[6];
+          snid[2]=serbuf[7];
+          int v=getNN(snid);
+          
+          //Serial.println("C AW");
+          //Serial.print("PARAM:");
+          //Serial.println(getNN(snid));
+          uint8_t p0,p1;
+          
+          if (v>255){
+            p0=highByte(v);
+            p1=lowByte(v);
+          }
+          else{
+            p1=0;
+            p0=v;
+          }
+          Serial.println("Send Broadcast action");
+             //bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
+           return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[3]),charToInt(serbuf[2]),serbuf[4],p0,p1);
+      }
    }
-   return false;
+
+   if (serbuf[0] == 'A' || serbuf[0] == 'a'){
+          snid[0]=serbuf[2];
+          snid[1]=serbuf[3];
+          snid[2]=serbuf[4];
+          id=getNN(snid);
+          //Serial.print("ID:");
+          //Serial.println(id);
+      if (serbuf[1] == 'W' || serbuf[1] == 'w') {
+          //example: AW33360100 -> A=addressed W=write 333=node 6=element_motor 0=param_index 100=speed%
+          //bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
+
+          snid[0]=serbuf[7];
+          snid[1]=serbuf[8];
+          snid[2]=serbuf[9];
+          //Serial.println("C AW");
+          //Serial.print("PARAM:");
+          //Serial.println(getNN(snid));
+          uint8_t p0,p1;
+          int v=getNN(snid);
+          if (v>255){
+            p1=highByte(v);
+            p0=lowByte(v);
+          }
+          else{
+            p1=0;
+            p0=v;
+          }
+           Serial.println("Send addressed write");
+          return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),p0,p1);
+      }
+      if (serbuf[1] == 'R' || serbuf[1] == 'r') {
+           //example: AR33360 -> A=addressed R=read 333=node 6=element_motor 0=param0
+           //bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
+          //Serial.println("C AR");
+
+          return server.sendAddressedReadMessage(serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
+      }
+      if (serbuf[1] == 'O' || serbuf[1] == 'o') {
+          //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
+          //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
+          //Serial.println("C AO");
+           Serial.println("Send addressed operation");
+          return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
+      }
+        if (serbuf[1] == 'C' || serbuf[1] == 'c') {
+            //Serial.println("C AC");
+            //ac111260100 = ac=addressed action 111=node 2=AC_SET_PARAM 6=motor 0=speed 100=value
+
+            snid[0]=serbuf[2];
+            snid[1]=serbuf[3];
+            snid[2]=serbuf[4];
+            int nn=getNN(snid);
+            
+            snid[0]=serbuf[8];
+            snid[1]=serbuf[9];
+            snid[2]=serbuf[10];
+            int v=getNN(snid);
+            
+            //Serial.println("C AW");
+            //Serial.print("PARAM:");
+            //Serial.println(getNN(snid));
+            uint8_t p0,p1;
+            
+            if (v>255){
+              p0=highByte(v);
+              p1=lowByte(v);
+            }
+            else{
+              p1=0;
+              p0=v;
+            }
+            Serial.println("Send Addressed action");
+               //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
+               //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
+             return server.sendAddressedActionMessage(serverId, nn, charToInt(serbuf[6]),charToInt(serbuf[5]),serbuf[7],p0);
+        }
+   } 
 }
 
 uint16_t getNN(byte *snn){

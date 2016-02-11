@@ -42,7 +42,8 @@ typedef enum STATUS_TYPE {
    STT_QUERY_STATUS=1,
    STT_ANSWER_STATUS,
    STT_QUERY_VALUE,
-   STT_ANSWER_VALUE
+   STT_ANSWER_VALUE,
+   STT_QUERY_VALUE_FAIL
 };
 
 //which part
@@ -100,11 +101,12 @@ public:
     bool sendBroadcastRequestRegister(uint8_t group);
     bool sendBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
-
+    
     bool sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1);
     bool sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx);
     bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
     bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
+    bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
 
     bool sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendEmergencyBroadcast(uint8_t group);
