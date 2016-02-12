@@ -17,7 +17,9 @@ typedef enum states {
    ACCELERATING,
    BLINKING,
    EMERGENCY,
-   NORMAL
+   NORMAL,
+   NIGHT,
+   DAY
 };
 
 typedef enum ACTIONS{
