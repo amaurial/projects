@@ -31,7 +31,7 @@ long last_request_register_time = 0;
 
 long last_request_battery = 0;
 int request_battery_time = 500;   
-int request_battery_time_step = 6;
+int request_battery_time_step = 40;
 
 
 void setup(){
@@ -60,13 +60,15 @@ void loop(){
   newMessage = server.readMessage();
 
   if (newMessage && server.isStatus()){
-    Serial.println("New message");
-    dumpMessage();
-    Serial.println();
+   // Serial.println("New message");
+   // dumpMessage();
+   // Serial.println();
+    Serial.print ("Registered: ");
+    Serial.println(carsIdx);
     
     if (server.isStatus() && (server.getStatusType() == RP_INITIALREG)){
       byte nn=insertNode(server.getNodeNumber(),server.getSender());
-       Serial.print("Confirming registration for ");
+       Serial.print("registration for ");
        Serial.print(cars[nn]);
        Serial.print("\t");
        Serial.println(server.getNodeNumber());
@@ -78,13 +80,13 @@ void loop(){
        if (server.getStatusType()==STT_ANSWER_VALUE){
            Serial.print("Status for node ");
            Serial.println(server.getNodeNumber());
-           Serial.print("element: ");
+           Serial.print("e: ");
            Serial.print(server.getElement());
-           Serial.print("\t param 0: ");
+           Serial.print("\t p0: ");
            Serial.print(server.getVal0());
-           Serial.print("\t param 1: ");
+           Serial.print("\t p1: ");
            Serial.print(server.getVal1());
-           Serial.print("\t param 2: ");
+           Serial.print("\t p2: ");
            Serial.println(server.getVal2());           
        }
     }    
@@ -140,7 +142,7 @@ void loop(){
   }
 */
   sendRequestRegister();
-  //requestBatterySpeedLevel(); 
+  requestBatterySpeedLevel(); 
 }
 
 
@@ -151,8 +153,11 @@ void requestBatterySpeedLevel(){
   long t = millis();
   if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){
      
-     for (i=0;i<carsIdx;i++){
-	//bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
+     for (i=0;i<carsIdx;i++){	
+        Serial.print ("query ");
+        Serial.print (cars[i]);
+        Serial.print (" ");
+        Serial.println(senders[i]);
         server.sendAddressedStatusMessage(STT_QUERY_VALUE,senders[i],cars[i],BOARD,0,1,2);       
      }
      last_request_battery = millis();
@@ -185,7 +190,7 @@ void dumpMessage(){
 }
 
 uint8_t insertNode(uint16_t nn,int sender){
-  int i;
+  byte i;
 
   if (carsIdx==0){
     cars[0]=nn;
@@ -193,17 +198,17 @@ uint8_t insertNode(uint16_t nn,int sender){
     carsIdx++;
     return 0;
   }
-
+  //check if exists and update the radio
   for (i=0;i<carsIdx;i++){
     if (cars[i]==nn){
       senders[i]=sender;
       return i;
     }
   }
-
-  carsIdx++;
+  
   cars[carsIdx]=nn;
   senders[carsIdx]=sender;
+  carsIdx++;
   return carsIdx-1;
 
 }

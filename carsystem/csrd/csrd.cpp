@@ -350,10 +350,10 @@ bool CSRD::readMessage(){
 
                     //we expect 8 bytes
                     if (length>MESSAGE_SIZE){
-                        #ifdef CSRD_DEBUG
+                        //#ifdef CSRD_DEBUG
                           Serial.print("message bigger than expected: ");
                           Serial.println(length);
-                        #endif // CSRD_DEBUG
+                        //#endif // CSRD_DEBUG
                         return false;
                     }
                     length=len;

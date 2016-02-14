@@ -22,6 +22,7 @@
 #define BATTERY_PIN               A7//A5
 #define IR_RECEIVE_PIN            6 //AUX3
 #define IR_SEND_PIN               A5 //AUX4
+#define CHARGER_PIN               A1
 
 #define MAXPARAMS                 5
 
@@ -141,6 +142,8 @@ void setup() {
   Serial.begin(19200);
   delay(100);
 
+  //charger pin
+  pinMode(CHARGER_PIN, INPUT);
 
   uint16_t n=getNodeIdFromEprom();
   if (n>999){
@@ -170,8 +173,8 @@ void setup() {
   count = 0;
   status = NOT_REGISTERED;
 
-  randomSeed(analogRead(0));
-  refresh_registration = random(1, 3000);
+  randomSeed(analogRead(A0));
+  refresh_registration = random(1, 2000);
   initElements();
   Serial.println("START CLIENT");
 }
@@ -194,12 +197,13 @@ void loop() {
         dumpMessage();
       #endif
       confirmRegistrationMessage();
+      checkBroadcastRegister();
     }
  
     //send registration message
     sendRegistrationMessage();
     
-    if (newMessage){
+    if (newMessage){      
       checkMsgRestoreDefault();        
       checkMsgWriteParameter();
       checkAction();
@@ -212,7 +216,7 @@ void loop() {
 
     //if (elements[MOTOR].state==ON){
       msamples++;
-      motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/msamples;
+      motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/(float)msamples;
       dvalues[1] = motor_rotation;
       if (msamples > 1000){
         //Serial.print("motor current: ");
@@ -273,12 +277,22 @@ void confirmRegistrationMessage(){
 
 }
 
+//check broadcast register
+void checkBroadcastRegister(){
+  if (car.isBroadcastRegister() && car.isMyGroup(group) ){
+     //set the timer
+     status = WAITING_REGISTRATION;
+      //set timer
+      refresh_registration = random(100, 3000);
+      last_registration = millis();
+  }
+}
+
 //send initial registration message
 void sendRegistrationMessage(){
    
    if ( status == NOT_REGISTERED ||
-       ( status == WAITING_REGISTRATION && (actime - last_registration) > refresh_registration) ||
-       (newMessage && car.isBroadcastRegister() && car.isMyGroup(group) )) {
+       ( status == WAITING_REGISTRATION && (actime - last_registration) > refresh_registration) ) {
           
           #ifdef DEBUG_CAR
           /*
@@ -368,41 +382,48 @@ void checkQuery(){
               
               switch (e){
                 case BOARD:
-                    //board has only 2 params                    
-                    if ((p0 < 2) && (p1 < 2)){
-                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, (dvalues[p0]/1023)*100, (dvalues[p1]/1024)*100, 255);  
+                    byte charger;
+                    charger = 0;
+                    //board has only 3 params: battery level, motor rotation, charger level                  
+                    if ((p0 < 3) && (p1 < 3) && (p2 < 3)){
+                      if (p2 == 2){                          
+                          if (digitalRead(CHARGER_PIN) == HIGH ){
+                            charger = 1;
+                          }
+                      }
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, (dvalues[p0]/1024.0)*100, (dvalues[p1]/1024.0)*100, charger);  
                     }
                     else{
                       car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, p0, p1, p2);  
                     }                    
                 break;
                 default:
-		    //element does not exist
-                    if (e >= NUM_ELEMENTS ){
-			car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, 0, 0, 0);  
-   		    }
-		    //sanity check on params
-		    uint8_t val0,val1,val2;
-		    if (p0 < elements[e].total_params){
-			val0=elements[e].params[p0];
-		    }			
-		    else val0=RP_FILLER;
-		    
-		    if (p1 < elements[e].total_params){
-			val1=elements[e].params[p1];
-		    }			
-		    else val1=RP_FILLER;
-  
-		    if (p2 < elements[e].total_params){
-			val2=elements[e].params[p2];
-		    }			
-		    else val2=RP_FILLER;
-
-		    car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, val0, val1, val2);  
-		break;
+		              {
+                  if (e >= NUM_ELEMENTS ){
+			                car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, 0, 0, 0);  
+   		            }
+          		    //sanity check on params
+          		    uint8_t val0,val1,val2;
+          		    if (p0 < elements[e].total_params){
+          			    val0=elements[e].params[p0];
+          		    }			
+          		    else val0=RP_FILLER;
+          		    
+          		    if (p1 < elements[e].total_params){
+          			    val1=elements[e].params[p1];
+          		    }			
+          		    else val1=RP_FILLER;
+            
+          		    if (p2 < elements[e].total_params){
+          			    val2=elements[e].params[p2];
+          		    }			
+          		    else val2=RP_FILLER;
+          
+          		    car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, val0, val1, val2);  
+		              }
               }              
-	    }
-	 }   
+	        }
+	     }   
     }             
 }
 
@@ -527,7 +548,7 @@ void setNextOperation(){
 void checkBattery(){
   int l = analogRead(BATTERY_PIN);
   bat_reads++;  
-  bat_level = (bat_level + l) / bat_reads;
+  bat_level = (bat_level + l) / (float)bat_reads;
 
   if (bat_reads > BAT_LEVEL_READ){
     dvalues[0]=bat_level;
