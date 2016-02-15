@@ -28,10 +28,11 @@ long turnonffWait=10000;
 long request_register_time = 5000;   // time to send a request for registration if no car is registered
 int  request_register_time_step = 30;  // multiplier of request_register_time to request all cars to register.
 long last_request_register_time = 0;
+byte car;
 
 long last_request_battery = 0;
 int request_battery_time = 500;   
-int request_battery_time_step = 40;
+int request_battery_time_step = 20;
 
 
 void setup(){
@@ -46,6 +47,7 @@ void setup(){
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
   count=0;
   carsIdx=0;
+  car=0;
   status=ACTIVE;
   last_request_register_time = millis();
   Serial.println("START SERVER");
@@ -151,15 +153,19 @@ void requestBatterySpeedLevel(){
   if (carsIdx == 0) return;
 
   long t = millis();
-  if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){
+  if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){    
      
-     for (i=0;i<carsIdx;i++){	
-        Serial.print ("query ");
-        Serial.print (cars[i]);
-        Serial.print (" ");
-        Serial.println(senders[i]);
-        server.sendAddressedStatusMessage(STT_QUERY_VALUE,senders[i],cars[i],BOARD,0,1,2);       
-     }
+    Serial.print ("query ");
+    Serial.print (cars[car]);
+    Serial.print (" ");
+    Serial.println(senders[car]);
+    server.sendAddressedStatusMessage(STT_QUERY_VALUE,senders[car],cars[car],BOARD,0,1,2);       
+
+    car++;
+    if (car>=carsIdx){
+      car=0;
+    }
+    
      last_request_battery = millis();
   }
 }

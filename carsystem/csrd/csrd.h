@@ -19,7 +19,8 @@ typedef enum states {
    EMERGENCY,
    NORMAL,
    NIGHT,
-   DAY
+   DAY,
+   ALL_BLINKING
 };
 
 typedef enum ACTIONS{

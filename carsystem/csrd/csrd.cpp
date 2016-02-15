@@ -595,6 +595,15 @@ states CSRD::convertFromInt(uint8_t s){
     case(6):
       return NORMAL;
       break;
+    case(7):
+      return NIGHT;
+      break;
+    case(8):
+      return DAY;
+      break;
+    case(9):
+      return ALL_BLINKING;
+      break;
     default:
       return OFF;
 

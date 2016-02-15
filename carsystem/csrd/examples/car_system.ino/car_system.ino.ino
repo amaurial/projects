@@ -213,26 +213,32 @@ void loop() {
         setNextOperation();
       }
     }  
-
-    //if (elements[MOTOR].state==ON){
-      msamples++;
-      motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/(float)msamples;
-      dvalues[1] = motor_rotation;
-      if (msamples > 1000){
-        //Serial.print("motor current: ");
-        //Serial.println(motor_rotation);
-        msamples=1;
-        motor_rotation=analogRead(MOTOR_ROTATION_PIN);
-        if (motor_rotation==0){
-          //TODO
-         //send IR stop signal
-        }
-        else{
-          //send the IR moving signal
-        }
-      }
-      checkBattery();
-   // }
+    
+    msamples++;
+    motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/2.0;
+    dvalues[1] = motor_rotation;
+    //dvalues[1] = analogRead(MOTOR_ROTATION_PIN);
+    if (msamples > 500){
+      /*
+      Serial.print("motor current: ");
+      Serial.print(motor_rotation);
+      Serial.print("\t");
+      Serial.print(analogRead(MOTOR_ROTATION_PIN));
+      Serial.print("\t");
+      Serial.println(motor_rotation*0.49);
+      */
+      msamples=1;
+      //motor_rotation=analogRead(MOTOR_ROTATION_PIN);
+      //if (motor_rotation==0){
+        //TODO
+       //send IR stop signal
+      //}
+      //else{
+        //send the IR moving signal
+      //}
+    }
+    checkBattery();
+   
 }
 
 /*
@@ -391,7 +397,7 @@ void checkQuery(){
                             charger = 1;
                           }
                       }
-                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, (dvalues[p0]/1024.0)*100, (dvalues[p1]/1024.0)*100, charger);  
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, dvalues[p0]*0.049, dvalues[p1]*0.049, charger);  
                     }
                     else{
                       car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, p0, p1, p2);  
@@ -495,26 +501,41 @@ void setNextOperation(){
     }
     
     int e = car.getElement();
-    states s = car.convertFromInt(car.getState());
+    states s = car.convertFromInt(car.getState());    
     if (e != BOARD) {
       if (e < NUM_ELEMENTS) {        
         elements[e].next = s;            
       }
     }
     else {
+      //Serial.print("operation "); 
+      //Serial.println(s);
       switch (s) {
         case (EMERGENCY):
           //save actual state
           for (byte i = 0; i < NUM_ELEMENTS; i++) {
             elements[i].tempState = elements[i].state;
           }
-          elements[(uint8_t)LEFT_LIGHT].next = BLINKING;
-          elements[(uint8_t)RIGHT_LIGHT].next = BLINKING;
-          elements[(uint8_t)SIRENE_LIGHT].next = BLINKING;
-          elements[(uint8_t)BREAK_LIGHT].next = BLINKING;
-          elements[(uint8_t)REAR_BREAK_LIGHT].next = BLINKING;
-          elements[(uint8_t)FRONT_LIGHT].next = BLINKING;
-          elements[(uint8_t)MOTOR].next = OFF;
+          elements[LEFT_LIGHT].next = BLINKING;
+          elements[RIGHT_LIGHT].next = BLINKING;
+          elements[SIRENE_LIGHT].next = BLINKING;
+          elements[BREAK_LIGHT].next = BLINKING;
+          elements[REAR_BREAK_LIGHT].next = BLINKING;
+          elements[FRONT_LIGHT].next = BLINKING;
+          elements[MOTOR].next = OFF;
+
+          break;
+        case (ALL_BLINKING):
+          //save actual state
+          for (byte i = 0; i < NUM_ELEMENTS; i++) {
+            elements[i].tempState = elements[i].state;
+          }
+          elements[LEFT_LIGHT].next = BLINKING;
+          elements[RIGHT_LIGHT].next = BLINKING;
+          elements[SIRENE_LIGHT].next = BLINKING;
+          elements[BREAK_LIGHT].next = BLINKING;
+          elements[REAR_BREAK_LIGHT].next = BLINKING;
+          elements[FRONT_LIGHT].next = BLINKING;          
 
           break;
         case (NORMAL):
@@ -531,15 +552,17 @@ void setNextOperation(){
           }
 
           break;
-        case (NIGHT):                    
-          elements[(uint8_t)BREAK_LIGHT].next = ON;
-          elements[(uint8_t)REAR_BREAK_LIGHT].next = ON;
-          elements[(uint8_t)FRONT_LIGHT].next = ON;
+        case (NIGHT):        
+          //Serial.println("night");            
+          elements[BREAK_LIGHT].next = ON;
+          elements[REAR_BREAK_LIGHT].next = ON;
+          elements[FRONT_LIGHT].next = ON;
           break; 
-        case (DAY):                    
-          elements[(uint8_t)BREAK_LIGHT].next = OFF;
-          elements[(uint8_t)REAR_BREAK_LIGHT].next = OFF;
-          elements[(uint8_t)FRONT_LIGHT].next = OFF;
+        case (DAY):           
+          //Serial.println("day");          
+          elements[BREAK_LIGHT].next = OFF;
+          elements[REAR_BREAK_LIGHT].next = OFF;
+          elements[FRONT_LIGHT].next = OFF;
           break; 
       }
     }      
@@ -547,18 +570,18 @@ void setNextOperation(){
 
 void checkBattery(){
   int l = analogRead(BATTERY_PIN);
-  bat_reads++;  
-  bat_level = (bat_level + l) / (float)bat_reads;
-
-  if (bat_reads > BAT_LEVEL_READ){
-    dvalues[0]=bat_level;
-    if (bat_level >= 643){
+  //bat_reads++;  
+  //bat_level = (bat_level + l) / (float)bat_reads;
+  //Serial.println(bat_level);
+  //if (bat_reads > BAT_LEVEL_READ){
+    dvalues[0]=l;
+    //if (bat_level >= 643){
       //send message
-      car.sendLowBattery(serverStation,nodeid);
-    }
-    bat_reads = 0;
-    bat_level = 0;
-  }
+      //car.sendLowBattery(serverStation,nodeid);
+    //}
+   // bat_reads = 0;
+   // bat_level = 0;
+  //}
 }
 
 
