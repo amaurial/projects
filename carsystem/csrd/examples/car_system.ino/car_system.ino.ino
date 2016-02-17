@@ -950,7 +950,7 @@ void controlMotor(ELEMENTS * element) {
     SoftPWMSetPercent(element->port, 0);    
     
     //save the break state    
-    element->tempState = elements[BREAK_LIGHT].state;
+    elements[BREAK_LIGHT].auxState = elements[BREAK_LIGHT].state;
     element->auxState = elements[BREAK_LIGHT].lastState;
     //turn the break light on
     elements[BREAK_LIGHT].next = ON;
@@ -972,9 +972,9 @@ void controlMotor(ELEMENTS * element) {
       element->lastState = ON;
       element->state = OFF;
       //turn the break lights off
-      elements[BREAK_LIGHT].next = element->tempState;
+      elements[BREAK_LIGHT].next = elements[BREAK_LIGHT].auxState;
       elements[BREAK_LIGHT].state = element->auxState;
-      elements[REAR_BREAK_LIGHT].next = element->tempState;
+      elements[REAR_BREAK_LIGHT].next = elements[BREAK_LIGHT].auxState;
       elements[REAR_BREAK_LIGHT].state = element->auxState;;
       
       element->tempState=OFF;
