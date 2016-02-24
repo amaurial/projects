@@ -17,6 +17,7 @@
 #define SIRENE_LIGHT_PIN          A2 //AUX1
 #define BREAK_LIGHT_PIN           3//13
 #define REAR_BREAK_LIGHT_PIN      A3//AUX2
+#define MAG_REED_PIN      A3//AUX2
 #define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A6//A3
 #define BATTERY_PIN               A7//A5
