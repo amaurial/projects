@@ -8,15 +8,26 @@ CSRD server;
 RH_RF69 driver;
 //RHReliableDatagram manager(driver, 1);
 
+#define NUM_CARS 10
+
+
+typedef struct CARS{
+  uint16_t carid;
+  byte senderid;
+  boolean registered;
+  byte requests;
+  byte idx;  
+};
+
+CARS cars[NUM_CARS];
+
 uint8_t sbuffer[MESSAGE_SIZE];
 uint8_t recbuffer[MESSAGE_SIZE];
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 byte i;
 long st;
-long count;
+
 STATUS status;
-uint16_t cars[128];
-uint8_t senders[128];
 long register_time_interval = 1000;
 long last_register_sent;
 uint8_t serverId=1;
@@ -45,7 +56,7 @@ void setup(){
     Serial.println("FAILED");
   }
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
-  count=0;
+
   carsIdx=0;
   car=0;
   status=ACTIVE;
@@ -71,11 +82,13 @@ void loop(){
     if (server.isStatus() && (server.getStatusType() == RP_INITIALREG)){
       byte nn=insertNode(server.getNodeNumber(),server.getSender());
        Serial.print("registration for ");
-       Serial.print(cars[nn]);
+       Serial.print(cars[nn].carid);
+       Serial.print("\t");
+       Serial.print(cars[nn].senderid);
        Serial.print("\t");
        Serial.println(server.getNodeNumber());
        
-       server.sendInitialRegisterMessage(senders[nn],serverId,ACTIVE,255,255,255);
+       server.sendInitialRegisterMessage(cars[nn].senderid,serverId,ACTIVE,255,255,255);
     }                
 
     if (server.isStatus()){
@@ -89,62 +102,18 @@ void loop(){
            Serial.print("\t p1: ");
            Serial.print(server.getVal1());
            Serial.print("\t p2: ");
-           Serial.println(server.getVal2());           
+           Serial.println(server.getVal2());   
+           byte idx = getCarIdx(server.getNodeNumber()); 
+           if (idx != 255){
+              cars[idx].requests--;
+           }
        }
     }    
   }
-
-  /*
-  if (carsIdx>0 && (( millis()-turnonffTime)>turnonffWait)) {
-    int i=0;
-
-    for (i=0;i<carsIdx;i++){
-      switch (turnOn){
-        case (0):
-          //Serial.print("Changing status for  ");
-          //Serial.print(cars[i]);
-          //Serial.println(" ON");
-          //server.sendAddressedOPMessage(
-           // senders[i],cars[i],MOTOR,ON,0,0);//motor on
-           //delay(10);
-           //server.sendAddressedOPMessage(
-           //senders[i],cars[i],SIRENE_LIGHT,BLINKING,0,0);//sirene light on
-          turnOn=1;
-        break;
-
-        case (1):
-          //Serial.print("Changing status for  ");
-          //Serial.print(cars[i]);
-          //Serial.println(" EMERGENCY");
-          //server.sendEmergencyBroadcast(serverId);
-          turnOn=2;
-        break;
-        case (2):
-          //Serial.print("Changing status for  ");
-          //Serial.print(cars[i]);
-          //Serial.println(" NORMAL");
-          //server.sendBackToNormalBroadcast(serverId);
-          turnOn=3;
-        break;
-        case (3):
-          //Serial.print("Changing status for  ");
-          //Serial.print(cars[i]);
-          //Serial.println(" OFF");
-          //server.sendAddressedOPMessage(
-            //senders[i],cars[i],MOTOR,OFF,0,0);//motor on
-           //delay(10);
-           //server.sendAddressedOPMessage(
-            //senders[i],cars[i],SIRENE_LIGHT,OFF,0,0);//sirene light on
-          turnOn=0;
-        break;
-      }
-
-    }
-    turnonffTime=millis();
-  }
-*/
+ 
   sendRequestRegister();
   requestBatterySpeedLevel(); 
+  unregister();
 }
 
 
@@ -152,14 +121,23 @@ void requestBatterySpeedLevel(){
 
   if (carsIdx == 0) return;
 
+  if (cars[car].registered == false) {
+    car++;
+    if (car>=carsIdx){
+      car=0;
+    }
+    return;
+  }
+
   long t = millis();
   if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){    
      
     Serial.print ("query ");
-    Serial.print (cars[car]);
+    Serial.print (cars[car].carid);
     Serial.print (" ");
-    Serial.println(senders[car]);
-    server.sendAddressedStatusMessage(STT_QUERY_VALUE,senders[car],cars[car],BOARD,0,1,2);       
+    Serial.println(cars[car].senderid);
+    cars[car].requests++;
+    server.sendAddressedStatusMessage(STT_QUERY_VALUE,cars[car].senderid,cars[car].carid,BOARD,0,1,2);       
 
     car++;
     if (car>=carsIdx){
@@ -170,6 +148,15 @@ void requestBatterySpeedLevel(){
   }
 }
 
+void unregister(){
+  for (byte i = 0; i< NUM_CARS ;i++){
+    if (cars[i].requests > 6){
+       cars[i].registered = false;
+       cars[i].requests = 0;
+       carsIdx--;
+    }
+  }
+}
 
 void sendRequestRegister(){
   long t = millis();
@@ -198,31 +185,36 @@ void dumpMessage(){
 uint8_t insertNode(uint16_t nn,int sender){
   byte i;
 
-  if (carsIdx==0){
-    cars[0]=nn;
-    senders[0]=sender;
+  if (carsIdx > 9){
+    return 255;
+  }
+
+  if (carsIdx == 0){
+    cars[0].carid = nn;
+    cars[0].senderid = sender;
+    cars[0].registered = true;
     carsIdx++;
     return 0;
   }
   //check if exists and update the radio
   for (i=0;i<carsIdx;i++){
-    if (cars[i]==nn){
-      senders[i]=sender;
+    if (cars[i].carid == nn){
+      cars[i].senderid = sender;
       return i;
     }
   }
   
-  cars[carsIdx]=nn;
-  senders[carsIdx]=sender;
+  cars[carsIdx].carid = nn;
+  cars[carsIdx].senderid = sender;
+  cars[carsIdx].registered = true;
   carsIdx++;
   return carsIdx-1;
-
 }
 
 uint8_t getSender(uint16_t nn){
    for (i=0;i<carsIdx;i++){
-    if (cars[i] == nn){      
-      return senders[i];
+    if (cars[i].carid == nn){      
+      return cars[i].senderid;
     }
   }
   return 255;
@@ -230,7 +222,7 @@ uint8_t getSender(uint16_t nn){
 
 uint8_t getCarIdx(uint16_t nn){
    for (i=0;i<carsIdx;i++){
-    if (cars[i] == nn){      
+    if (cars[i].carid == nn){      
       return i;
     }
   }
@@ -408,7 +400,7 @@ bool getSerialCommand(){
 uint16_t getNN(byte *snn){
     String inString = "";
     for (byte a=0;a<3;a++){
-	inString += (char)snn[a];
+	     inString += (char)snn[a];
     }
     return inString.toInt();
 }

@@ -25,12 +25,13 @@
 #define IR_SEND_PIN               A5 //AUX4
 #define CHARGER_PIN               A1
 
+#define BAT_FULL_LEVEL            610 //analog read equivalent to 4V
+#define BAT_LEVEL_READ            680 //by tests 688 the motor stops
+
 #define MAXPARAMS                 5
 
 #define MEMORY_REF                23
 #define EPROM_SIZE                512
-
-#define BAT_LEVEL_READ            200
 
 typedef struct ELEMENTS *ELEMENT;
 
@@ -58,7 +59,8 @@ typedef struct ELEMENTS {
 struct ELEMENTS elements[NUM_ELEMENTS];
 
 //dynamic values
-
+//[0] = batery
+//[1] = motor
 #define D_VALUES 5
 uint16_t dvalues[D_VALUES];
 
@@ -78,8 +80,7 @@ float motor_rotation;
 int msamples;
 
 //battery vars
-int bat_reads = 0;
-int bat_level = 0;
+long bat_send_timer = 0; //time between lowbat level
 
 //incomming and outcomming buffer
 uint8_t sbuffer[MESSAGE_SIZE];
@@ -217,29 +218,9 @@ void loop() {
       }
     }  
     
-    msamples++;
-    motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/2.0;
-    dvalues[1] = motor_rotation;
-    //dvalues[1] = analogRead(MOTOR_ROTATION_PIN);
-    if (msamples > 500){
-      /*
-      Serial.print("motor current: ");
-      Serial.print(motor_rotation);
-      Serial.print("\t");
-      Serial.print(analogRead(MOTOR_ROTATION_PIN));
-      Serial.print("\t");
-      Serial.println(motor_rotation*0.49);
-      */
-      msamples=1;
-      //motor_rotation=analogRead(MOTOR_ROTATION_PIN);
-      //if (motor_rotation==0){
-        //TODO
-       //send IR stop signal
-      //}
-      //else{
-        //send the IR moving signal
-      //}
-    }
+    //msamples++;
+    //motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/2.0;
+    dvalues[1] = analogRead(MOTOR_ROTATION_PIN);    
     checkBattery();
    
 }
@@ -290,6 +271,9 @@ void confirmRegistrationMessage(){
 void checkBroadcastRegister(){
   if (car.isBroadcastRegister() && car.isMyGroup(group) ){
      //set the timer
+     #ifdef DEBUG_CAR
+            Serial.println("BREG received status WAITING REG");
+      #endif
      status = WAITING_REGISTRATION;
       //set timer
       refresh_registration = random(100, 3000);
@@ -323,6 +307,9 @@ void sendRegistrationMessage(){
            */   
           #endif
       //send message. change the status
+      #ifdef DEBUG_CAR
+            Serial.println("send REG request");
+      #endif
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
       status = WAITING_REGISTRATION;
       //set timer
@@ -400,7 +387,11 @@ void checkQuery(){
                             charger = 1;
                           }
                       }
-                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, dvalues[p0]*0.049, dvalues[p1]*0.049, charger);  
+                      //0 -> battery 1->motor
+                      //4v -> 610 charged 3.3v -> 640 ; 0v ->1023
+                      //688 - motor stopped
+                      byte bperc = (byte)(100*((BAT_LEVEL_READ - dvalues[p0])/(float)(BAT_LEVEL_READ-BAT_FULL_LEVEL)));
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, bperc, dvalues[p1]*0.049, charger);  
                     }
                     else{
                       car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, p0, p1, p2);  
@@ -576,21 +567,19 @@ void setNextOperation(){
 }
 
 void checkBattery(){
-  int l = analogRead(BATTERY_PIN);
-  //bat_reads++;  
-  //bat_level = (bat_level + l) / (float)bat_reads;
-  //Serial.println(bat_level);
-  //if (bat_reads > BAT_LEVEL_READ){
-    dvalues[0]=l;
-    //if (bat_level >= 643){
+   
+  //Serial.println(l);
+  
+    dvalues[0] = analogRead(BATTERY_PIN);
+    byte bperc = (byte)(100*((BAT_LEVEL_READ - dvalues[0])/(float)(BAT_LEVEL_READ - BAT_FULL_LEVEL)));    
+    if (bperc < 20){
       //send message
-      //car.sendLowBattery(serverStation,nodeid);
-    //}
-   // bat_reads = 0;
-   // bat_level = 0;
-  //}
+      if (bat_send_timer < (millis() + 5000 )){ //wait 5 sec to send again
+        car.sendLowBattery(serverStation,nodeid);
+        bat_send_timer = millis();
+      }      
+    }     
 }
-
 
 uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1, uint8_t p2, uint8_t p3){
     uint8_t params[MAXPARAMS];
