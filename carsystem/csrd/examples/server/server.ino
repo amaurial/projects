@@ -37,7 +37,7 @@ uint8_t turnOn=0;
 long turnonffTime;
 long turnonffWait=10000;
 long request_register_time = 5000;   // time to send a request for registration if no car is registered
-int  request_register_time_step = 30;  // multiplier of request_register_time to request all cars to register.
+int  request_register_time_step = 6;  // multiplier of request_register_time to request all cars to register.
 long last_request_register_time = 0;
 byte car;
 
@@ -79,7 +79,7 @@ void loop(){
     Serial.print ("Registered: ");
     Serial.println(carsIdx);
     
-    if (server.isStatus() && (server.getStatusType() == RP_INITIALREG)){
+    if (server.getStatusType() == RP_INITIALREG){
       byte nn=insertNode(server.getNodeNumber(),server.getSender());
        Serial.print("registration for ");
        Serial.print(cars[nn].carid);
@@ -91,24 +91,24 @@ void loop(){
        server.sendInitialRegisterMessage(cars[nn].senderid,serverId,ACTIVE,255,255,255);
     }                
 
-    if (server.isStatus()){
-       if (server.getStatusType()==STT_ANSWER_VALUE){
-           Serial.print("Status for node ");
-           Serial.println(server.getNodeNumber());
-           Serial.print("e: ");
-           Serial.print(server.getElement());
-           Serial.print("\t p0: ");
-           Serial.print(server.getVal0());
-           Serial.print("\t p1: ");
-           Serial.print(server.getVal1());
-           Serial.print("\t p2: ");
-           Serial.println(server.getVal2());   
-           byte idx = getCarIdx(server.getNodeNumber()); 
-           if (idx != 255){
-              cars[idx].requests--;
-           }
-       }
-    }    
+    
+     if (server.getStatusType()==STT_ANSWER_VALUE){
+         Serial.print("Status for node ");
+         Serial.println(server.getNodeNumber());
+         Serial.print("e: ");
+         Serial.print(server.getElement());
+         Serial.print("\t p0: ");
+         Serial.print(server.getVal0());
+         Serial.print("\t p1: ");
+         Serial.print(server.getVal1());
+         Serial.print("\t p2: ");
+         Serial.println(server.getVal2());   
+         byte idx = getCarIdx(server.getNodeNumber()); 
+         if (idx != 255){
+            cars[idx].requests--;
+         }
+     }
+        
   }
  
   sendRequestRegister();

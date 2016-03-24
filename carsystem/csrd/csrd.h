@@ -54,7 +54,7 @@ typedef enum objects_enum {
   LEFT_LIGHT=0,
   RIGHT_LIGHT,
   BREAK_LIGHT,
-  REAR_BREAK_LIGHT,
+  REED,
   SIRENE_LIGHT,
   FRONT_LIGHT,
   MOTOR,

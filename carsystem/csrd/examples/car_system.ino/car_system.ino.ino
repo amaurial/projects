@@ -14,10 +14,9 @@
 #define FRONT_LIGHT_PIN           7//A1
 #define LEFT_LIGHT_PIN            5
 #define RIGHT_LIGHT_PIN           4
-#define SIRENE_LIGHT_PIN          A2 //AUX1
+#define SIRENE_LIGHT_PIN          A3 //AUX2
 #define BREAK_LIGHT_PIN           3//13
-#define REAR_BREAK_LIGHT_PIN      A3//AUX2
-#define MAG_REED_PIN      A3//AUX2
+#define REED_PIN                  A2//AUX1
 #define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A6//A3
 #define BATTERY_PIN               A7//A5
@@ -106,6 +105,7 @@ void controlBreakLeds(ELEMENTS * element);
 void controlBlinkLed(ELEMENTS * element);
 void controlMotor(ELEMENTS * element);
 void controlAux(ELEMENTS * element);
+void controlReed(ELEMENTS * element);
 
 /*
 Print nice status messages
@@ -148,6 +148,8 @@ void setup() {
 
   //charger pin
   pinMode(CHARGER_PIN, INPUT);
+  //reed pin
+  pinMode(REED_PIN, INPUT_PULLUP);
 
   uint16_t n=getNodeIdFromEprom();
   if (n>999){
@@ -176,10 +178,10 @@ void setup() {
 
   count = 0;
   status = NOT_REGISTERED;
-
-  randomSeed(analogRead(A0));
-  refresh_registration = random(1, 2000);
+    
   initElements();
+  randomSeed(analogRead(A0));
+  refresh_registration = random(200, 5000);
   Serial.println("START CLIENT");
 }
 
@@ -188,11 +190,11 @@ void loop() {
     actime = millis();
 
     //carry the active actions
-    if (status == ACTIVE) {
+    //if (status == ACTIVE) {
       for (byte i = 0; i < NUM_ELEMENTS; i++) {
         elements[i].controller(&elements[i]);
       }
-    } 
+    //} 
 
     newMessage = car.readMessage();
   
@@ -276,6 +278,7 @@ void checkBroadcastRegister(){
       #endif
      status = WAITING_REGISTRATION;
       //set timer
+      randomSeed(analogRead(A0));
       refresh_registration = random(100, 3000);
       last_registration = millis();
   }
@@ -313,7 +316,8 @@ void sendRegistrationMessage(){
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
       status = WAITING_REGISTRATION;
       //set timer
-      refresh_registration = random(200, 3000);
+      randomSeed(analogRead(A0));
+      refresh_registration = random(200, 5000);
       last_registration = millis();
      
       #ifdef DEBUG_CAR
@@ -454,19 +458,22 @@ void checkMsgWriteParameter(){
                       aux = elements[e].params[1] * elements[e].params[2];                      
                       aux=aux1;
                    }
-                   SoftPWMSetFadeTime(elements[e].port, aux, aux1);   
-                   //setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
                    //send ack
                    car.sendACKMessage(serverStation, nodeid,e,result);
-                   if ((e == MOTOR) && (elements[e].state == ON)) {    
-                      Serial.println("Change motor speed");
-                      SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-                      return;
-                  } 
-                  else 
-                  {
-                      SoftPWMSet(elements[e].port, elements[e].actual_pwm_val);          
-                  }
+                   if (e!=REED){
+                   
+                       SoftPWMSetFadeTime(elements[e].port, aux, aux1);
+                       
+                       if ((e == MOTOR) && (elements[e].state == ON)) {    
+                          Serial.println("Change motor speed");
+                          SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+                          return;
+                       } 
+                       else 
+                       {
+                          SoftPWMSet(elements[e].port, elements[e].actual_pwm_val);          
+                       }
+                   }
                 }
              }             
           }
@@ -505,34 +512,37 @@ void setNextOperation(){
       }
     }
     else {      
-      switch (s) {
+      controlBoard(s);
+    }      
+}
+
+void controlBoard(states s){
+  switch (s) {
         case (EMERGENCY):
           //save actual state
-          /*
+          
           for (byte i = 0; i < NUM_ELEMENTS; i++) {
-            elements[i].tempState = elements[i].state;
+            elements[i].auxState = elements[i].state;
           }
-          */
+          
           elements[LEFT_LIGHT].next = BLINKING;
           elements[RIGHT_LIGHT].next = BLINKING;
           elements[SIRENE_LIGHT].next = BLINKING;
-          elements[BREAK_LIGHT].next = BLINKING;
-          elements[REAR_BREAK_LIGHT].next = BLINKING;
+          elements[BREAK_LIGHT].next = BLINKING;          
           elements[FRONT_LIGHT].next = BLINKING;
           elements[MOTOR].next = OFF;
 
           break;
         case (ALL_BLINKING):
           //save actual state
-          /*
+          
           for (byte i = 0; i < NUM_ELEMENTS; i++) {
-            elements[i].tempState = elements[i].state;
-          }*/
+            elements[i].auxState = elements[i].state;
+          }
           elements[LEFT_LIGHT].next = BLINKING;
           elements[RIGHT_LIGHT].next = BLINKING;
           elements[SIRENE_LIGHT].next = BLINKING;
-          elements[BREAK_LIGHT].next = BLINKING;
-          elements[REAR_BREAK_LIGHT].next = BLINKING;
+          elements[BREAK_LIGHT].next = BLINKING;          
           elements[FRONT_LIGHT].next = BLINKING;          
 
           break;
@@ -540,7 +550,7 @@ void setNextOperation(){
           //get last state
           //save actual state
           for (byte i = 0; i < NUM_ELEMENTS; i++) {
-            elements[i].next = elements[i].lastState;
+            elements[i].next = elements[i].auxState;
             //elements[i].tempState = OFF;
           }
           if (elements[MOTOR].next == STOPING) {
@@ -552,18 +562,15 @@ void setNextOperation(){
           break;
         case (NIGHT):        
           //Serial.println("night");            
-          elements[BREAK_LIGHT].next = ON;
-          elements[REAR_BREAK_LIGHT].next = ON;
+          elements[BREAK_LIGHT].next = ON;          
           elements[FRONT_LIGHT].next = ON;
           break; 
         case (DAY):           
           //Serial.println("day");          
-          elements[BREAK_LIGHT].next = OFF;
-          elements[REAR_BREAK_LIGHT].next = OFF;
+          elements[BREAK_LIGHT].next = OFF;          
           elements[FRONT_LIGHT].next = OFF;
           break; 
       }
-    }      
 }
 
 void checkBattery(){
@@ -653,12 +660,12 @@ void setDefaultParams(){
       ok = false;
   }  
 
-  //rear break light
-  //params[0] = 50; //max bright %
-  //params[1] = 30; //base blink
-  //params[2] = 30; //blink time=this*base blink
-  //params[3] = 20; //blink time emergency=this*base blink  
-  if (setAndCheckParam(REAR_BREAK_LIGHT,4,10,30,30,20) != 0){
+  //reed
+  //params[0] = 0; //action when detected: 0=stop,1=blinking
+  //params[1] = 0; //spare
+  //params[2] = 0; //spare
+  //params[3] = 0; //spare 
+  if (setAndCheckParam(REED,0,0,0,0,0) != 0){
       ok = false;
   }  
 
@@ -724,7 +731,7 @@ void initElements() {
   elements[LEFT_LIGHT].total_params = 4;
   elements[RIGHT_LIGHT].total_params = 4;
   elements[SIRENE_LIGHT].total_params = 4;
-  elements[REAR_BREAK_LIGHT].total_params = 4;
+  elements[REED].total_params = 4;
   elements[IR_RECEIVE].total_params = 1;
   elements[IR_SEND].total_params = 1;
   setInitParams();
@@ -788,13 +795,11 @@ void initElements() {
   aux = elements[i].params[1]*elements[i].params[2];
   setPWM(i,0,aux,aux);   
 
-  //REAR_BREAK_LIGHT
-  i = REAR_BREAK_LIGHT; 
-  elements[i].obj = REAR_BREAK_LIGHT;
-  elements[i].port = REAR_BREAK_LIGHT_PIN;
-  elements[i].controller = &controlBlinkLed;    
-  aux = elements[i].params[1]*elements[i].params[2];
-  setPWM(i,0,aux,aux);   
+  //REED
+  i = REED; 
+  elements[i].obj = REED;
+  elements[i].port = REED_PIN;
+  elements[i].controller = &controlReed;    
 
   //IR_RECEIVE
   i = IR_RECEIVE;  
@@ -812,6 +817,51 @@ void initElements() {
 }
 
 void controlAux(ELEMENTS * element) {
+  return;
+}
+
+void controlReed(ELEMENTS * element) {
+
+  //Serial.println(digitalRead(REED_PIN));
+  
+  if (digitalRead(REED_PIN) == LOW ) element->state = OFF; //no magnet
+  else element->state = ON;//magnet
+
+  switch (element->params[0]){
+    case (0)://control motor
+         if (element->state == ON ){
+            //stop the car
+            if (element->lastState != ON){
+              element->lastState = ON;
+              element->next = elements[MOTOR].state;//save motor state
+              elements[MOTOR].next = OFF;
+            }            
+         }
+         else {
+            if (element->lastState == ON){
+              //back the motor to the last state
+              element->lastState = OFF;              
+              elements[MOTOR].next = element->next;              
+            }
+         }
+    break;
+    case (1)://blinking
+         if (element->state == ON ){            
+            if (element->lastState != ON){
+              element->lastState = ON;              
+              controlBoard(ALL_BLINKING);
+            }            
+         }
+         else {
+            if (element->lastState == ON){              
+              element->lastState = OFF;              
+              controlBoard(NORMAL);              
+            }
+         }
+    break;
+    
+  }
+    
   return;
 }
 
@@ -943,8 +993,7 @@ void controlMotor(ELEMENTS * element) {
     elements[BREAK_LIGHT].auxState = elements[BREAK_LIGHT].state;
     element->auxState = elements[BREAK_LIGHT].lastState;
     //turn the break light on
-    elements[BREAK_LIGHT].next = ON;
-    elements[REAR_BREAK_LIGHT].next = ON;
+    elements[BREAK_LIGHT].next = ON;    
     //return;
   }
   if (element->state == OFF && element->next == ON) {   
@@ -964,9 +1013,6 @@ void controlMotor(ELEMENTS * element) {
       //turn the break lights off
       elements[BREAK_LIGHT].next = elements[BREAK_LIGHT].auxState;
       elements[BREAK_LIGHT].state = element->auxState;
-      elements[REAR_BREAK_LIGHT].next = elements[BREAK_LIGHT].auxState;
-      elements[REAR_BREAK_LIGHT].state = element->auxState;;
-      
       element->tempState=OFF;
     }
     //return;
