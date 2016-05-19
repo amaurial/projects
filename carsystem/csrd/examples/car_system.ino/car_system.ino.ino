@@ -342,28 +342,28 @@ void checkAction(){
             		if (e != BOARD){
             		    if (p < elements[e].total_params){
               			  elements[e].params[p]=v;		
-        			if (p == 0){ //normally is the intensity (speed, light luminosity
-        			    elements[e].actual_pwm_val = v;
-        			}
-        			if (e == MOTOR){
-        			    aux = elements[e].params[1] * elements[e].params[2];
-        			    aux1 = elements[e].params[1] * elements[e].params[3];                      
-        			}
-        			else{                      
-        			    aux = elements[e].params[1] * elements[e].params[2];                      
-        			    aux=aux1;
-        			}   
-        			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
-        			if ((e == MOTOR) && (elements[e].state == ON)) {    
-        			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-        		      	    return;
-        			}              
-            		    }
+                			if (p == 0){ //normally is the intensity (speed, light luminosity
+                			    elements[e].actual_pwm_val = v;
+                			}
+                			if (e == MOTOR){
+                			    aux = elements[e].params[1] * elements[e].params[2];
+                			    aux1 = elements[e].params[1] * elements[e].params[3];                      
+                			}
+                			else{                      
+                			    aux = elements[e].params[1] * elements[e].params[2];                      
+                			    aux=aux1;
+                			}   
+                			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
+                			if ((e == MOTOR) && (elements[e].state == ON)) {    
+                			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+                		      	    return;
+                			}              
+            		   }
             		}
                else {
                   //TODO
                }
-         }             
+          }             
                     
        }
     }
@@ -662,7 +662,7 @@ void setDefaultParams(){
 
   //reed
   //params[0] = 0; //action when detected: 0=stop,1=blinking
-  //params[1] = 0; //spare
+  //params[1] = 0; //toogle 0 is default
   //params[2] = 0; //spare
   //params[3] = 0; //spare 
   if (setAndCheckParam(REED,0,0,0,0,0) != 0){
@@ -823,9 +823,21 @@ void controlAux(ELEMENTS * element) {
 void controlReed(ELEMENTS * element) {
 
   //Serial.println(digitalRead(REED_PIN));
-  
-  if (digitalRead(REED_PIN) == LOW ) element->state = OFF; //no magnet
-  else element->state = ON;//magnet
+  //toggle if the param 1 is set
+  if (digitalRead(REED_PIN) == LOW ) {
+    if (element->params[1] == 0){
+      element->state = OFF; //no magnet  
+    }else{
+      element->state = ON; //magnet
+    }    
+  }
+  else {    
+    if (element->params[1] == 0){
+      element->state = ON; //magnet  
+    }else{
+      element->state = OFF; //no magnet
+    } 
+  }
 
   switch (element->params[0]){
     case (0)://control motor
