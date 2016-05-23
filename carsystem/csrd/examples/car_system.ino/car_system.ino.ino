@@ -331,13 +331,14 @@ void checkAction(){
     if (car.isAction()){
        if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
           //if (car.getElement() != BOARD){
-	            uint8_t action=car.getAction();
+	           uint8_t action=car.getAction();
+             uint8_t e,p,v;
+             int aux, aux1;
              
              if (action == AC_SET_PARAM){
-                uint8_t e = car.getElement();
-             	  uint8_t p = car.getParamIdx();
-             	  uint8_t v = car.getVal0();
-          		  int aux, aux1;	                  
+                e = car.getElement();
+             	  p = car.getParamIdx();
+             	  v = car.getVal0();          		  	                  
           
             		if (e != BOARD){
             		    if (p < elements[e].total_params){
@@ -356,14 +357,27 @@ void checkAction(){
                 			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
                 			if ((e == MOTOR) && (elements[e].state == ON)) {    
                 			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-                		      	    return;
+                		      return;
                 			}              
             		   }
             		}
                else {
                   //TODO
                }
-          }             
+          }
+
+          if (action == AC_SET_PARAM){
+              e = car.getElement();
+              p = car.getParamIdx();
+              v = car.getVal0();                 
+              if (e == MOTOR && e == 0) {   
+                  SoftPWMSetFadeTime(elements[e].port, 0, 0);
+                  //SoftPWMSet(elements[idx].port, init_val); 
+                  //setPWM(e,elements[e].actual_pwm_val,0,0);                   
+                  SoftPWMSetPercent(elements[e].port,v);
+                  return;
+              }
+          }
                     
        }
     }
@@ -460,7 +474,7 @@ void checkMsgWriteParameter(){
                    }
                    //send ack
                    car.sendACKMessage(serverStation, nodeid,e,result);
-                   if (e!=REED){
+                   if (e!=REED){//Reed has no fade
                    
                        SoftPWMSetFadeTime(elements[e].port, aux, aux1);
                        

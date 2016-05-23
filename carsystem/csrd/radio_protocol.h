@@ -5,10 +5,10 @@
 #define RP_ADDRESSED    0
 #define RP_STATUS       1
 
-#define RP_WRITE        0
-#define RP_OPERATION    1
-#define RP_READ         2
-#define RP_ACTION       3
+#define RP_WRITE        0 //write data to eprom
+#define RP_OPERATION    1 //controls the changes in states
+#define RP_READ         2 //read parameter
+#define RP_ACTION       3 //set values to elements on runtime. data is not saved to eprom
 
 //status messages
 #define RP_INITIALREG          0
@@ -49,7 +49,7 @@
 "A" indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages ( RP_STATUS normally from client to server)
 
 If Broadcast
-    B indicates the type of action: store value (RP_WRITE) or perform some operation RP_OPERATION
+    B indicates the type of action: store value (RP_WRITE) or perform some operation RP_OPERATION, RP_ACTION
     C is the group. If equal to 0 means all groups
     D is the element. .0xff is the board element else (motor, left light,sirene, aux0, aux1, etc..)
 

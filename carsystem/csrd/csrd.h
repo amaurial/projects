@@ -26,7 +26,8 @@ typedef enum states {
 typedef enum ACTIONS{
    AC_LOWBATTERY=0,
    AC_RESTORE_DEFAULT_PARAMS,
-   AC_SET_PARAM
+   AC_SET_PARAM,
+   AC_SET_SPEED
 };
 
 //status
