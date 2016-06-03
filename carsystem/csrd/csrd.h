@@ -27,10 +27,17 @@ typedef enum ACTIONS{
    AC_LOWBATTERY=0,
    AC_RESTORE_DEFAULT_PARAMS,
    AC_SET_PARAM,
-   AC_SET_SPEED
+   AC_SET_SPEED,
+   AC_ACQUIRE,
+   AC_RELEASE,
+   AC_ACK,
+   AC_TURN_LEFT,
+   AC_TURN_RIGHT,
+   AC_MOVE_FORWARD,
+   AC_MOVE_BACKWARD
 };
 
-//status
+//car status
 typedef enum STATUS {
    ACTIVE=0,
    INACTIVE,

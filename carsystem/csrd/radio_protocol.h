@@ -46,7 +46,7 @@
 8 bytes
 <A><B><C><D><E><F><G><H>
 
-"A" indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages ( RP_STATUS normally from client to server)
+"A" indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages RP_STATUS
 
 If Broadcast
     B indicates the type of action: store value (RP_WRITE) or perform some operation RP_OPERATION, RP_ACTION
@@ -66,7 +66,7 @@ If Broadcast
             F,G,H is the action param
 
 If addressed message
-    B indicates the type of action: store value (RP_WRITE), perform some operation RP_OPERATION or read parameter RP_READ
+    B indicates the type of action: store value (RP_WRITE), perform some operation RP_OPERATION or read parameter RP_READ, RP_ACTION
     C and D is the node id
     E is the element .0xff is the board element else is (motor, left light,sirene, aux0, aux1, etc..)
         Case write
