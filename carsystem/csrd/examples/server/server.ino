@@ -3,13 +3,20 @@
 #include <csrd.h>
 #include <RH_RF69.h>
 #include <RHReliableDatagram.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define apin A0
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
 
 CSRD server;
 RH_RF69 driver;
 //RHReliableDatagram manager(driver, 1);
 
-#define NUM_CARS 10
-
+#define NUM_CARS 3
 
 typedef struct CARS{
   uint16_t carid;
@@ -51,6 +58,17 @@ void setup(){
   Serial.setTimeout(500);
   i=0;
 
+  //display
+  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64) 
+  // Clear the buffer.
+  display.clearDisplay();
+  // text display tests
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("Start");
+  display.display();
   //if (!server.init(&driver,&manager)){
   if (!server.init(&driver,NULL)){
     Serial.println("FAILED");
@@ -60,9 +78,8 @@ void setup(){
   carsIdx=0;
   car=0;
   status=ACTIVE;
-  last_request_register_time = millis();
-  Serial.println("START SERVER");
-  Serial.println("Send broadcast register");
+  last_request_register_time = millis();  
+  Serial.println("S br reg");
   server.sendBroadcastRequestRegister(serverId);
 }
 
@@ -76,12 +93,12 @@ void loop(){
    // Serial.println("New message");
    // dumpMessage();
    // Serial.println();
-    Serial.print ("Registered: ");
+    Serial.print ("Reg: ");
     Serial.println(carsIdx);
     
     if (server.getStatusType() == RP_INITIALREG){
       byte nn=insertNode(server.getNodeNumber(),server.getSender());
-       Serial.print("registration for ");
+       Serial.print("reg for ");
        Serial.print(cars[nn].carid);
        Serial.print("\t");
        Serial.print(cars[nn].senderid);
@@ -93,7 +110,7 @@ void loop(){
 
     
      if (server.getStatusType()==STT_ANSWER_VALUE){
-         Serial.print("Status for node ");
+         Serial.print("St node ");
          Serial.println(server.getNodeNumber());
          Serial.print("e: ");
          Serial.print(server.getElement());
@@ -114,6 +131,14 @@ void loop(){
   sendRequestRegister();
   requestBatterySpeedLevel(); 
   unregister();
+  
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.println("Reg:");
+  display.setCursor(25,0);
+  display.println(carsIdx);
+  display.display();
+  
 }
 
 
@@ -161,7 +186,7 @@ void unregister(){
 void sendRequestRegister(){
   long t = millis();
   if ((t - last_request_register_time) > (request_register_time * request_register_time_step)){
-     Serial.println("Send broadcast register");
+     Serial.println("S b reg");
      server.sendBroadcastRequestRegister(serverId);
      last_request_register_time = millis();
   }
@@ -258,7 +283,7 @@ bool getSerialCommand(){
           snid[0]=serbuf[4];
           snid[1]=serbuf[5];
           snid[2]=serbuf[6];
-          Serial.println("Send broadcast write");
+          Serial.println("S br wr");
 
           return server.sendBroadcastWriteMessage(serverId,charToInt(serbuf[2]),charToInt(serbuf[3]),getNN(snid),0,0);
       }
@@ -277,7 +302,7 @@ bool getSerialCommand(){
               if (s==255){
                 s=0;
               }
-               Serial.println("Send Restore");
+               Serial.println("S Re");
               return server.sendRestoreDefaultConfig(serverId,nn,s);
             }
            
@@ -288,7 +313,7 @@ bool getSerialCommand(){
       if (serbuf[1] == 'O' || serbuf[1] == 'o') {
           //example: BO60 -> B=broadcast O=operation 6=element_motor 0=ON
           //Serial.println("C BO");
-           Serial.println("Send broadcast operation");
+           Serial.println("S br op");
           return server.sendBroadcastOPMessage(serverId, charToInt(serbuf[2]),charToInt(serbuf[3]),0,0,0);
       }
 
@@ -312,7 +337,7 @@ bool getSerialCommand(){
             p1=0;
             p0=v;
           }
-          Serial.println("Send Broadcast action");
+          Serial.println("S Br ac");
              //bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
            return server.sendBroadcastActionMessage(serverId, charToInt(serbuf[3]),charToInt(serbuf[2]),serbuf[4],p0,p1);
       }
@@ -345,7 +370,7 @@ bool getSerialCommand(){
             p1=0;
             p0=v;
           }
-           Serial.println("Send addressed write");
+           Serial.println("S add wr");
           return server.sendAddressedWriteMessage(0, id, charToInt(serbuf[5]),charToInt(serbuf[6]),p0,p1);
       }
       if (serbuf[1] == 'R' || serbuf[1] == 'r') {
@@ -359,7 +384,7 @@ bool getSerialCommand(){
           //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
           //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
           //Serial.println("C AO");
-           Serial.println("Send addressed operation");
+           Serial.println("S add op");
           return server.sendAddressedOPMessage(serverId,id, charToInt(serbuf[5]),charToInt(serbuf[6]),0,0);
       }
         if (serbuf[1] == 'C' || serbuf[1] == 'c') {
@@ -389,7 +414,7 @@ bool getSerialCommand(){
               p1=0;
               p0=v;
             }
-            Serial.println("Send Addressed action");
+            Serial.println("S Add ac");
                //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
                //bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
              return server.sendAddressedActionMessage(serverId, nn, charToInt(serbuf[6]),charToInt(serbuf[5]),serbuf[7],p0);

@@ -436,7 +436,15 @@ byte releaseCar(byte carIndex){
     server.sendAddressedActionMessage(serverId, cars[carIndex].carid, BOARD,AC_RELEASE,0,0);
 }
 
-
+//car blink ligths
+//direction = 0 LEFT 1 RIGHT
+byte blinkCar(byte carIndex,byte direction, byte on){
+    states ac;
+    objects_enum e;
+    ac = on>0?ON:OFF;
+    e = direction>0?RIGHT_LIGHT:LEFT_LIGHT;
+    return server.sendAddressedOPMessage(serverId, cars[carIndex].carid, e ,ac,0,0);
+}
 
 
 

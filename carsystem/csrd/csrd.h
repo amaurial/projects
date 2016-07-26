@@ -31,10 +31,9 @@ typedef enum ACTIONS{
    AC_ACQUIRE,
    AC_RELEASE,
    AC_ACK,
-   AC_TURN_LEFT,
-   AC_TURN_RIGHT,
-   AC_MOVE_FORWARD,
-   AC_MOVE_BACKWARD
+   AC_TURN, //val0 is the angle
+   AC_MOVE, //val0 is the direction, val1 is the speed
+   AC_FAIL
 };
 
 //car status
