@@ -133,7 +133,7 @@ bool CSRD::sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,ui
 bool CSRD::sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
 
-    buf[0]=RP_ADDRESSED;
+    buf[0]=RP_BROADCAST;
     buf[1]=RP_ACTION;
     buf[2]=group;
     buf[3]=element;
@@ -350,10 +350,10 @@ bool CSRD::readMessage(){
 
                     //we expect 8 bytes
                     if (length>MESSAGE_SIZE){
-                        //#ifdef CSRD_DEBUG
+                        #ifdef CSRD_DEBUG
                           Serial.print("message bigger than expected: ");
                           Serial.println(length);
-                        //#endif // CSRD_DEBUG
+                        #endif // CSRD_DEBUG
                         return false;
                     }
                     length=len;
