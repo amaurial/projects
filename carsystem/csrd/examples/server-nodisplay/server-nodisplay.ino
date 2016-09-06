@@ -4,14 +4,8 @@
 #include <RH_RF69.h>
 #include <RHReliableDatagram.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
 #define apin A0
-#define OLED_RESET 4
-
-Adafruit_SSD1306 display(OLED_RESET);
-
 
 CSRD server;
 RH_RF69 driver(53,2);
@@ -69,18 +63,7 @@ void setup(){
   Serial.begin(115200);
   Serial.setTimeout(500);
   i=0;
-
-  //display
-  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64) 
-  // Clear the buffer.
-  display.clearDisplay();
-  // text display tests
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0,0);
-  display.println("Start");
-  display.display();
+  
   //if (!server.init(&driver,&manager)){
   if (!server.init(&driver,NULL)){
     Serial.println("FAILED");
@@ -100,34 +83,7 @@ void loop(){
 
   setSteering();
   setSpeed();
-  mainloop();
-  display.clearDisplay();
-  mainloop();
-  display.setCursor(0,0);
-  mainloop();
-  display.println("Reg:");
-  mainloop();
-  display.setCursor(25,0);
-  mainloop();
-  display.println(carsIdx);
-  mainloop();
-  display.setCursor(0,12);
-  mainloop();
-  display.println("Ang:");
-  mainloop();
-  display.setCursor(25,12);
-  mainloop();
-  display.println(printang);
-  mainloop();
-  display.setCursor(0,25);
-  mainloop();
-  display.println("Speed:");
-  mainloop();
-  display.setCursor(35,25);
-  mainloop();
-  display.println(printspeed);
-  mainloop();
-  display.display();    
+  mainloop();  
 }
 
 void setSteering(){

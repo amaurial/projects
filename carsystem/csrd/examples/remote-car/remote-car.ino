@@ -5,18 +5,21 @@
 #include <SPI.h>
 #include <EEPROM.h>
 #include <SoftPWM.h>
+#include <SoftwareServo.h>
 
 //uncomment for debug message
 //#define DEBUG_CAR 1;
 
 //PINS
-#define FRONT_LIGHT_PIN           7//A1
+#define STEERING_PIN              7
+#define FRONT_LIGHT_PIN           6//7 A1
 #define LEFT_LIGHT_PIN            5
 #define RIGHT_LIGHT_PIN           4
 #define SIRENE_LIGHT_PIN          A3 //AUX2
 #define BREAK_LIGHT_PIN           3//13
 #define REED_PIN                  A2//AUX1
 #define MOTOR_PIN                 A4
+#define MOTOR_PIN1                A5
 #define MOTOR_ROTATION_PIN        A6//A3
 #define BATTERY_PIN               A7//A5
 #define IR_RECEIVE_PIN            6 //AUX3
@@ -55,13 +58,21 @@ typedef struct ELEMENTS {
 //number of elements
 #define NUM_ELEMENTS 9
 struct ELEMENTS elements[NUM_ELEMENTS];
-
-//dynamic values
-//[0] = batery
-//[1] = motor
+/*
+* dynamic values
+* [0] = batery
+* [1] = motor
+*/
 #define D_VALUES 5
 uint16_t dvalues[D_VALUES];
-
+/*
+ * Board params 5
+ * 0 - adjust left
+ * 1 - adjust right
+ * 2 - 4 - spare
+ */
+ byte boardParams[5];
+ 
 //radio buffer
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 RH_RF69 driver;
@@ -70,116 +81,164 @@ RH_RF69 driver;
 //car message lib
 CSRD car;
 
-//aux vars
+/*
+ * aux vars
+ */
 long actime;
 long st;
-long count;
 float motor_rotation;
 int msamples;
 
-//battery vars
+/*
+ * battery vars
+ */
 long bat_send_timer = 0; //time between lowbat level
 
 //incomming and outcomming buffer
 uint8_t sbuffer[MESSAGE_SIZE];
 uint8_t recbuffer[MESSAGE_SIZE];
 
-//node status
+/*
+ * node status
+ */
 STATUS status;
 
-//node number and group
+/*
+ * node number and group
+ */
 uint16_t nodeid = 999;
 uint8_t group = 1;
 uint8_t serverStation = 1;
 
-//message flag
+/*
+ * message flag
+ */
 bool newMessage = false;
-//acquired flag
+/*
+ * acquired flag
+ */
 bool acquired = false;
-int acquire_server = 0;
+uint8_t acquire_server = 0;
 
-//time variables
+/*
+ * time variables
+ */
 long refresh_registration;
 long last_registration;
-
-//functions to control the elements
+byte LAST_MESSAGE_TIMEOUT = 30; //30 seconds
+double long last_message = 0;
+/*
+ * functions to control the elements
+ */
 void controlBreakLeds(ELEMENTS * element);
 void controlBlinkLed(ELEMENTS * element);
 void controlMotor(ELEMENTS * element);
 void controlAux(ELEMENTS * element);
 void controlReed(ELEMENTS * element);
 
+/*
+ * steering variable
+ * and call back function passed to softPWM
+ * to refresh the soft servo lib
+ */
+SoftwareServo myservo;
+byte midang = 92;
+byte lastAng = 0;
+
+void refreshSoftServo(int a){
+  SoftwareServo::refresh();
+}
+
 
 void setup() {
   boolean r=false;
+  #ifdef DEBUG_CAR
   Serial.begin(19200);
   delay(100);
+  #endif
 
-  //charger pin
-  pinMode(CHARGER_PIN, INPUT);
-  //reed pin
+  /*
+   * charger pin and reed pin 
+   */
+  pinMode(CHARGER_PIN, INPUT);  
   pinMode(REED_PIN, INPUT_PULLUP);
-  //get node number
+  
+  /*
+   * get node number ffrom eprom
+   */   
   uint16_t n=getNodeIdFromEprom();
   if (n > 999) nodeid = 999;
   else nodeid = n;
   
-  SoftPWMBegin();
+  /*
+   * Start steering
+   */
+  myservo.write(midang);
+  myservo.attach(STEERING_PIN);
+  SoftPWMBegin(SOFTPWM_NORMAL,&refreshSoftServo);
 
   //if (!car.init(&driver,&manager)){
+
+  /*
+   * Start the radio
+   * try 10 times if failed
+   */
   for (byte a=0;a<10;a++){
     if (car.init(&driver, NULL)) {
         r=true;
+        //driver.setTxPower(17);
         break;
     }
     delay(200);
   }
    
   if (r==false) {
+    #ifdef DEBUG_CAR
     Serial.println("FAILED THE RADIO");
+    #endif
     //turn on the sirene to blink indicating failure
     elements[SIRENE_LIGHT].next = BLINKING;
-  }
-  
+  }  
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
-
-  count = 0;
+  
   status = NOT_REGISTERED;
     
   initElements();
   randomSeed(analogRead(A0));
   refresh_registration = random(200, 5000);
+  
+  #ifdef DEBUG_CAR
   Serial.println("START CLIENT");
+  #endif
 }
 
-void loop() {
-
+void loop() {    
     actime = millis();
 
     //carry the active actions
     //if (status == ACTIVE) {
       for (byte i = 0; i < NUM_ELEMENTS; i++) {
-        elements[i].controller(&elements[i]);
+        elements[i].controller(&elements[i]);        
       }
     //} 
 
-    newMessage = car.readMessage();
-  
+    newMessage = car.readMessage();    
     if (newMessage) {
+      last_message = actime;
       #ifdef DEBUG_CAR
         dumpMessage();
       #endif
-      confirmRegistrationMessage();
-      checkBroadcastRegister();      
-    }
- 
-    //send registration message
+      
+      confirmRegistrationMessage();      
+      checkBroadcastRegister();       
+    }  
+      
     sendRegistrationMessage();
     
-    if (newMessage){      
-      checkMsgRestoreDefault();        
-      checkMsgWriteParameter();
-      checkAction();
+    if (newMessage){            
+      checkMsgRestoreDefault();             
+      checkMsgWriteParameter();      
+      checkAction();     
       checkQuery();
       
       if (status == ACTIVE){
@@ -187,25 +246,31 @@ void loop() {
       }
     }
     dvalues[1] = analogRead(MOTOR_ROTATION_PIN);    
-    checkBattery();
-   
+    checkBattery();  
+
+    if ((actime - last_message) >= LAST_MESSAGE_TIMEOUT * 1000 ){
+      acquired = false;
+    }
+    if (!acquired) {      
+      //myservo.detach();
+      //car.sendAddressedActionMessage(serverId, car.getNodeNumber() , BOARD, AC_RELEASE, 0, 0);
+    }    
 }
 
 /*
 /* Print the received message
 */
-
-void dumpMessage() {
-	#ifdef DEBUG_CAR  
+#ifdef DEBUG_CAR
+void dumpMessage() {	  
 	  Serial.println("New Message");
 	  car.getMessageBuffer(recbuffer);
 	  for (byte i = 0; i < MESSAGE_SIZE; i++) {
 	    Serial.print (recbuffer[i]);
 	    Serial.print ("   ");
 	  }
-	  Serial.println();
-	#endif
+	  Serial.println();	
 }
+#endif
 
 //restore default parameters
 void checkMsgRestoreDefault(){  
@@ -229,7 +294,6 @@ void confirmRegistrationMessage(){
       #endif
     }
   }
-
 }
 
 //check broadcast register
@@ -267,8 +331,8 @@ void sendRegistrationMessage(){
 }
 
 //deal with Action messages
-void checkAction(){  
-    if (car.isAction()){
+void checkAction(){    
+    if (car.isAction()){       
        if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
           //if (car.getElement() != BOARD){
 	          uint8_t action=car.getAction();
@@ -297,7 +361,7 @@ void checkAction(){
                 			setPWM(e,elements[e].actual_pwm_val,aux,aux1);  
                 			if ((e == MOTOR) && (elements[e].state == ON)) {    
                 			    SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
-                		            return;
+                		      return;
                 			}              
                    }
                 }
@@ -320,33 +384,75 @@ void checkAction(){
           else if (action == AC_ACQUIRE){
               if (acquired){
                  //uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
-                 sendAddressedActionMessage(car.getSender(), nodeid,
+                 car.sendAddressedActionMessage(serverStation, nodeid,
                                             BOARD, AC_FAIL, 
                                             highByte(acquire_server), lowByte(acquire_server));
               }
               else{
                 acquire_server = word(car.getVal0(), car.getVal1());
                 acquired = true;
-                sendAddressedActionMessage(car.getSender(), nodeid, BOARD, AC_ACK, 0, 0);
+                car.sendAddressedActionMessage(serverStation, nodeid, BOARD, AC_ACK, 0, 0);
+                myservo.write(midang);
+                myservo.attach(STEERING_PIN);
               }
           } 
           else if (action == AC_RELEASE){
               if (acquired){
                 acquired = false;
-                sendAddressedActionMessage(car.getSender(), nodeid, BOARD, AC_ACK, 0, 0);
+                car.sendAddressedActionMessage(serverStation, nodeid, BOARD, AC_ACK, 0, 0);
               }
           }
           else if (action == AC_MOVE){              
               v = car.getVal0();  
               v1 = car.getVal1();                               
-              if (e == MOTOR && e == 0) {
-                  //TODO set the direction
-                  SoftPWMSetPercent(elements[e].port,v1);                  
+              if (e == MOTOR || e == 0) {
+                  //byte d = car.getVal1();
+                  if (v1 == 0){
+                    elements[MOTOR].port = A4;
+                  }
+                  else{
+                    elements[MOTOR].port = A5;
+                  }
+                  if (v1 == elements[MOTOR].params[4]){                    
+                    SoftPWMSetPercent(elements[MOTOR].port,v);                     
+                  }
+                  else {
+                    if (v1 == 0){
+                      SoftPWMSetPercent(A5,0);                      
+                    }
+                    else{
+                      SoftPWMSetPercent(A4,0);                      
+                    }
+                    elements[MOTOR].params[4] = v1;
+                    SoftPWMSetPercent(elements[MOTOR].port,v);                    
+                  }                                   
               }
           }
           else if (action == AC_TURN){              
-              v = car.getVal0();                                             
-              //TODO set the angle
+              v = car.getVal0();
+              v1 = car.getVal1();
+              //direction
+              if (v1 == 0){
+                if (lastAng != (midang + v + boardParams[v1])){
+                  //myservo.attach(STEERING_PIN);
+                  //delay(10);
+                  myservo.write(midang + v + boardParams[v1]);
+                  lastAng = midang + v + boardParams[v1];
+                  //delay(20);                           
+                  //myservo.detach();
+                }                
+              }
+              else {
+                  if (lastAng != (midang - v - boardParams[v1])){
+                    //myservo.attach(STEERING_PIN);
+                    //delay(10);
+                    myservo.write(midang - v - boardParams[v1]);
+                    lastAng = midang - v - boardParams[v1];
+                    //delay(20);                            
+                    //myservo.detach();
+                  }
+              }    
+              
           }
        }
     }
@@ -355,9 +461,15 @@ void checkAction(){
 //deal with query messages
 void checkQuery(){  
     if (car.isStatus()){
+      #ifdef DEBUG_CAR
+        Serial.println("st msg");
+      #endif
        if ( car.getNodeNumber() == nodeid ){
 	        uint8_t sttype=car.getStatusType();          
           if (sttype == STT_QUERY_VALUE){
+              #ifdef DEBUG_CAR
+                Serial.println("qry msg");
+              #endif
               uint8_t e = car.getElement();
               uint8_t p0 = car.getVal0();
               uint8_t p1 = car.getVal1();
@@ -374,20 +486,31 @@ void checkQuery(){
                             charger = 1;
                           }
                       }
-                      //0 -> battery 1->motor
-                      //4v -> 610 charged 3.3v -> 640 ; 0v ->1023
-                      //688 - motor stopped
+                      /*
+                       * 0 -> battery 1->motor
+                       * 4v -> 610 charged 3.3v -> 640 ; 0v ->1023
+                       * 688 - motor stopped
+                      */
                       byte bperc = (byte)(100*((BAT_LEVEL_READ - dvalues[p0])/(float)(BAT_LEVEL_READ-BAT_FULL_LEVEL)));
-                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, bperc, dvalues[p1]*0.049, charger);  
+                      #ifdef DEBUG_CAR
+                         Serial.println("Send battery msg");
+                      #endif
+                      byte v= dvalues[p1]*0.049;    
+                     
+                      #ifdef DEBUG_CAR                  
+                         Serial.println(bperc);Serial.println(v);Serial.println(charger);                                       
+                      #endif
+                      
+                      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, serverStation, nodeid, e, bperc, v, charger);                        
                     }
                     else{
-                      car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, p0, p1, p2);  
+                      car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, serverStation, nodeid, e, p0, p1, p2);  
                     }                    
                 break;
                 default:
                 {
                   if (e >= NUM_ELEMENTS ){
-                    car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, car.getSender(), nodeid, e, 0, 0, 0);  
+                    car.sendAddressedStatusMessage(STT_QUERY_VALUE_FAIL, serverStation, nodeid, e, 0, 0, 0);  
    		            }
           		    //sanity check on params
           		    uint8_t val0,val1,val2;
@@ -404,9 +527,8 @@ void checkQuery(){
           		    if (p2 < elements[e].total_params){
           			    val2=elements[e].params[p2];
           		    }			
-          		    else val2=RP_FILLER;
-        
-        		      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, car.getSender(), nodeid, e, val0, val1, val2);  
+          		    else val2=RP_FILLER;                  
+        		      car.sendAddressedStatusMessage(STT_ANSWER_VALUE, serverStation, nodeid, e, val0, val1, val2);  
   		          }//default
               }//switch              
 	          }//STT_QUERY_VALUE
@@ -447,8 +569,7 @@ void checkMsgWriteParameter(){
                    
                        SoftPWMSetFadeTime(elements[e].port, aux, aux1);
                        
-                       if ((e == MOTOR) && (elements[e].state == ON)) {    
-                          Serial.println("Change motor speed");
+                       if ((e == MOTOR) && (elements[e].state == ON)) {                              
                           SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
                           return;
                        } 
@@ -484,8 +605,9 @@ void setNextOperation(){
     if (!(car.getNodeNumber() == nodeid || (car.isBroadcast() && car.isMyGroup(group) ))) {
        return;
     }
-
-    //dumpParameters();
+    #ifdef DEBUG_CAR
+    dumpParameters();
+    #endif
     
     byte e = car.getElement();
     states s = car.convertFromInt(car.getState());    
@@ -632,18 +754,24 @@ void setInitParams(){
   #ifdef DEBUG_CAR
   Serial.println("Loading from eprom");
   #endif
-  byte i = 0;
-  for (i = 0; i < NUM_ELEMENTS; i++) {
+  
+  for (byte i = 0; i < NUM_ELEMENTS; i++) {
+	  #ifdef DEBUG_CAR 
       Serial.println("get epron");
+	  #endif
       if ((getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
+	     #ifdef DEBUG_CAR 
         Serial.print("Failed to load eprom for element ");
         Serial.println(i);
+	    #endif
       }
       #ifdef DEBUG_CAR        
         dumpParameters();
       #endif
   }
 }
+
+#ifdef DEBUG_CAR
 
 void dumpParameters(){
   for (byte i=0;i<NUM_ELEMENTS;i++){
@@ -657,15 +785,17 @@ void dumpParameters(){
     Serial.println();
   }
 }
+#endif
 
-void setPWM(byte idx,byte init_val,int p1, int p2){  
-  Serial.println("pwm");    
+void setPWM(byte idx,byte init_val,int p1, int p2){
   SoftPWMSetFadeTime(elements[idx].port, p1, p2);
   SoftPWMSet(elements[idx].port, init_val);  
 }
 
 void initElements() {
+  #ifdef DEBUG_CAR
   Serial.println("Ini elements");
+  #endif
   elements[MOTOR].total_params = 4;
   elements[FRONT_LIGHT].total_params = 4;
   elements[BREAK_LIGHT].total_params = 4;
@@ -678,7 +808,9 @@ void initElements() {
   setInitParams();
 
   //set initial state
+  #ifdef DEBUG_CAR
   Serial.println("all OFF");
+  #endif
   byte j;
   for (j=0;j<NUM_ELEMENTS;j++){
     elements[j].state = OFF;
@@ -687,7 +819,9 @@ void initElements() {
   byte i = MOTOR;
   int aux, aux1;
   //motor  
+  #ifdef DEBUG_CAR
   Serial.println("set motor");
+  #endif
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
   elements[i].port = MOTOR_PIN;  
@@ -754,7 +888,17 @@ void initElements() {
   elements[i].port = IR_SEND_PIN;
   elements[i].controller = &controlAux; 
   //elements[i].total_params = 1;
+
+  //Board params
+  boardParams[0] = 10 ;//degrees for extra steering left
+  boardParams[1] = 0 ;//degrees for extra steering right
+  boardParams[2] = 0 ;
+  boardParams[3] = 0 ;
+  boardParams[4] = 0 ;
+  
+  #ifdef DEBUG_CAR
   Serial.println("all set");
+  #endif
 }
 
 void controlAux(ELEMENTS * element) {
@@ -841,7 +985,7 @@ void controlBreakLeds(ELEMENTS * element) {
   }
 
   if (element->state == BLINKING ) {
-    //Serial.println("blinking");
+    
     if (t > element->auxTime) {
       element->auxTime = t + element->params[1] * element->params[2];
       if (element->tempState == OFF) {
@@ -873,7 +1017,7 @@ void controlBreakLeds(ELEMENTS * element) {
 
 }
 void controlBlinkLed(ELEMENTS * element) {
-  //Serial.println("controlBlinkLed");
+  
   long t;
   byte aux;
   t = millis();
@@ -882,8 +1026,7 @@ void controlBlinkLed(ELEMENTS * element) {
     element->lastState = element->state;
     element->state = OFF;
     element->actual_pwm_val = 0;
-    SoftPWMSetPercent(element->port, 0);
-    //analogWrite(element->port, 0);        
+    SoftPWMSetPercent(element->port, 0);           
   }
   
   if (element->state == OFF && element->next == ON) {
@@ -927,8 +1070,7 @@ void controlBlinkLed(ELEMENTS * element) {
 void controlMotor(ELEMENTS * element) {
   long t;
   byte aux;
-
-  //Serial.println("controlMotor");
+  
   t = millis();
   if (element->state == ON && element->next == OFF) {
     element->lastState = element->state;
@@ -1005,20 +1147,12 @@ uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
     #endif
     return 2;
   }
-  //Serial.print("getting element:");
-  //Serial.print(obj);
-  //Serial.println();
+  
   for (i = 0; i < numParams; i++) {
     val = EEPROM.read(startpos + i);
-    params[i] = val;
-    //Serial.print(i);
-    //Serial.print("\t");
-    //Serial.print(val);
-    //Serial.print(" pos:");
-    //Serial.print(startpos + i);
-    //Serial.print("\t");
+    params[i] = val;    
   }
-  //Serial.println();
+  
 return 0;
 }
 
@@ -1041,20 +1175,10 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
     #endif
     return 2;
   }
-  //Serial.print("saving element:");
-  //Serial.print(obj);
-  //Serial.println();
-  for (i = 0; i < numParams; i++) {    
-    //Serial.print(i);
-    //Serial.print("\t");
-    //Serial.print(params[i]);
-    //Serial.print(" pos:");
-    //Serial.print(startpos + i);
-    //Serial.print("\t");
- 
+  
+  for (i = 0; i < numParams; i++) {  
     EEPROM.write(startpos + i, params[i]);    
-  }
-  //Serial.println();
+  }  
   return 0;
 }
 
