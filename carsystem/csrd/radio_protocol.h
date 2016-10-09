@@ -1,9 +1,16 @@
 #ifndef __RADIO__PROTOCOL__
 #define __RADIO__PROTOCOL__
 
-#define RP_BROADCAST    0xff
-#define RP_ADDRESSED    0
-#define RP_STATUS       1
+#define RP_BROADCAST        0xff
+#define RP_ADDRESSED        0
+#define RP_STATUS           1
+#define RP_ID_RESOLUTION    2
+#define BR_SERVER_AUTO_ENUM 3
+#define BR_CAR_AUTO_ENUM    4
+#define RC_ID               5
+#define CAR_ID              6
+#define CAR_ACQUIRE         7
+#define CAR_RELEASE         8
 
 #define RP_WRITE        0 //write data to eprom
 #define RP_OPERATION    1 //controls the changes in states

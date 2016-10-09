@@ -145,7 +145,7 @@ bool CSRD::sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t acti
 }
 
 bool CSRD::sendBroadcastRequestRegister(uint8_t group){
-uint8_t buf[MESSAGE_SIZE];
+    uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_BROADCAST;
     buf[1]=RP_ACTION;
     buf[2]=group;
@@ -159,50 +159,50 @@ uint8_t buf[MESSAGE_SIZE];
 
 bool CSRD::sendBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_BROADCAST;
-    buf[1]=RP_WRITE;
-    buf[2]=group;
-    buf[3]=element;
-    buf[4]=param_idx;
-    buf[5]=val0;
-    buf[6]=val1;
-    buf[7]=val2;
+    buf[0] = RP_BROADCAST;
+    buf[1] = RP_WRITE;
+    buf[2] = group;
+    buf[3] = element;
+    buf[4] = param_idx;
+    buf[5] = val0;
+    buf[6] = val1;
+    buf[7] = val2;
     return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_WRITE;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=element;
-    buf[5]=param_idx;
-    buf[6]=val0;
-    buf[7]=val1;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_WRITE;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = param_idx;
+    buf[6] = val0;
+    buf[7] = val1;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 bool CSRD::sendAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_READ;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=element;
-    buf[5]=param_idx;
-    buf[6]=0;
-    buf[7]=0;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_READ;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = param_idx;
+    buf[6] = 0;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_OPERATION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=element;
-    buf[5]=state;
-    buf[6]=val0;
-    buf[7]=val1;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_OPERATION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = state;
+    buf[6] = val0;
+    buf[7] = val1;
     //Serial.print("CSRD::sendAddressedOPMessage message to: ");
     //Serial.println(serverAddr);
     //dumpBuffer(buf);
@@ -211,14 +211,14 @@ bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t ele
 
 bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_ACTION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=element;
-    buf[5]=action;
-    buf[6]=val0;
-    buf[7]=val1;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_ACTION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = action;
+    buf[6] = val0;
+    buf[7] = val1;
     //Serial.print("CSRD::sendAddressedOPMessage message to: ");
     //Serial.println(serverAddr);
     //dumpBuffer(buf);
@@ -227,91 +227,177 @@ bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
 
 bool CSRD::sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_STATUS;
-    buf[1]=status_code;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=element;
-    buf[5]=p0;
-    buf[6]=p1;
-    buf[7]=p2;
+    buf[0] = RP_STATUS;
+    buf[1] = status_code;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = p0;
+    buf[6] = p1;
+    buf[7] = p2;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
 bool CSRD::sendEmergencyBroadcast(uint8_t group){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_BROADCAST;
-    buf[1]=RP_OPERATION;
-    buf[2]=group;
-    buf[3]=255;
-    buf[4]=EMERGENCY;
-    buf[5]=0;
-    buf[6]=0;
-    buf[7]=0;
+    buf[0] = RP_BROADCAST;
+    buf[1] = RP_OPERATION;
+    buf[2] = group;
+    buf[3] = 255;
+    buf[4] = EMERGENCY;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendEmergency(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_OPERATION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=255;
-    buf[5]=EMERGENCY;
-    buf[6]=0;
-    buf[7]=0;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_OPERATION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = 255;
+    buf[5] = EMERGENCY;
+    buf[6] = 0;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
 bool CSRD::sendBackToNormalBroadcast(uint8_t group){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_BROADCAST;
-    buf[1]=RP_OPERATION;
-    buf[2]=group;
-    buf[3]=255;
-    buf[4]=NORMAL;
-    buf[5]=0;
-    buf[6]=0;
-    buf[7]=0;
+    buf[0] = RP_BROADCAST;
+    buf[1] = RP_OPERATION;
+    buf[2] = group;
+    buf[3] = 255;
+    buf[4] = NORMAL;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,RH_BROADCAST_ADDRESS);
 }
 bool CSRD::sendBackToNormal(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_OPERATION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=255;
-    buf[5]=NORMAL;
-    buf[6]=0;
-    buf[7]=0;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_OPERATION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = 255;
+    buf[5] = NORMAL;
+    buf[6] = 0;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
 bool CSRD::sendLowBattery(uint8_t serverAddr,uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_ACTION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=255;
-    buf[5]=AC_LOWBATTERY;
-    buf[6]=serverAddr;
-    buf[7]=0;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_ACTION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = 255;
+    buf[5] = AC_LOWBATTERY;
+    buf[6] = serverAddr;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
 }
 
 bool CSRD::sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr){
     uint8_t buf[MESSAGE_SIZE];
-    buf[0]=RP_ADDRESSED;
-    buf[1]=RP_ACTION;
-    buf[2]=highByte(nodeid);
-    buf[3]=lowByte(nodeid);
-    buf[4]=255;
-    buf[5]=AC_RESTORE_DEFAULT_PARAMS;
-    buf[6]=serverAddr;
-    buf[7]=0;
+    buf[0] = RP_ADDRESSED;
+    buf[1] = RP_ACTION;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = 255;
+    buf[5] = AC_RESTORE_DEFAULT_PARAMS;
+    buf[6] = serverAddr;
+    buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,nodeAddr);
+}
+
+bool CSRD::sendServerAutoEnum(uint8_t id){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = BR_SERVER_AUTO_ENUM;
+    buf[1] = id;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,id);
+}
+
+bool CSRD::sendCarAutoEnum(uint8_t id){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = BR_CAR_AUTO_ENUM;
+    buf[1] = id;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,id);
+}
+
+bool CSRD::sendId(uint8_t id){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RP_ID_RESOLUTION;
+    buf[1] = id;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,id);
+}
+
+bool CSRD::sendRCId(uint8_t id){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_ID;
+    buf[1] = id;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,id);
+}
+
+bool CSRD::sendCarId(uint8_t id){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = CAR_ID;
+    buf[1] = id;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,id);
+}
+
+bool CSRD::sendAcquire(uint8_t carid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = CAR_ACQUIRE;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+uint8_t CSRD::getId(){
+   return buffer[1];
+}
+
+uint8_t CSRD::getServerId(){
+   return buffer[2];
 }
 
 uint8_t CSRD::getMessage(uint8_t *mbuffer){
@@ -395,21 +481,49 @@ bool CSRD::isRadioOn(){
 }
 
 bool CSRD::isBroadcast(){
-    if (buffer[0]==RP_BROADCAST){
+    if (buffer[0] == RP_BROADCAST){
         return true;
     }
     return false;
 }
 
 bool CSRD::isAddressed(){
-    if (buffer[0]==RP_ADDRESSED){
+    if (buffer[0] == RP_ADDRESSED){
         return true;
     }
     return false;
 }
 
+bool CSRD::isResolutionId(){
+    return (buffer[0] == RP_ID_RESOLUTION);
+}
+
+bool CSRD::isServerAutoEnum(){
+    return (buffer[0] == BR_SERVER_AUTO_ENUM);
+}
+
+bool CSRD::isCarAutoEnum(){
+    return (buffer[0] == BR_CAR_AUTO_ENUM);
+}
+
+bool CSRD::isCarId(){
+    return (buffer[0] == CAR_ID);
+}
+
+bool CSRD::isRCId(){
+    return (buffer[0] == RC_ID);
+}
+
+bool CSRD::isAcquire(){
+    return (buffer[0] == CAR_ACQUIRE);
+}
+
+bool CSRD::isCarRelease(){
+    return (buffer[0] == CAR_RELEASE);
+}
+
 bool CSRD::isStatus(){
-    if (buffer[0]==RP_STATUS){
+    if (buffer[0] == RP_STATUS){
         return true;
     }
     return false;

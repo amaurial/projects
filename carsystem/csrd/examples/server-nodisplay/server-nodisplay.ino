@@ -4,14 +4,32 @@
 #include <RH_RF69.h>
 #include <RHReliableDatagram.h>
 #include <Wire.h>
+#include <EEPROM.h>
 
 #define apin A0
 
 CSRD server;
-RH_RF69 driver(53,2);
+RH_RF69 driver(10,2);
 //RHReliableDatagram manager(driver, 1);
 
-#define NUM_CARS 3
+#define NUM_CARS         10
+#define SPEED_UP_PIN     3
+#define SPEED_DOWN_PIN   4
+#define SELECT_PIN       5
+#define RELEASE_PIN      6
+#define LED_PIN          7
+
+#define NUM_CARS 20
+#define NUM_SERVERS 10
+#define REG_TIMEOUT 2000 //2 secs
+#define RC_TIMEOUT 5000
+
+byte cars[NUM_CARS];
+byte servers[NUM_SERVERS];
+
+//time to keep the release button pressed to free the car
+#define RELEASE_PRESS_TIME 1000
+
 
 typedef struct CARS{
   uint16_t carid;
@@ -21,7 +39,7 @@ typedef struct CARS{
   byte idx;  
 };
 
-CARS cars[NUM_CARS];
+CARS selected_car;
 
 uint8_t sbuffer[MESSAGE_SIZE];
 uint8_t recbuffer[MESSAGE_SIZE];
@@ -32,7 +50,7 @@ long st;
 STATUS status;
 long register_time_interval = 1000;
 long last_register_sent;
-uint8_t serverId=1;
+uint8_t serverId=0;
 bool newMessage=false;
 uint8_t carsIdx=0;
 uint8_t turnOn=0;
@@ -42,6 +60,8 @@ long request_register_time = 5000;   // time to send a request for registration 
 int  request_register_time_step = 6;  // multiplier of request_register_time to request all cars to register.
 long last_request_register_time = 0;
 byte car;
+byte idx;
+bool newMessage;
 
 long last_request_battery = 0;
 int request_battery_time = 500;   
@@ -58,6 +78,15 @@ int printang = 0;
 int printspeed = 0;
 int lastspeed = 1;
 
+//timers
+// auto enunmeration 
+long t1,t2;
+// send RC registration
+long t3,t4;
+int t;
+bool resolved = false;
+bool sentreg = false;
+bool select_pressed = false;
 
 void setup(){
   Serial.begin(115200);
@@ -65,9 +94,27 @@ void setup(){
   i=0;
   
   //if (!server.init(&driver,&manager)){
-  if (!server.init(&driver,NULL)){
+
+/*
+* Start the radio
+* try 10 times if failed
+*/
+  boolean r=false;
+  for (byte a=0;a<10;a++){
+    if (server.init(&driver,NULL)) {
+        r=true;
+        //driver.setTxPower(17);
+        break;
+    }
+    delay(200);
+  }
+
+  if (!r){
     Serial.println("FAILED");
   }
+  //if (!server.init(&driver,NULL)){
+  //  Serial.println("FAILED");
+  //}
   //driver.setTxPower(17);
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
 
@@ -77,9 +124,50 @@ void setup(){
   last_request_register_time = millis();  
   Serial.println("S br reg");
   server.sendBroadcastRequestRegister(serverId);
+
+  //setup push buttons
+  pinMode(SPEED_UP_PIN, INPUT_PULLUP);
+  pinMode(SPEED_DOWN_PIN, INPUT_PULLUP);
+  pinMode(SPEED_UP_PIN, INPUT_PULLUP);
+  pinMode(SELECT_PIN, INPUT_PULLUP);
+  pinMode(RELEASE_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);  
+
+  randomSeed(analogRead(apin));
+  serverId = EEPROM.read(0);
+  if (serverId != EEPROM.read(1)){
+    //get a random value if the old one is not the same
+    serverId = random(1 , 255);
+  }
+  
+  t1 = millis();  
+  t3 = t1 - RC_TIMEOUT;//just to guarantee we send it as fast as we can
+  Serial.print("random id: ");Serial.println(serverId);
+  t = random(0, 1000);
+  //retry timer
+  Serial.print("random retry timer: ");Serial.println(t);
+  
 }
 
 void loop(){
+
+  if (!resolved) resolveId();
+
+  if (digitalRead(SELECT_PIN) == HIGH){//pressed
+    if (){
+      
+    }
+  }
+
+  newMessage = server.readMessage();
+  
+  if (newMessage){
+    checkServerEnum();    
+  }
+
+  if (resolved){
+    sendRCRegistration();
+  }
 
   setSteering();
   setSpeed();
@@ -142,7 +230,7 @@ void setSpeed(){
 void mainloop(){
   getSerialCommand();
 
-  newMessage = server.readMessage();
+  //newMessage = server.readMessage();
 
   if (newMessage){
     Serial.println("New message");
@@ -155,13 +243,9 @@ void mainloop(){
         if (server.getStatusType() == RP_INITIALREG){
           byte idx=insertNode(server.getNodeNumber(),server.getSender());
            Serial.print("reg for ");
-           Serial.print(cars[idx].carid);
-           Serial.print("\t");
-           Serial.print(cars[idx].senderid);
-           Serial.print("\t");
-           Serial.println(server.getNodeNumber());
-           
-           server.sendInitialRegisterMessage(cars[idx].senderid,serverId,ACTIVE,255,255,255);
+           Serial.println(cars[idx]);
+                      
+           server.sendInitialRegisterMessage(cars[idx],serverId,ACTIVE,255,255,255);
         }
         if (server.getStatusType() == STT_ANSWER_VALUE){
              Serial.print("St node ");
@@ -176,14 +260,16 @@ void mainloop(){
              Serial.println(server.getVal2());   
              byte idx = getCarIdx(server.getNodeNumber()); 
              if (idx != 255){
-                cars[idx].requests--;
+                //cars[idx].requests--;
              }
         }
         if (server.getStatusType() == STT_QUERY_VALUE_FAIL){
              Serial.println("Qry failed");
         }
     }
-    else Serial.println("Not st msg");
+    else {
+      
+    }
         
   }
  
@@ -192,12 +278,70 @@ void mainloop(){
   unregister();
 }
 
+void checkServerEnum(){
+  if (server.isResolutionId() && !resolved){
+      servers[i] = server.getId();
+      Serial.print ("received id: ");Serial.println(servers[i]);
+      i++;
+      if (i > NUM_SERVERS) i = NUM_SERVERS -1;
+    }
+    if (server.isServerAutoEnum()){      
+      server.sendId(serverId);
+      Serial.print ("sent my id: ");Serial.println(serverId);
+    }
+}
+
+void resolveId(){
+  //send autoenum message if not registered
+  
+  if (millis() - t1 > t){
+    t1 = millis();
+    server.sendServerAutoEnum(serverId);
+  }
+  if (!sentreg){
+    t2 = millis();
+    sentreg = true;
+  }  
+
+  if (millis() - t2 > REG_TIMEOUT){
+    //end timer. transverse the data until find a valid id
+    boolean f = true;
+    Serial.println ("resolving the id");
+    while (f){
+      f = false;
+      for (byte j = 0; j < i; j++){
+        if (servers[j] == serverId ){
+          f = true;
+          serverId ++;
+          if (serverId > 255){
+            serverId = 1;
+          }
+          break;
+        }
+      }
+    }
+    Serial.print ("valid id: ");Serial.println(serverId);
+    resolved = true;
+    //save to eprom
+    //save both value in the 2 first positions, so we can assure we did it
+    EEPROM.write(0,serverId);
+    EEPROM.write(1,serverId);
+  }
+}
+
+void sendRCRegistration(){
+  if (millis() - t3 > RC_TIMEOUT){
+    t3 = millis();
+    server.sendRCId(serverId);
+  }
+}
+
 
 void requestBatterySpeedLevel(){
 
   if (carsIdx == 0) return;
 
-  if (cars[car].registered == false) {
+  if (cars[car] == 0) {
     car++;
     if (car>=carsIdx){
       car=0;
@@ -209,18 +353,15 @@ void requestBatterySpeedLevel(){
   if ((t - last_request_battery) > (request_battery_time * request_battery_time_step)){    
      
     Serial.print ("query ");
-    Serial.print (cars[car].carid);
-    Serial.print (" ");
-    Serial.println(cars[car].senderid);
-    cars[car].requests++;
-    server.sendAddressedStatusMessage(STT_QUERY_VALUE,cars[car].senderid,cars[car].carid,BOARD,0,1,2);       
+    Serial.println (cars[car]);   
+    
+    server.sendAddressedStatusMessage(STT_QUERY_VALUE,serverId,cars[car],BOARD,0,1,2);       
 
     car++;
     if (car>=carsIdx){
       car=0;
-    }
-    
-     last_request_battery = millis();
+    }    
+    last_request_battery = millis();
   }
 }
 

@@ -272,7 +272,7 @@ void dumpMessage() {
 }
 #endif
 
-//restore default parameters
+/* restore default parameters */
 void checkMsgRestoreDefault(){  
     if (car.isRestoreDefaultConfig(nodeid)){
        #ifdef DEBUG_CAR
@@ -283,7 +283,7 @@ void checkMsgRestoreDefault(){
     }
 }
 
-//confirm we received a registration
+/* confirm we received a registration */
 void confirmRegistrationMessage(){
   if (status == WAITING_REGISTRATION) {      
 
@@ -296,41 +296,41 @@ void confirmRegistrationMessage(){
   }
 }
 
-//check broadcast register
+/* check broadcast register */
 void checkBroadcastRegister(){
   if (car.isBroadcastRegister() && car.isMyGroup(group) ){
-     //set the timer
+     /* set the timer */
      #ifdef DEBUG_CAR
             Serial.println("BREG received status WAITING REG");
       #endif
      status = WAITING_REGISTRATION;
-      //set timer
+      /* set timer */
       randomSeed(analogRead(A0));
       refresh_registration = random(100, 3000);
       last_registration = millis();
   }
 }
 
-//send initial registration message
+/* send initial registration message */
 void sendRegistrationMessage(){
    
    if ( status == NOT_REGISTERED ||
        ( status == WAITING_REGISTRATION && (actime - last_registration) > refresh_registration) ) {          
           
-      //send message. change the status
+      /* send message. change the status */
       #ifdef DEBUG_CAR
             Serial.println("send REG request");
       #endif
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
       status = WAITING_REGISTRATION;
-      //set timer
+      /* set timer */
       randomSeed(analogRead(A0));
       refresh_registration = random(200, 5000);
       last_registration = millis();     
   }
 }
 
-//deal with Action messages
+/* deal with Action messages */
 void checkAction(){    
     if (car.isAction()){       
        if ( (car.isAddressed() && (car.getNodeNumber() == nodeid)) || (car.isBroadcast() && car.isMyGroup(group)) ){
@@ -458,7 +458,7 @@ void checkAction(){
     }
 }
 
-//deal with query messages
+/* deal with query messages */
 void checkQuery(){  
     if (car.isStatus()){
       #ifdef DEBUG_CAR
@@ -536,7 +536,7 @@ void checkQuery(){
     }             
 }
 
-//deal with write message
+/* deal with write message */
 void checkMsgWriteParameter(){  
     if (car.isWrite()){
        if ( (car.isAddressed() ) || (car.isBroadcast() && car.isMyGroup(group)) ){
@@ -595,7 +595,7 @@ void checkMsgWriteParameter(){
     }
 }
 
-//set next operation
+/* set next operation */
 void setNextOperation(){
 
     if (!(car.isOperation())) {
@@ -890,7 +890,7 @@ void initElements() {
   //elements[i].total_params = 1;
 
   //Board params
-  boardParams[0] = 10 ;//degrees for extra steering left
+  boardParams[0] = 0 ;//degrees for extra steering left
   boardParams[1] = 0 ;//degrees for extra steering right
   boardParams[2] = 0 ;
   boardParams[3] = 0 ;
@@ -1066,7 +1066,7 @@ void controlBlinkLed(ELEMENTS * element) {
   }  
   
 }
-//Control the motor
+/* Control the motor */
 void controlMotor(ELEMENTS * element) {
   long t;
   byte aux;
@@ -1156,7 +1156,7 @@ uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
 return 0;
 }
 
-//save the general parameters to the prom
+/* save the general parameters to the prom */
 uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
@@ -1182,7 +1182,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
   return 0;
 }
 
-//save the node id to the prom
+/* save the node id to the prom */
 uint8_t saveNodeIdToEprom(uint16_t node) {  
   byte val0 = highByte(node);  
   byte val1 = lowByte(node);  
@@ -1193,7 +1193,7 @@ uint8_t saveNodeIdToEprom(uint16_t node) {
   return 0;
 }
 
-//retrieve the node id from the prom
+/* retrieve the node id from the prom */
 
 uint16_t getNodeIdFromEprom() {  
   byte val0 = EEPROM.read(0);

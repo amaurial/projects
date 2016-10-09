@@ -92,6 +92,13 @@ public:
     bool isMyGroup(uint8_t mygroup);
     bool isLowBattery(uint8_t serverAddr);
     bool isRestoreDefaultConfig(uint16_t myid);
+    bool isServerAutoEnum();
+    bool isCarAutoEnum();
+    bool isResolutionId();
+    bool isRCId();
+    bool isCarId();
+    bool isAcquire();
+    bool isCarRelease();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -105,7 +112,8 @@ public:
     uint16_t getSender(){return origin;};
     uint8_t getAction();
     uint8_t getStatusType();
-
+    uint8_t getId();
+    uint8_t getServerId();
 
     bool sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastRequestRegister(uint8_t group);
@@ -117,8 +125,8 @@ public:
     bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
     bool sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1);
     bool sendAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2);
-
     bool sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2);
+
     bool sendEmergencyBroadcast(uint8_t group);
     bool sendEmergency(uint8_t serverAddr,uint16_t nodeid);
     bool sendBackToNormalBroadcast(uint8_t group);
@@ -126,11 +134,16 @@ public:
     bool sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr);
     bool sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status);
     bool sendACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t status);
+    bool sendServerAutoEnum(uint8_t id);   
+    bool sendCarAutoEnum(uint8_t id);   
+    bool sendId(uint8_t id);   
+    bool sendCarId(uint8_t id);   
+    bool sendRCId(uint8_t id);   
+    bool sendAcquire(uint8_t carid, uint8_t serverid);   
 
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();
     uint8_t getLength(){return length;};
-
 
     bool isRadioOn();
 
