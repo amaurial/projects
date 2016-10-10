@@ -87,6 +87,11 @@ int t;
 bool resolved = false;
 bool sentreg = false;
 bool select_pressed = false;
+bool waiting_acquire = false;
+byte acquired_car = 0;
+byte acquiring_car = 0;
+long t_acquire = 0;
+byte select_index = 0;
 
 void setup(){
   Serial.begin(115200);
@@ -146,34 +151,87 @@ void setup(){
   t = random(0, 1000);
   //retry timer
   Serial.print("random retry timer: ");Serial.println(t);
-  
+  digitalWrite(LED_PIN, LOW);
 }
 
 void loop(){
 
   if (!resolved) resolveId();
-
-  if (digitalRead(SELECT_PIN) == HIGH){//pressed
-    if (){
-      
-    }
-  }
-
+  checkAcquire();
+  releaseCar();
   newMessage = server.readMessage();
   
   if (newMessage){
     checkServerEnum();    
+    if (server.isAcquireAck() && server.getServerId() == serverId && server.getId() == cars[acquiring_car].carid){
+       //car aquired
+       car_acquired = true;
+       car = acquiring_car;
+       digitalWrite(LED_PIN, HIGH);
+    }
+    if (server.isReleaseAck() && server.getServerId() == serverId && server.getId() == cars[car].carid){
+       //car aquired
+       car_acquired = false;
+       digitalWrite(LED_PIN, LOW);
+    }
+
   }
 
   if (resolved){
     sendRCRegistration();
   }
-
-  setSteering();
-  setSpeed();
+  if (car_aquired){
+  	setSteering();
+  	setSpeed();
+  }
   mainloop();  
 }
 
+void checkAcquire(){
+  /* acquire a car */
+  if (digitalRead(SELECT_PIN) == LOW){//pressed
+    select_pressed = true;
+  }
+  else {
+    if (select_pressed) {//was pressed and now released
+        select_pressed = false;
+
+	if (select_index > NUM_CARS) select_index = 0;
+
+        for (i = select_index; i < NUM_CARS; i++){
+	    if (cars[i].carid != 0){
+	       if (wainting_acquire && i != acquiring_car){
+	       	  //the user pressed the button again. release any pending car
+		  server.sendRelease(cars[acquiring_car].carid, serverId);
+	       }
+	       server.sendAcquire(cars[i].carid,serverId));
+	       waiting_aquire = true;
+	       t_acquire = millis();
+	       acquiring_car = i;
+	       select_index++;
+	       break;
+            }
+	}	
+    }
+  }
+}
+
+void releaseCar(){
+  /* release the acquired car*/
+  if (digitalRead(RELEASE_PIN) == LOW){//pressed
+    release_pressed = true;
+  }
+  else {
+    if (release_pressed) {//was pressed and now released
+        release_pressed = false;
+        if (car_aquired){
+          server.sendAddressedActionMessage(cars[car].carid, serverId, MOTOR, AC_MOVE, 0, 0);    
+	  delay(20);
+	  server.sendRelease(cars[car].carid, serverId);
+	  car_aquired = false;
+	}
+  }
+}
 void setSteering(){
   val = analogRead(potpin);
   /*
@@ -195,8 +253,7 @@ void setSteering(){
       direction = 1;
       ang = ang * -1;    
     }
-   
-    server.sendBroadcastActionMessage(serverId,BOARD, AC_TURN, ang,direction,0);    
+    server.sendAddressedActionMessage(cars[car].carid, serverId, BOARD, AC_TURN, ang, direction);    
   }
   if (direction == 1){      
       ang = ang * -1;    
@@ -211,7 +268,6 @@ void setSpeed(){
   
   //Serial.print(val);Serial.print("\t");Serial.println(ang);
   if (speed != lastspeed){   
-    //bool sendBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2);
     direction = 1;
     lastspeed = speed;
     printspeed = speed;
@@ -220,7 +276,7 @@ void setSpeed(){
       speed = speed * -1;    
     }
    
-    server.sendBroadcastActionMessage(serverId,MOTOR, AC_MOVE, speed,direction,0);    
+    server.sendAddressedActionMessage(cars[car].carid, serverId, MOTOR, AC_MOVE, speed, direction);    
   }
   if (direction == 1){      
       speed = speed * -1;    

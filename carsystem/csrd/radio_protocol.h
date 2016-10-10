@@ -11,6 +11,8 @@
 #define CAR_ID              6
 #define CAR_ACQUIRE         7
 #define CAR_RELEASE         8
+#define CAR_ACQUIRE_ACK     9
+#define CAR_RELEASE_ACK     10
 
 #define RP_WRITE        0 //write data to eprom
 #define RP_OPERATION    1 //controls the changes in states

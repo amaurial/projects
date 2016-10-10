@@ -98,7 +98,9 @@ public:
     bool isRCId();
     bool isCarId();
     bool isAcquire();
+    bool isAcquireAck();
     bool isCarRelease();
+    bool isCarReleaseAck();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -140,6 +142,9 @@ public:
     bool sendCarId(uint8_t id);   
     bool sendRCId(uint8_t id);   
     bool sendAcquire(uint8_t carid, uint8_t serverid);   
+    bool sendAcquireAck(uint8_t carid, uint8_t serverid);   
+    bool sendCarRelease(uint8_t carid, uint8_t serverid);   
+    bool sendCarReleaseAck(uint8_t carid, uint8_t serverid);   
 
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();
