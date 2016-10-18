@@ -101,6 +101,9 @@ public:
     bool isAcquireAck();
     bool isCarRelease();
     bool isCarReleaseAck();
+    bool isCarKeepAlive();
+    bool isRCKeepAlive();
+    bool isSaveParam();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -145,6 +148,9 @@ public:
     bool sendAcquireAck(uint8_t carid, uint8_t serverid);   
     bool sendCarRelease(uint8_t carid, uint8_t serverid);   
     bool sendCarReleaseAck(uint8_t carid, uint8_t serverid);   
+    bool sendCarKeepAlive(uint8_t carid, uint8_t serverid);   
+    bool sendRCKeepAlive(uint8_t carid, uint8_t serverid);   
+    bool sendSaveParam(uint8_t carid, uint8_t serverid, uint8_t idx, uint8_t value );   
 
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();

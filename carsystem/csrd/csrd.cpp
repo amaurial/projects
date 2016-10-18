@@ -431,6 +431,45 @@ bool CSRD::sendCarReleaseAck(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
+bool CSRD::sendCarKeepAlive(uint8_t carid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = CAR_KEEP_ALIVE;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendRCKeepAlive(uint8_t carid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_KEEP_ALIVE;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendSaveParam(uint8_t carid, uint8_t serverid, uint8_t idx, uint8_t value){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = SAVE_PARAM;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = idx;
+    buf[4] = value;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
 uint8_t CSRD::getId(){
    return buffer[1];
 }
@@ -557,8 +596,28 @@ bool CSRD::isAcquire(){
     return (buffer[0] == CAR_ACQUIRE);
 }
 
+bool CSRD::isAcquireAck(){
+    return (buffer[0] == CAR_ACQUIRE_ACK);
+}
+
 bool CSRD::isCarRelease(){
     return (buffer[0] == CAR_RELEASE);
+}
+
+bool CSRD::isCarReleaseAck(){
+    return (buffer[0] == CAR_RELEASE_ACK);
+}
+
+bool CSRD::isCarKeepAlive(){
+    return (buffer[0] == CAR_KEEP_ALIVE);
+}
+
+bool CSRD::isRCKeepAlive(){
+    return (buffer[0] == RC_KEEP_ALIVE);
+}
+
+bool CSRD::isSaveParam(){
+    return (buffer[0] == SAVE_PARAM);
 }
 
 bool CSRD::isStatus(){
@@ -689,26 +748,38 @@ uint8_t CSRD::getGroup(){
 
 
 uint8_t CSRD::getParamIdx(){
-    if (isAddressed()){
+    if (isSaveParam()){
+        return buffer[3];
+    }
+    else if (isAddressed()){
         return buffer[5];
     }
     return buffer[4];
 }
 
 uint8_t CSRD::getVal0(){
-    if (isAddressed() && !isStatus() ){
+    if (isSaveParam()){
+        return buffer[4];
+    }
+    else if (isAddressed() && !isStatus() ){
         return buffer[6];
     }
     return buffer[5];
 }
 uint8_t CSRD::getVal1(){
-    if (isAddressed() && !isStatus() ){
+    if (isSaveParam()){
+        return buffer[5];
+    }
+    else if (isAddressed() && !isStatus() ){
         return buffer[7];
     }
     return buffer[6];
 }
 uint8_t CSRD::getVal2(){
-    if (isAddressed() && !isStatus()){
+    if (isSaveParam()){
+        return buffer[6];
+    }
+    else if (isAddressed() && !isStatus()){
         return RP_FILLER;
     }
     return buffer[7];
