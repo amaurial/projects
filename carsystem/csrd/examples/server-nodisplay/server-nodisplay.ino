@@ -15,8 +15,8 @@ RH_RF69 driver(10,2);
 //RHReliableDatagram manager(driver, 1);
 
 #define NUM_CARS         10
-#define SPEED_UP_PIN     6
-#define SPEED_DOWN_PIN   5
+#define SPEED_UP_PIN     5
+#define SPEED_DOWN_PIN   6
 #define SELECT_PIN       4
 #define RELEASE_PIN      3
 #define LED_PIN          A3
@@ -26,6 +26,8 @@ RH_RF69 driver(10,2);
 #define RC_TIMEOUT 5000
 #define RC_KEEP_ALIVE 300 //ms
 #define CAR_KEEP_ALIVE_TIMEOUT 5000 //ms
+#define BLINK_RATE 1000
+#define UNREG_CAR_TIMEOUT 4000 // if a car does not send any message in 5s then unreg.
 
 byte servers[NUM_SERVERS];
 
@@ -37,8 +39,7 @@ typedef struct CARS{
   uint8_t carid;
   uint8_t senderid;
   bool registered;
-  uint8_t requests;
-  uint8_t idx;  
+  long lastmsg;    
 };
 
 CARS cars[NUM_CARS];
@@ -81,6 +82,8 @@ long tk = 0;
 long tk_car = 0;
 long act = 0;
 int t;
+long tblink = 0;
+
 bool resolved = false;
 bool sentreg = false;
 bool select_pressed = false; /*button select was pressed*/
@@ -99,11 +102,15 @@ int potmin;
 
 uint8_t sp_counter = 100; //increase or decrease depending on the button pressed
 bool speedpressed = false;
+bool any_car_registered = false;
+boolean r=false;//for the radio
 
 void setup(){
   #ifdef DEBUG
   Serial.begin(115200);
   Serial.setTimeout(500);
+  delay(100);
+  Serial.println("start");
   #endif
   
   i=0;
@@ -114,7 +121,7 @@ void setup(){
 * Start the radio
 * try 10 times if failed
 */
-  boolean r=false;
+  
   for (byte a=0;a<10;a++){
     if (server.init(&driver,NULL)) {
         r=true;
@@ -128,6 +135,7 @@ void setup(){
     #ifdef DEBUG
     Serial.println("FAILED");
     #endif
+    digitalWrite(LED_PIN, HIGH);
   }
   //if (!server.init(&driver,NULL)){
   //  Serial.println("FAILED");
@@ -139,10 +147,8 @@ void setup(){
   car=0;
  
   last_request_register_time = millis(); 
-  #ifdef DEBUG 
-  Serial.println("S br reg");
-  #endif
-  server.sendBroadcastRequestRegister(serverId);
+  
+  //server.sendBroadcastRequestRegister(serverId);  
 
   //setup push buttons
   pinMode(SPEED_UP_PIN, INPUT_PULLUP);
@@ -162,6 +168,7 @@ void setup(){
   //get potmax and min  
   potmin = word(EEPROM.read(3), EEPROM.read(4));
   potmax = word(EEPROM.read(5), EEPROM.read(6));
+  
   if (potmin >= potmax){
     potmin = 40;
     potmax = 700; 
@@ -210,8 +217,7 @@ void loop(){
       #ifdef DEBUG
       Serial.print("keep alive ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(server.getServerId());      
       #endif    
-    }
-    
+    }    
   }
 
   if (resolved){
@@ -227,6 +233,7 @@ void loop(){
     if (act - tk > RC_KEEP_ALIVE){
       server.sendRCKeepAlive(cars[car].carid,serverId);
       tk = millis();
+      cars[car].lastmsg = tk;
     }
    
     /*
@@ -244,6 +251,32 @@ void loop(){
     */
   }
   mainloop();  
+  blinkLed();
+  unregister();
+}
+
+
+
+void blinkLed(){
+  
+  if (!car_acquired){
+    any_car_registered = false;
+    for (i = 0; i < NUM_CARS; i++){
+      if (cars[i].carid != 0 ){
+        any_car_registered = true;
+        break;
+      }
+    }
+    if (any_car_registered) {
+      if (act - tblink > BLINK_RATE){
+        digitalWrite(LED_PIN,!digitalRead(LED_PIN));
+        tblink = act;
+      }
+    }
+    else if (!r){
+      digitalWrite(LED_PIN,LOW);    
+    }
+  }
 }
 
 bool doFineTunning(){
@@ -267,8 +300,10 @@ bool doFineTunning(){
         
         server.sendSaveParam(cars[car].carid, serverId, 1, midang);
         delay(100);
+        return true;
       }
     }  
+    return false;
 }
 
 bool confirmRelease(){
@@ -314,33 +349,46 @@ void checkAcquire(){
             #endif
             
         	  if (select_index > NUM_CARS) select_index = 0;
-    
-            for (i = select_index; i < NUM_CARS; i++){
-          	    if (cars[i].carid != 0){
-          	       if (waiting_acquire && i != acquiring_car){
+            
+            i = select_index;
+            uint8_t counter = 0;
+            
+            //for (i = select_index; i < NUM_CARS; i++){
+            while (counter < NUM_CARS || !waiting_acquire){
+              
+                if (select_index > NUM_CARS) select_index = 0;
+                
+          	    if (cars[select_index].carid != 0){
+                   #ifdef DEBUG
+                      Serial.print("selected idx ");Serial.println(select_index);
+                      Serial.print("car ");Serial.println(cars[select_index].carid);
+                      #endif
+          	       if (waiting_acquire && select_index != acquiring_car){
           	       	  //the user pressed the button again. release any pending car
-                      
+                                            
                       #ifdef DEBUG
                       Serial.print("Releasing car ");Serial.println(cars[acquiring_car].carid);
                       #endif
-                      
+                                                                  
           		        server.sendCarRelease(cars[acquiring_car].carid, serverId);
                       delay(20);
           	       }
                    
                    #ifdef DEBUG
-                   Serial.print("Acquire car ");Serial.println(cars[i].carid);
+                   Serial.print("Acquire car ");Serial.println(cars[select_index].carid);
                    #endif
                    
-          	       server.sendAcquire(cars[i].carid,serverId);
+          	       server.sendAcquire(cars[select_index].carid,serverId);
           	       waiting_acquire = true;
           	       t_acquire = millis();
-          	       acquiring_car = i;  
-                   //select_index++;      	       
-          	       break;
-                }              
-    	      }	
-            select_index++;
+          	       acquiring_car = select_index;
+                   select_index++;
+                   break;
+                   //select_index = i + 1;                   
+                } 
+                counter++;
+                select_index++;             
+    	      }	            
       }
   }
 }
@@ -350,29 +398,34 @@ void releaseCar(){
   if (digitalRead(RELEASE_PIN) == LOW){//pressed
     if (car_acquired){
       release_pressed = true;
+      #ifdef DEBUG
+      Serial.println("release pressed");
+      #endif
       return;      
     }
 
     if (digitalRead(SPEED_DOWN_PIN) == LOW){
-      int val;
+      #ifdef DEBUG
+      Serial.println("fine tunning start");
+      #endif
+      int potread;
       //not acquired do the calibration
-      val = analogRead(potpin);
-      if (val > potmax){
-        potmax = val;
+      potread = analogRead(potpin);
+      if (potread > potmax){
+        potmax = potread;
       }
-      if (val < potmin){
-        potmin = val;
+      if (potread < potmin){
+        potmin = potread;
       }
       //save to eprom
       EEPROM.write(3,highByte(potmin));
       EEPROM.write(4,lowByte(potmin));
       EEPROM.write(5,highByte(potmax));
       EEPROM.write(6,lowByte(potmax));
+      #ifdef DEBUG
+      Serial.println("fine tunning done");
+      #endif
     }
-    
-    
-    
-    
   }
   else {
     if (release_pressed) {//was pressed and now released
@@ -468,11 +521,11 @@ void setSpeed1(){
   
   //Serial.print(val);Serial.print("\t");Serial.println(ang);
   if (speed != lastspeed){   
-    direction = 1;
+    direction = 0;
     lastspeed = speed;
     printspeed = speed;
     if (speed < 0){
-      direction = 0;
+      direction = 1;
       speed = speed * -1;    
     }
    
@@ -507,6 +560,7 @@ void mainloop(){
         
         if (server.getStatusType() == RP_INITIALREG){
           byte idx=insertNode(server.getNodeNumber(),server.getSender());
+          cars[idx].lastmsg = act;
            #ifdef DEBUG
            Serial.print("reg for ");
            Serial.println(cars[idx].carid);
@@ -615,6 +669,9 @@ void sendRCRegistration(){
   if (millis() - t3 > RC_TIMEOUT){
     t3 = millis();
     server.sendRCId(serverId);
+    #ifdef DEBUG
+    Serial.println("send RC reg");
+    #endif
   }
 }
 
@@ -650,11 +707,14 @@ void requestBatterySpeedLevel(){
 }
 
 void unregister(){
-  for (byte i = 0; i< NUM_CARS ;i++){
-    if (cars[i].requests > 6){
-       cars[i].registered = false;
-       cars[i].requests = 0;
-       carsIdx--;
+  for (i = 0; i< NUM_CARS ;i++){
+    if (cars[i].carid != 0 ){    
+      if (act - cars[i].lastmsg > UNREG_CAR_TIMEOUT){
+         cars[i].registered = false;
+         cars[i].carid = 0;
+         cars[i].lastmsg = 0;
+         carsIdx--;
+      }
     }
   }
 }
@@ -915,22 +975,6 @@ uint16_t getNN(byte *snn){
 byte charToInt(byte v){
     return v - '0';
 }
-
-int getNumRegisteredCars(){
-  return 0;  
-}
-
-byte getButtonMode(){
-  return 0;
-}
-
-
-
-
-
-
-
-
 
 
 

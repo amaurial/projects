@@ -11,7 +11,7 @@
 #define apin A0
 
 //uncomment for debug message
-#define DEBUG_CAR 1;
+//#define DEBUG_CAR 1;
 
 CSRD car;
 RH_RF69 driver(10,2);
@@ -58,21 +58,22 @@ uint16_t dvalues[D_VALUES];
 
 //timers
 // auto enunmeration 
-long t1,t2;
+unsigned long t1,t2;
 // send RC registration
-long t3;
+unsigned long t3;
 // last rc message
-long t4;
+unsigned long t4;
 //send keep alive
-long tk = 0;
+unsigned long tk = 0;
 //receive rc keep alive
-long tk_rc = 0;
-long act = 0;
-int t;
-long refresh_registration;
-long last_registration;
+unsigned long tk_rc = 0;
+unsigned long act = 0;
+unsigned long t;
+unsigned long refresh_registration;
+unsigned long last_registration;
 uint8_t LAST_MESSAGE_TIMEOUT = 30; //30 seconds
-double long last_message = 0;
+unsigned long last_message = 0;
+long counter = 0;
 /*
  * battery vars
  */
@@ -95,22 +96,39 @@ uint8_t midang = 90;
 uint8_t lastAng = 0;
 uint8_t lastspeed = 0;
 
-boolean acquired;
+volatile boolean acquired = false;
 bool newMessage;
 uint8_t rc;
-//int acquire_server; //TODO: check if we need it
 
 //each 20ms
 void refreshSoftServo(int a){  
-    //SoftwareServo::refresh();
+  if (acquired){
+    counter++;
+    if (counter > 500){
+      SoftwareServo::refresh();    
+      counter = 0;
+    }    
+  }  
 }
-
 
 void setup(){
   #ifdef DEBUG_CAR
   Serial.begin(115200);
   Serial.setTimeout(500);
   #endif
+
+  /*
+   * Start steering
+   */
+  steering.attach(STEERING_PIN);
+  steering.write(midang);  
+  SoftwareServo::refresh();
+  SoftPWMBegin(SOFTPWM_NORMAL,&refreshSoftServo);
+  //SoftPWMBegin(SOFTPWM_NORMAL);
+  for (byte i = 0; i < 10; i++){
+    SoftwareServo::refresh();
+    delay(20);
+  }
   
   /*
   * Start the radio
@@ -163,23 +181,14 @@ void setup(){
   pinMode(CHARGER_PIN, INPUT);  
   pinMode(BATTERY_PIN, INPUT);
   pinMode(MOTOR_ROTATION_PIN, INPUT);
-
-  act = millis();
-    /*
-   * Start steering
-   */
-  steering.write(midang);
-  steering.attach(STEERING_PIN);
-  SoftPWMBegin(SOFTPWM_NORMAL,&refreshSoftServo);
-
+  
   refresh_registration = random(200, 5000);
   
 }
 
-void loop(){
-
+void loop(){  
   act = millis();
-  
+  SoftwareServo::refresh();
   if (!resolved) resolveId();
 
   if (resolved && !acquired){
@@ -212,6 +221,7 @@ void loop(){
         }
     }
     if (acquired) {
+      SoftwareServo::refresh();
       if (car.isRCKeepAlive() && car.getId() == id && rc == car.getServerId()){
          tk_rc = act; //renew the last keep alive
          #ifdef DEBUG_CAR
@@ -248,11 +258,10 @@ void loop(){
             steering.write(midang);  
           }
           else midang = 90;
-          EEPROM.write(2,midang);
-          
-          
+          EEPROM.write(2,midang);          
         }
       }
+      SoftwareServo::refresh();
       
       //checkQuery();      
     }    
