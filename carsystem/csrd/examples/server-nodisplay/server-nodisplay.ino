@@ -15,11 +15,13 @@ RH_RF69 driver(10,2);
 //RHReliableDatagram manager(driver, 1);
 
 #define NUM_CARS         10
-#define SPEED_UP_PIN     5
-#define SPEED_DOWN_PIN   6
-#define SELECT_PIN       4
-#define RELEASE_PIN      3
-#define LED_PIN          A3
+#define SPEED_UP_PIN     3
+#define SPEED_DOWN_PIN   4
+#define SELECT_PIN       5
+#define RELEASE_PIN      6
+#define LED_PIN          A1
+#define RADIO_RST        A4
+#define ANGLE_LIMIT      10
 
 #define NUM_SERVERS 10
 #define REG_TIMEOUT 2000 //2 secs
@@ -61,12 +63,12 @@ long last_request_battery = 0;
 int request_battery_time = 500;   
 int request_battery_time_step = 20;
 
-byte potpin = A2;  
+byte potpin = A7;  
 int val=0;
 int ang=0;/*angle mapped from the potentimeter*/
 int lastang=1;/*last angle selected*/
 byte direction=0;/*car direction*/
-byte potspeed = A1;
+byte potspeed = A6;
 int speed = 0;/*car speed*/
 int printang = 0;
 int printspeed = 0;
@@ -106,6 +108,15 @@ bool any_car_registered = false;
 boolean r=false;//for the radio
 
 void setup(){
+
+  digitalWrite(LED_PIN, HIGH);
+  delay(300);
+  digitalWrite(LED_PIN, LOW);
+  delay(300);
+  digitalWrite(LED_PIN, HIGH);
+  delay(300);
+  digitalWrite(LED_PIN, LOW);
+  
   #ifdef DEBUG
   Serial.begin(115200);
   Serial.setTimeout(500);
@@ -114,7 +125,10 @@ void setup(){
   #endif
   
   i=0;
-  
+  pinMode(RADIO_RST,OUTPUT);
+  digitalWrite(RADIO_RST,HIGH);
+  delay(10);
+  digitalWrite(RADIO_RST,LOW);
   //if (!server.init(&driver,&manager)){
 
 /*
@@ -140,7 +154,7 @@ void setup(){
   //if (!server.init(&driver,NULL)){
   //  Serial.println("FAILED");
   //}
-  //driver.setTxPower(17);
+  driver.setTxPower(13);
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
 
   carsIdx=0;
@@ -354,8 +368,7 @@ void checkAcquire(){
             uint8_t counter = 0;
             
             //for (i = select_index; i < NUM_CARS; i++){
-            while (counter < NUM_CARS || !waiting_acquire){
-              
+            while (counter <= NUM_CARS){                
                 if (select_index > NUM_CARS) select_index = 0;
                 
           	    if (cars[select_index].carid != 0){
@@ -383,6 +396,7 @@ void checkAcquire(){
           	       t_acquire = millis();
           	       acquiring_car = select_index;
                    select_index++;
+                   counter++;
                    break;
                    //select_index = i + 1;                   
                 } 
@@ -456,9 +470,9 @@ void setSteering(){
    * 12 degrees is limit for the car
    */
    
-  ang=map(val,potmin,potmax,-12,12);
-  if (ang > 12) ang = 12;
-  if (ang < -12) ang = -12;  
+  ang=map(val, potmin, potmax, -ANGLE_LIMIT, ANGLE_LIMIT);
+  if (ang > ANGLE_LIMIT) ang = ANGLE_LIMIT;
+  if (ang < -ANGLE_LIMIT) ang = -ANGLE_LIMIT;  
   
   if (ang != lastang){       
     direction = 1;

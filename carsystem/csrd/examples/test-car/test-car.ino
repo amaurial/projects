@@ -149,6 +149,7 @@ void setup(){
     Serial.println("FAILED");
     #endif
   }
+  driver.setTxPower(13);
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
   randomSeed(analogRead(apin));
   id = EEPROM.read(0);
@@ -196,9 +197,11 @@ void loop(){
   }
 
   newMessage = car.readMessage();
-  if (newMessage){    
+  if (newMessage){        
     checkCarAutoEnum();
- 
+    #ifdef DEBUG_CAR
+    Serial.print("pwrec ");Serial.println(driver.lastRssi());
+    #endif
     if (car.isAcquire() && car.getId() == id && !acquired){
         //check if server is registered
         #ifdef DEBUG_CAR
