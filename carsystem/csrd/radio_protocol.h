@@ -16,6 +16,8 @@
 #define CAR_KEEP_ALIVE      11
 #define RC_KEEP_ALIVE       12
 #define SAVE_PARAM          13
+#define RC_LIGHTS           14
+#define RC_BREAK_LIGHTS     15
 
 #define RP_WRITE        0 //write data to eprom
 #define RP_OPERATION    1 //controls the changes in states

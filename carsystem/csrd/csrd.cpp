@@ -35,7 +35,7 @@ bool CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
             #endif // CSRD_DEBUG
             return false;
         }
-        if (!driver->setFrequency(915)){
+        if (!driver->setFrequency(433)){
             #ifdef CSRD_DEBUG
                 Serial.println("Radio freq set failed.");
             #endif // CSRD_DEBUG
@@ -450,6 +450,32 @@ bool CSRD::sendRCKeepAlive(uint8_t carid, uint8_t serverid){
     buf[1] = carid;
     buf[2] = serverid;
     buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_LIGHTS;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = on;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_BREAK_LIGHTS;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = on;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;

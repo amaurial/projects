@@ -19,6 +19,10 @@ RH_RF69 driver(10,2);
 #define SPEED_DOWN_PIN   4
 #define SELECT_PIN       5
 #define RELEASE_PIN      6
+#define PB_C             7
+#define PB_A             9
+#define PB_B             8
+#define PB_D             A0
 #define LED_PIN          A1
 #define RADIO_RST        A4
 #define ANGLE_LIMIT      10
@@ -107,8 +111,24 @@ bool speedpressed = false;
 bool any_car_registered = false;
 boolean r=false;//for the radio
 
+//pb variables
+boolean pba_pressed = false;
+boolean pba_released = false;
+boolean pbb_pressed = false;
+boolean pbb_released = false;
+boolean pbc_pressed = false;
+boolean pbc_released = false;
+boolean pbd_pressed = false;
+boolean pbd_released = false;
+
+boolean lights_on;
+
 void setup(){
 
+  digitalWrite(LED_PIN, HIGH);
+  delay(300);
+  digitalWrite(LED_PIN, LOW);
+  delay(300);
   digitalWrite(LED_PIN, HIGH);
   delay(300);
   digitalWrite(LED_PIN, LOW);
@@ -269,7 +289,15 @@ void loop(){
   unregister();
 }
 
-
+void turnLights(){
+  if (digitalRead(PB_C) == LOW){
+    pbc_pressed = true;    
+  }
+  else if (pbc_pressed == true){
+    //button released
+    
+  }
+}
 
 void blinkLed(){
   

@@ -163,6 +163,8 @@ void setup(){
   if (midang < 80 || midang > 100){
     midang = 90; 
   }
+  steering.write(midang);  
+  SoftwareServo::refresh();
             
   t1 = millis();  
   t3 = t1 - RC_TIMEOUT;//just to guarantee we send it as fast as we can
@@ -452,6 +454,9 @@ boolean checkAction(){
                   else{
                     motorpin = MOTOR_PIN1;
                   }
+                  #ifdef DEBUG_CAR
+                  Serial.print("speed ");Serial.println(v);
+                  #endif
                   if (v1 == lastspeed){                    
                     SoftPWMSetPercent(motorpin,v);                     
                   }
@@ -480,16 +485,16 @@ boolean checkAction(){
               v1 = car.getVal1();
               //direction
               if (v1 == 0){
-                if (lastAng != (midang + v + boardParams[v1])){                  
-                  steering.write(midang + v + boardParams[v1]);
-                  lastAng = midang + v + boardParams[v1];                  
+                if (lastAng != (midang + v )){                  
+                  steering.write(midang + v );
+                  lastAng = midang + v ;                  
                   //delay(10);
                 }                
               }
               else if (v1 == 1) {
-                  if (lastAng != (midang - v - boardParams[v1])){                    
-                    steering.write(midang - v - boardParams[v1]);
-                    lastAng = midang - v - boardParams[v1];                    
+                  if (lastAng != (midang - v )){                    
+                    steering.write(midang - v );
+                    lastAng = midang - v ;                    
                     //delay(10);
                   }
               }

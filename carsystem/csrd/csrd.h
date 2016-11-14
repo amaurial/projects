@@ -104,6 +104,8 @@ public:
     bool isCarKeepAlive();
     bool isRCKeepAlive();
     bool isSaveParam();
+    bool isRCLights();
+    bool isRCBreakLights();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -152,6 +154,8 @@ public:
     bool sendRCKeepAlive(uint8_t carid, uint8_t serverid);   
     bool sendSaveParam(uint8_t carid, uint8_t serverid, uint8_t idx, uint8_t value );   
 
+    bool sendCarLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on);   
+    bool sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on);   
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     void resetToDefault();
     uint8_t getLength(){return length;};
@@ -173,7 +177,5 @@ private:
     uint8_t radioBuffSize;
     void dumpBuffer(uint8_t *pbuf);
 };
-
-
 
 #endif // __CSRD__H
