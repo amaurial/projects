@@ -106,6 +106,10 @@ public:
     bool isSaveParam();
     bool isRCLights();
     bool isRCBreakLights();
+    bool isStopCar();
+    bool isRCMove();
+    bool isRCTurn();
+    bool isRCSaveParam();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -121,6 +125,7 @@ public:
     uint8_t getStatusType();
     uint8_t getId();
     uint8_t getServerId();
+    uint8_t getByte(uint8_t idx);
 
     bool sendBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2);
     bool sendBroadcastRequestRegister(uint8_t group);
@@ -153,10 +158,12 @@ public:
     bool sendCarKeepAlive(uint8_t carid, uint8_t serverid);   
     bool sendRCKeepAlive(uint8_t carid, uint8_t serverid);   
     bool sendSaveParam(uint8_t carid, uint8_t serverid, uint8_t idx, uint8_t value );   
-
-    bool sendCarLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on);   
-    bool sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on);   
+    bool sendRCTurn(uint8_t carid, uint8_t serverid,uint8_t angle, uint8_t direction);
+    bool sendRCMove(uint8_t carid, uint8_t serverid,uint8_t speed, uint8_t direction);
+    bool sendCarLightOnOff(uint8_t carid, uint8_t serverid);   
+    bool sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid);   
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
+    bool sendStopCar(uint8_t carid, uint8_t serverAddr);
     void resetToDefault();
     uint8_t getLength(){return length;};
 

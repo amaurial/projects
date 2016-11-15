@@ -190,6 +190,10 @@ void setup(){
   pinMode(SPEED_UP_PIN, INPUT_PULLUP);
   pinMode(SELECT_PIN, INPUT_PULLUP);
   pinMode(RELEASE_PIN, INPUT_PULLUP);
+  pinMode(PB_A, INPUT_PULLUP);
+  pinMode(PB_B, INPUT_PULLUP);
+  pinMode(PB_C, INPUT_PULLUP);
+  pinMode(PB_D, INPUT_PULLUP);
   pinMode(LED_PIN, OUTPUT);  
 
   randomSeed(analogRead(apin));
@@ -269,7 +273,10 @@ void loop(){
       tk = millis();
       cars[car].lastmsg = tk;
     }
-   
+
+    stopCar();
+    breakLights();
+    turnLights();
     /*
     if (act - tk_car > CAR_KEEP_ALIVE_TIMEOUT){
       
@@ -290,12 +297,37 @@ void loop(){
 }
 
 void turnLights(){
+  if (digitalRead(PB_B) == LOW){
+    pbb_pressed = true;    
+  }
+  else if (pbb_pressed == true){
+    //button released
+    server.sendCarLightOnOff(serverId, cars[car].carid);
+    pbb_pressed = false;
+  }
+}
+
+void breakLights(){
+  if (digitalRead(PB_A) == LOW){
+    pba_pressed = true;    
+  }
+  else if (pba_pressed == true){
+    //button released
+    server.sendCarBreakLightOnOff(serverId, cars[car].carid);
+    pba_pressed = false;
+  }
+}
+
+void stopCar(){
   if (digitalRead(PB_C) == LOW){
     pbc_pressed = true;    
   }
   else if (pbc_pressed == true){
     //button released
-    
+    server.sendStopCar(cars[car].carid, serverId); 
+    pbc_pressed = false;
+    sp_counter = 101;
+    lastspeed = 0;
   }
 }
 
@@ -320,7 +352,7 @@ void blinkLed(){
     }
   }
 }
-
+//change the mid angle
 bool doFineTunning(){
   if (digitalRead(SELECT_PIN) == LOW){
       setparam = false;
@@ -510,7 +542,8 @@ void setSteering(){
       direction = 0;
       ang = ang * -1;    
     }
-    server.sendAddressedActionMessage(serverId, cars[car].carid, BOARD, AC_TURN, ang, direction); 
+    //server.sendAddressedActionMessage(serverId, cars[car].carid, BOARD, AC_TURN, ang, direction);     
+    server.sendRCTurn(cars[car].carid, serverId, ang, direction); 
     delay(5); 
     //Serial.print("steering ");Serial.print(val);Serial.print("\t");Serial.println(ang);  
   }
@@ -571,8 +604,12 @@ void setSpeed1(){
       speed = speed * -1;    
     }
    
-    server.sendAddressedActionMessage(serverId, cars[car].carid, MOTOR, AC_MOVE, speed, direction);  
-    delay(10);  
+    //server.sendAddressedActionMessage(serverId, cars[car].carid, MOTOR, AC_MOVE, speed, direction); 
+    server.sendRCMove(cars[car].carid, serverId, speed, direction); 
+    #ifdef DEBUG
+     Serial.print("speed ");Serial.print(speed);Serial.print(" ");Serial.println(direction);
+    #endif 
+    delay(30);  
   }
   if (direction == 1){      
       speed = speed * -1;    

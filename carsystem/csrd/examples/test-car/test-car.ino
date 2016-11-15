@@ -227,12 +227,17 @@ void loop(){
     }
     if (acquired) {
       SoftwareServo::refresh();
-      if (car.isRCKeepAlive() && car.getId() == id && rc == car.getServerId()){
+      if (car.isRCKeepAlive() && isForMe()){
          tk_rc = act; //renew the last keep alive
          #ifdef DEBUG_CAR
         //Serial.println("receive keep alive");
         #endif
       }
+
+        #ifdef DEBUG_CAR
+        Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
+        #endif
+      
       
       if ((car.isCarRelease() && car.getId() == id) || (millis() - tk_rc > RC_TIMEOUT)){
         #ifdef DEBUG_CAR
@@ -247,9 +252,14 @@ void loop(){
         acquired = false;
       }
       
-      if (checkAction()) tk_rc = act; 
+      //if (checkAction()) tk_rc = act; 
+      if (checkMove()) tk_rc = act; 
+      if (checkTurn()) tk_rc = act; 
+      
 
-      if (car.isSaveParam() && car.getId() == id && rc == car.getServerId()){
+      checkStopCar();
+      
+      if (car.isSaveParam() && isForMe()){
         #ifdef DEBUG_CAR
         Serial.print("trimming ");
         Serial.println(car.getParamIdx());
@@ -291,6 +301,20 @@ void loop(){
    //checkBattery();
   //dvalues[1] = analogRead(MOTOR_ROTATION_PIN);    
    
+}
+
+bool isForMe(){
+  return (car.getId() == id) && (rc == car.getServerId());
+}
+
+void checkStopCar(){
+  if (car.isStopCar() && isForMe()){
+        #ifdef DEBUG_CAR
+        Serial.println("stopping car");
+        #endif
+        SoftPWMSetPercent(MOTOR_PIN, 0);
+        SoftPWMSetPercent(MOTOR_PIN1, 0);
+  }
 }
 
 void resolveId(){
@@ -409,6 +433,72 @@ void sendCarRegistration(){
       }
     }
   }
+}
+
+bool checkMove(){
+  if (car.isRCMove() && isForMe()){
+    uint8_t p_speed;
+    uint8_t p_dir;
+    p_speed = car.getByte(3);  
+    p_dir = car.getByte(4);
+      
+      if (p_dir == 0){
+        motorpin = MOTOR_PIN;
+      }
+      else{
+        motorpin = MOTOR_PIN1;
+      }
+      #ifdef DEBUG_CAR
+      Serial.print("speed ");Serial.println(p_speed);
+      #endif
+      if (p_dir == lastspeed){                    
+        SoftPWMSetPercent(motorpin,p_speed);                     
+      }
+      else {
+        if (p_dir == 0){
+          SoftPWMSetPercent(motorpin,0);                      
+        }
+        else{
+          SoftPWMSetPercent(motorpin,0);                      
+        }
+        lastspeed = p_dir;
+        SoftPWMSetPercent(motorpin,p_speed);
+        if (motorpin == MOTOR_PIN){
+          SoftPWMSetPercent(MOTOR_PIN1,0);                      
+        }
+        else{
+          SoftPWMSetPercent(MOTOR_PIN,0);
+        }
+      }                                   
+    
+    return true;
+  }
+  return false;
+}
+
+boolean checkTurn(){
+  if (car.isRCTurn() && isForMe()){
+    uint8_t p_angle;
+    uint8_t p_dir;
+    p_angle = car.getByte(3);  
+    p_dir = car.getByte(4);
+    
+    //direction
+    if (p_dir == 0){
+      if (lastAng != (midang + p_angle )){                  
+        steering.write(midang + p_angle );
+        lastAng = midang + p_angle ;        
+      }                
+    }
+    else if (p_dir == 1) {
+        if (lastAng != (midang - p_angle )){                    
+          steering.write(midang - p_angle );
+          lastAng = midang - p_angle ;          
+        }
+    }
+    return true; 
+  }
+  return false;
 }
 
 /* deal with Action messages */

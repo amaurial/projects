@@ -457,12 +457,12 @@ bool CSRD::sendRCKeepAlive(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on){
+bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_LIGHTS;
     buf[1] = carid;
     buf[2] = serverid;
-    buf[3] = on;
+    buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -470,13 +470,52 @@ bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid, uint8_t on){
+bool CSRD::sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_BREAK_LIGHTS;
     buf[1] = carid;
     buf[2] = serverid;
-    buf[3] = on;
+    buf[3] = 0;
     buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendStopCar(uint8_t carid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_STOP_CAR;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendRCMove(uint8_t carid, uint8_t serverid,uint8_t speed, uint8_t direction){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_MOVE;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = speed;
+    buf[4] = direction;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendRCTurn(uint8_t carid, uint8_t serverid,uint8_t angle, uint8_t direction){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_TURN;
+    buf[1] = carid;
+    buf[2] = serverid;
+    buf[3] = angle;
+    buf[4] = direction;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
@@ -502,6 +541,12 @@ uint8_t CSRD::getId(){
 
 uint8_t CSRD::getServerId(){
    return buffer[2];
+}
+
+uint8_t CSRD::getByte(uint8_t idx){
+   if (idx >= MESSAGE_SIZE ) return 0;
+
+   return buffer[idx];
 }
 
 uint8_t CSRD::getMessage(uint8_t *mbuffer){
@@ -640,6 +685,30 @@ bool CSRD::isCarKeepAlive(){
 
 bool CSRD::isRCKeepAlive(){
     return (buffer[0] == RC_KEEP_ALIVE);
+}
+
+bool CSRD::isRCBreakLights(){
+    return (buffer[0] == RC_BREAK_LIGHTS);
+}
+
+bool CSRD::isRCLights(){
+    return (buffer[0] == RC_LIGHTS);
+}
+
+bool CSRD::isStopCar(){
+    return (buffer[0] == RC_STOP_CAR);
+}
+
+bool CSRD::isRCMove(){
+    return (buffer[0] == RC_MOVE);
+}
+
+bool CSRD::isRCTurn(){
+    return (buffer[0] == RC_TURN);
+}
+
+bool CSRD::isRCSaveParam(){
+    return (buffer[0] == RC_SAVE_PARAM);
 }
 
 bool CSRD::isSaveParam(){
