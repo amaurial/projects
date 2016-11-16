@@ -109,7 +109,6 @@ public:
     bool isStopCar();
     bool isRCMove();
     bool isRCTurn();
-    bool isRCSaveParam();
 
     uint8_t getGroup();
     uint8_t getElement();

@@ -707,10 +707,6 @@ bool CSRD::isRCTurn(){
     return (buffer[0] == RC_TURN);
 }
 
-bool CSRD::isRCSaveParam(){
-    return (buffer[0] == RC_SAVE_PARAM);
-}
-
 bool CSRD::isSaveParam(){
     return (buffer[0] == SAVE_PARAM);
 }

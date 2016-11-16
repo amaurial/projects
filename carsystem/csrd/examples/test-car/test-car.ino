@@ -288,7 +288,7 @@ void loop(){
           if (max_angle > 15) max_angle = 15;        
 
           EEPROM.write(3,max_angle);          
-
+        }
       }
       SoftwareServo::refresh();
       
@@ -318,10 +318,11 @@ void loop(){
 }
 
 bool isForMe(){
-  return (car.getId() == id) && (rc == car.getServerId());
+  
+  return ((car.getId() == id) && (rc == car.getServerId()));
 }
 
-void checkStopCar(){
+void checkStopCar() {
   if (car.isStopCar() && isForMe()){
         #ifdef DEBUG_CAR
         Serial.println("stopping car");

@@ -101,6 +101,7 @@ long t_acquire = 0;
 uint8_t select_index = 0;/*actual index of registered cars*/
 bool release_pressed = false; /*button release was pressed*/
 uint8_t midang = 90;/*middle servo angle*/
+uint8_t max_angle = 10; /*angle for steering*/
 bool setparam = false; /*set parameter state set*/
 
 int potmax;
@@ -381,14 +382,14 @@ bool doFineTunning(){
         pvalue = midang;
       }
       /*Max angle*/
-    if (digitalRead(PB_B) == LOW){
+    if (digitalRead(PB_A) == LOW){
         max_angle++;
         if (max_angle > 15) max_angle = 15;
         setparam = true;
         pidx = 2;
         pvalue = max_angle;
       }
-      if (digitalRead(PB_A) == LOW){
+      if (digitalRead(PB_B) == LOW){
         max_angle--;
         if (max_angle < 1) max_angle = 1;
         setparam = true;
