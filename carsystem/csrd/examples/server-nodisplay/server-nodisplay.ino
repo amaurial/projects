@@ -25,7 +25,7 @@ RH_RF69 driver(10,2);
 #define PB_D             A0
 #define LED_PIN          A1
 #define RADIO_RST        A4
-#define ANGLE_LIMIT      10
+#define ANGLE_LIMIT      100
 
 #define NUM_SERVERS 10
 #define REG_TIMEOUT 2000 //2 secs
@@ -297,6 +297,9 @@ void loop(){
 }
 
 void turnLights(){
+  
+  if (digitalRead(SELECT_PIN) == LOW) return; /*tunning*/
+
   if (digitalRead(PB_B) == LOW){
     pbb_pressed = true;    
   }
@@ -308,6 +311,8 @@ void turnLights(){
 }
 
 void breakLights(){
+  if (digitalRead(SELECT_PIN) == LOW) return; /*tunning*/
+
   if (digitalRead(PB_A) == LOW){
     pba_pressed = true;    
   }
@@ -319,6 +324,8 @@ void breakLights(){
 }
 
 void stopCar(){
+  if (digitalRead(SELECT_PIN) == LOW) return; /*tunning*/
+
   if (digitalRead(PB_C) == LOW){
     pbc_pressed = true;    
   }
@@ -355,24 +362,49 @@ void blinkLed(){
 //change the mid angle
 bool doFineTunning(){
   if (digitalRead(SELECT_PIN) == LOW){
+      uint8_t pidx = 0;
+      uint8_t pvalue = 0;
       setparam = false;
+      /* Middle angle*/
       if (digitalRead(SPEED_UP_PIN) == LOW){
         midang++;
         if (midang > 100) midang = 100;
         setparam = true;
+        pidx = 1;
+        pvalue = midang;
       }
       if (digitalRead(SPEED_DOWN_PIN) == LOW){
         midang--;
         if (midang < 80) midang = 80;
         setparam = true;
+        pidx = 1;
+        pvalue = midang;
       }
+      /*Max angle*/
+    if (digitalRead(PB_B) == LOW){
+        max_angle++;
+        if (max_angle > 15) max_angle = 15;
+        setparam = true;
+        pidx = 2;
+        pvalue = max_angle;
+      }
+      if (digitalRead(PB_A) == LOW){
+        max_angle--;
+        if (max_angle < 1) max_angle = 1;
+        setparam = true;
+        pidx = 2;
+        pvalue = max_angle;
+      }
+
+
+
       if (setparam){
         
         #ifdef DEBUG
-        Serial.print("trimming: ");Serial.println(midang);
+        Serial.print("trimming param ");Serial.print(pidx);Serial.print(" to " );Serial.println(pvalue);
         #endif
         
-        server.sendSaveParam(cars[car].carid, serverId, 1, midang);
+        server.sendSaveParam(cars[car].carid, serverId, pidx, pvalue);
         delay(100);
         return true;
       }

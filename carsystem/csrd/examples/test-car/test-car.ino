@@ -93,6 +93,7 @@ uint8_t i = 0;
  */
 SoftwareServo steering;
 uint8_t midang = 90;
+uint8_t max_angle = 10; // the max variation over the midangle. can be changed by configuration
 uint8_t lastAng = 0;
 uint8_t lastspeed = 0;
 
@@ -165,7 +166,13 @@ void setup(){
   }
   steering.write(midang);  
   SoftwareServo::refresh();
-            
+  
+  /* get the max angle for steering */
+  max_angle = EEPROM.read(3);
+  if (max_angle > 15 || max_angle == 0){
+      max_angle = 10;
+  }
+
   t1 = millis();  
   t3 = t1 - RC_TIMEOUT;//just to guarantee we send it as fast as we can
 
@@ -238,7 +245,6 @@ void loop(){
         Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
         #endif
       
-      
       if ((car.isCarRelease() && car.getId() == id) || (millis() - tk_rc > RC_TIMEOUT)){
         #ifdef DEBUG_CAR
         Serial.println("rec release");
@@ -255,7 +261,6 @@ void loop(){
       //if (checkAction()) tk_rc = act; 
       if (checkMove()) tk_rc = act; 
       if (checkTurn()) tk_rc = act; 
-      
 
       checkStopCar();
       
@@ -264,7 +269,9 @@ void loop(){
         Serial.print("trimming ");
         Serial.println(car.getParamIdx());
         #endif
-        if (car.getParamIdx() == 1){
+        uint8_t pidx = car.getParamIdx(); 
+        if ( pidx == 1){
+          // middle angle
           midang = car.getVal0();
           #ifdef DEBUG_CAR
           Serial.print("trimming val ");Serial.println(midang);
@@ -275,6 +282,13 @@ void loop(){
           else midang = 90;
           EEPROM.write(2,midang);          
         }
+        else if (pidx == 2){
+        //max angle
+          max_angle = car.getVal0();
+          if (max_angle > 15) max_angle = 15;        
+
+          EEPROM.write(3,max_angle);          
+
       }
       SoftwareServo::refresh();
       
@@ -480,20 +494,28 @@ boolean checkTurn(){
   if (car.isRCTurn() && isForMe()){
     uint8_t p_angle;
     uint8_t p_dir;
+    uint8_t ang;
+
     p_angle = car.getByte(3);  
     p_dir = car.getByte(4);
+
+    /*
+    * the server sends a parcentage of the movement
+    * we transform it an angle
+    */
+    ang = map (p_angle, 0, 100, 0, max_angle);
     
     //direction
     if (p_dir == 0){
-      if (lastAng != (midang + p_angle )){                  
-        steering.write(midang + p_angle );
-        lastAng = midang + p_angle ;        
+      if (lastAng != (midang + ang )){                  
+        steering.write(midang + ang );
+        lastAng = midang + ang ;        
       }                
     }
     else if (p_dir == 1) {
-        if (lastAng != (midang - p_angle )){                    
-          steering.write(midang - p_angle );
-          lastAng = midang - p_angle ;          
+        if (lastAng != (midang - ang )){                    
+          steering.write(midang - ang );
+          lastAng = midang - ang ;          
         }
     }
     return true; 
