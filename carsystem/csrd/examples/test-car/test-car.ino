@@ -245,7 +245,7 @@ void loop(){
         Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
         #endif
       
-      if ((car.isCarRelease() && car.getId() == id) || (millis() - tk_rc > RC_TIMEOUT)){
+      if ((car.isCarRelease() && isForMe()) || (millis() - tk_rc > RC_TIMEOUT)){
         #ifdef DEBUG_CAR
         Serial.println("rec release");
         #endif
@@ -261,8 +261,7 @@ void loop(){
       //if (checkAction()) tk_rc = act; 
       if (checkMove()) tk_rc = act; 
       if (checkTurn()) tk_rc = act; 
-
-      checkStopCar();
+      if (checkStopCar()) tk_rc = act;
       
       if (car.isSaveParam() && isForMe()){
         #ifdef DEBUG_CAR

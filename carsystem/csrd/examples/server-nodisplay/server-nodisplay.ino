@@ -265,7 +265,7 @@ void loop(){
   if (car_acquired){
 
     doFineTunning();  
-  	setSteering();
+    setSteering();
     if (!setparam){
       setSpeed1();
     }  	
