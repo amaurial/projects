@@ -33,7 +33,10 @@ RH_RF69 driver(10,2);
 #define RC_KEEP_ALIVE 300 //ms
 #define CAR_KEEP_ALIVE_TIMEOUT 5000 //ms
 #define BLINK_RATE 1000
-#define UNREG_CAR_TIMEOUT 4000 // if a car does not send any message in 5s then unreg.
+#define UNREG_CAR_TIMEOUT 5000 // if a car does not send any message in 5s then unreg.
+#define BLINK_START_RATE 300
+#define TRIMMING_DELAY   500
+#define UNUSED_INDEX     255
 
 byte servers[NUM_SERVERS];
 
@@ -101,7 +104,8 @@ long t_acquire = 0;
 uint8_t select_index = 0;/*actual index of registered cars*/
 bool release_pressed = false; /*button release was pressed*/
 uint8_t midang = 90;/*middle servo angle*/
-uint8_t max_angle = 10; /*angle for steering*/
+uint8_t max_angle_right = 10; /*angle for steering*/
+uint8_t max_angle_left = 10; /*angle for steering*/
 bool setparam = false; /*set parameter state set*/
 
 int potmax;
@@ -126,16 +130,10 @@ boolean lights_on;
 
 void setup(){
 
-  digitalWrite(LED_PIN, HIGH);
-  delay(300);
-  digitalWrite(LED_PIN, LOW);
-  delay(300);
-  digitalWrite(LED_PIN, HIGH);
-  delay(300);
-  digitalWrite(LED_PIN, LOW);
-  delay(300);
-  digitalWrite(LED_PIN, HIGH);
-  delay(300);
+  for (i=0;i < 5;i++){
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(BLINK_START_RATE);
+  }  
   digitalWrite(LED_PIN, LOW);
   
   #ifdef DEBUG
@@ -254,7 +252,7 @@ void loop(){
     if (server.isCarKeepAlive()){
       tk_car = act;//renew last keep alive  
       #ifdef DEBUG
-      Serial.print("keep alive ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(server.getServerId());      
+      Serial.print("rec keep alive ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(server.getServerId());      
       #endif    
     }    
   }
@@ -271,10 +269,12 @@ void loop(){
     }  	
     if (act - tk > RC_KEEP_ALIVE){
       server.sendRCKeepAlive(cars[car].carid,serverId);
+      #ifdef DEBUG
+      Serial.print("send keep alive ");Serial.print(car);Serial.print(" ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(serverId);      
+      #endif  
       tk = millis();
       cars[car].lastmsg = tk;
     }
-
     stopCar();
     breakLights();
     turnLights();
@@ -362,10 +362,11 @@ void blinkLed(){
 }
 //change the mid angle
 bool doFineTunning(){
+  setparam = false;
   if (digitalRead(SELECT_PIN) == LOW){
       uint8_t pidx = 0;
       uint8_t pvalue = 0;
-      setparam = false;
+      uint8_t ang;      
       /* Middle angle*/
       if (digitalRead(SPEED_UP_PIN) == LOW){
         midang++;
@@ -383,21 +384,36 @@ bool doFineTunning(){
       }
       /*Max angle*/
     if (digitalRead(PB_A) == LOW){
-        max_angle++;
-        if (max_angle > 15) max_angle = 15;
+        if (digitalRead(PB_C) == LOW){
+          max_angle_left++;
+          ang = max_angle_left;
+          pidx = 3;
+        }
+        else{
+          max_angle_right++;
+          ang = max_angle_right;
+          pidx = 2;
+        }
+        if (ang > 15) ang = 15;
         setparam = true;
-        pidx = 2;
-        pvalue = max_angle;
+        
+        pvalue = ang;
       }
       if (digitalRead(PB_B) == LOW){
-        max_angle--;
-        if (max_angle < 1) max_angle = 1;
-        setparam = true;
-        pidx = 2;
-        pvalue = max_angle;
+        if (digitalRead(PB_C) == LOW){
+          max_angle_left--;
+          ang = max_angle_left;
+          pidx = 3;
+        }
+        else{
+          max_angle_right--;
+          ang = max_angle_right;
+          pidx = 2;
+        }
+        if (ang < 1) ang = 1;
+        setparam = true;        
+        pvalue = ang;
       }
-
-
 
       if (setparam){
         
@@ -406,7 +422,7 @@ bool doFineTunning(){
         #endif
         
         server.sendSaveParam(cars[car].carid, serverId, pidx, pvalue);
-        delay(100);
+        delay(TRIMMING_DELAY);
         return true;
       }
     }  
@@ -418,6 +434,7 @@ bool confirmRelease(){
        //car aquired
        car_acquired = false;
        waiting_acquire = false;
+       acquiring_car = false;
        digitalWrite(LED_PIN, LOW);
        return true;
     }
@@ -506,7 +523,7 @@ void releaseCar(){
     if (car_acquired){
       release_pressed = true;
       #ifdef DEBUG
-      Serial.println("release pressed");
+      //Serial.println("release pressed");
       #endif
       return;      
     }
@@ -542,8 +559,8 @@ void releaseCar(){
         
         release_pressed = false;
         if (car_acquired){
-          server.sendAddressedActionMessage(cars[car].carid, serverId, MOTOR, AC_MOVE, 0, 0);    
-      	  delay(20);
+          server.sendStopCar(cars[car].carid, serverId);     
+      	  delay(50);
       	  server.sendCarRelease(cars[car].carid, serverId);
       	  car_acquired = false;
           digitalWrite(LED_PIN, LOW);
@@ -672,13 +689,15 @@ void mainloop(){
         
         if (server.getStatusType() == RP_INITIALREG){
           byte idx=insertNode(server.getNodeNumber(),server.getSender());
-          cars[idx].lastmsg = act;
-           #ifdef DEBUG
-           Serial.print("reg for ");
-           Serial.println(cars[idx].carid);
-           #endif
-                      
-           server.sendInitialRegisterMessage(cars[idx].carid,serverId,ACTIVE,255,255,255);
+          if (idx != 255){
+            cars[idx].lastmsg = act;
+             #ifdef DEBUG
+             Serial.print("reg for ");
+             Serial.println(cars[idx].carid);
+             #endif
+                        
+             server.sendInitialRegisterMessage(cars[idx].carid,serverId,ACTIVE,255,255,255);
+          }
         }
         if (server.getStatusType() == STT_ANSWER_VALUE){
              #ifdef DEBUG
@@ -822,10 +841,19 @@ void unregister(){
   for (i = 0; i< NUM_CARS ;i++){
     if (cars[i].carid != 0 ){    
       if (act - cars[i].lastmsg > UNREG_CAR_TIMEOUT){
-         cars[i].registered = false;
-         cars[i].carid = 0;
-         cars[i].lastmsg = 0;
-         carsIdx--;
+        if ( !(car_acquired && i == car)){
+           #ifdef DEBUG
+            Serial.print ("removing car: ");Serial.println(cars[i].carid);
+           #endif
+           cars[i].registered = false;
+           cars[i].carid = 0;
+           cars[i].lastmsg = 0;
+            
+           carsIdx--;
+        }
+        else{
+          cars[i].lastmsg = act;
+        }
       }
     }
   }
@@ -868,31 +896,52 @@ uint8_t insertNode(uint16_t nn,int sender){
   if (carsIdx >= NUM_CARS){
     return 255;
   }
-
+/*
   if (carsIdx == 0){
-    cars[0].carid = nn;
-    cars[0].senderid = sender;
+    cars[0].carid = (uint8_t) nn;
+    cars[0].senderid = (uint8_t) sender;
     cars[0].registered = true;
     carsIdx++;
     return 0;
   }
+  */
   //check if exists and update the radio
-  for (i=0;i<carsIdx;i++){
-    if (cars[i].carid == nn){
-      cars[i].senderid = sender;
+  for (i = 0; i < NUM_CARS; i++){
+    if (cars[i].carid == (uint8_t) nn){
+      cars[i].senderid = (uint8_t) sender;
+      cars[i].registered = true;
+      cars[i].lastmsg = act;
+      #ifdef DEBUG
+      Serial.print("car exist ");Serial.print(nn);Serial.print(" in ");Serial.println(i);
+      #endif
       return i;
     }
   }
-  
-  cars[carsIdx].carid = nn;
-  cars[carsIdx].senderid = sender;
-  cars[carsIdx].registered = true;
+
+  /*get first space available*/
+  for (i = 0; i < NUM_CARS; i++){
+    if (cars[i].carid == 0){
+      cars[i].carid = (uint8_t) nn;
+      cars[i].senderid = (uint8_t) sender;
+      cars[i].registered = true;
+      cars[i].lastmsg = act;
+      #ifdef DEBUG
+      Serial.print("insert car ");Serial.print(nn);Serial.print(" in ");Serial.println(i);
+      #endif
+      carsIdx++;
+      return i;
+    }
+  }
+    
+  #ifdef DEBUG
+  Serial.print("insert car ");Serial.print(nn);Serial.print(" in ");Serial.println(carsIdx);
+  #endif
   carsIdx++;
   return carsIdx-1;
 }
 
 uint8_t getSender(uint16_t nn){
-   for (i=0;i<carsIdx;i++){
+   for (i=0;i < NUM_CARS;i++){
     if (cars[i].carid == nn){      
       return cars[i].senderid;
     }
@@ -901,7 +950,7 @@ uint8_t getSender(uint16_t nn){
 }
 
 uint8_t getCarIdx(uint16_t nn){
-   for (i=0;i<carsIdx;i++){
+   for (i=0; i < NUM_CARS;i++){
     if (cars[i].carid == nn){      
       return i;
     }

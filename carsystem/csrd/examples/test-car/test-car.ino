@@ -93,7 +93,8 @@ uint8_t i = 0;
  */
 SoftwareServo steering;
 uint8_t midang = 90;
-uint8_t max_angle = 10; // the max variation over the midangle. can be changed by configuration
+uint8_t max_angle_right = 10; // the max variation over the midangle. can be changed by configuration
+uint8_t max_angle_left = 10; // the max variation over the midangle. can be changed by configuration
 uint8_t lastAng = 0;
 uint8_t lastspeed = 0;
 
@@ -168,9 +169,13 @@ void setup(){
   SoftwareServo::refresh();
   
   /* get the max angle for steering */
-  max_angle = EEPROM.read(3);
-  if (max_angle > 15 || max_angle == 0){
-      max_angle = 10;
+  max_angle_right = EEPROM.read(3);
+  if (max_angle_right > 15 || max_angle_right == 0){
+      max_angle_right = 10;
+  }
+  max_angle_left = EEPROM.read(4);
+  if (max_angle_left > 15 || max_angle_left == 0){
+      max_angle_left = 10;
   }
 
   t1 = millis();  
@@ -206,97 +211,44 @@ void loop(){
   }
 
   newMessage = car.readMessage();
-  if (newMessage){        
-    checkCarAutoEnum();
-    #ifdef DEBUG_CAR
-    Serial.print("pwrec ");Serial.println(driver.lastRssi());
-    #endif
-    if (car.isAcquire() && car.getId() == id && !acquired){
-        //check if server is registered
-        #ifdef DEBUG_CAR
-        Serial.print("rec acquire numserv ");Serial.println(car.getServerId());
-        #endif
-        
-        rc = car.getServerId();        
-        for ( i = 0; i < NUM_SERVERS; i++){          
-          if ( servers[i] == rc){            
-            acquired = true;
-            car.sendAcquireAck(id, rc);
-            #ifdef DEBUG_CAR
-            Serial.println("send acquire ack");
-            #endif            
-            steering.write(midang);
-            steering.attach(STEERING_PIN);
-            tk_rc = millis();            
-            break;
-          }
-        }
+  if (newMessage){
+    
+    //debuging thing
+  #ifdef DEBUG_CAR
+    if (car.isRCKeepAlive()){     
+      Serial.print("kpa ");Serial.print(car.getId());Serial.print(" ");Serial.println(car.getServerId());    
     }
-    if (acquired) {
-      SoftwareServo::refresh();
-      if (car.isRCKeepAlive() && isForMe()){
-         tk_rc = act; //renew the last keep alive
-         #ifdef DEBUG_CAR
-        //Serial.println("receive keep alive");
-        #endif
-      }
+  #endif
 
-        #ifdef DEBUG_CAR
-        Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
-        #endif
+    checkCarAutoEnum();
+    checkAcquire();
+    
+    if ((car.getStatusType() != RP_INITIALREG) || isForMe()){
       
-      if ((car.isCarRelease() && isForMe()) || (millis() - tk_rc > RC_TIMEOUT)){
-        #ifdef DEBUG_CAR
-        Serial.println("rec release");
-        #endif
-        SoftPWMSetPercent(MOTOR_PIN, 0);
-        SoftPWMSetPercent(MOTOR_PIN1, 0);
-        car.sendCarReleaseAck(id, rc);
-        #ifdef DEBUG_CAR
-        Serial.println("send release ack");
-        #endif
-        acquired = false;
-      }
+      #ifdef DEBUG_CAR
+      //Serial.print("pwrec ");Serial.println(driver.lastRssi());
+      #endif
       
-      //if (checkAction()) tk_rc = act; 
-      if (checkMove()) tk_rc = act; 
-      if (checkTurn()) tk_rc = act; 
-      if (checkStopCar()) tk_rc = act;
-      
-      if (car.isSaveParam() && isForMe()){
-        #ifdef DEBUG_CAR
-        Serial.print("trimming ");
-        Serial.println(car.getParamIdx());
-        #endif
-        uint8_t pidx = car.getParamIdx(); 
-        if ( pidx == 1){
-          // middle angle
-          midang = car.getVal0();
+      if (acquired) {
+        SoftwareServo::refresh();        
+          checkKeepAlive();
           #ifdef DEBUG_CAR
-          Serial.print("trimming val ");Serial.println(midang);
+          //Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
           #endif
-          if (midang >= 80 && midang <=100){
-            steering.write(midang);  
-          }
-          else midang = 90;
-          EEPROM.write(2,midang);          
-        }
-        else if (pidx == 2){
-        //max angle
-          max_angle = car.getVal0();
-          if (max_angle > 15) max_angle = 15;        
-
-          EEPROM.write(3,max_angle);          
-        }
-      }
-      SoftwareServo::refresh();
-      
-      //checkQuery();      
-    }    
+          
+          if (checkMove()) tk_rc = act; 
+          if (checkTurn()) tk_rc = act; 
+          if (checkStopCar()) tk_rc = act;
+        
+          checkSaveParam();
+          SoftwareServo::refresh();         
+      }   
+    } 
   }
 
   if (acquired){
     SoftwareServo::refresh();
+    checkKeepAliveTimeout();
     /*
     if (millis() - tk > T_KEEP_ALIVE){
         tk = millis();        
@@ -321,14 +273,103 @@ bool isForMe(){
   return ((car.getId() == id) && (rc == car.getServerId()));
 }
 
-void checkStopCar() {
+void checkSaveParam(){
+  if (car.isSaveParam() && isForMe()){
+        #ifdef DEBUG_CAR
+        Serial.print("trimming ");
+        Serial.println(car.getParamIdx());
+        #endif
+        uint8_t pidx = car.getParamIdx(); 
+        tk_rc = act;
+        if ( pidx == 1){
+          // middle angle
+          midang = car.getVal0();
+          #ifdef DEBUG_CAR
+          Serial.print("trimming val ");Serial.println(midang);
+          #endif
+          if (midang >= 80 && midang <=100){
+            steering.write(midang);  
+          }
+          else midang = 90;
+          EEPROM.write(2,midang);          
+        }
+        else if (pidx == 2){
+        //max angle
+          max_angle_right = car.getVal0();
+          if (max_angle_right > 15) max_angle_right = 15;        
+
+          EEPROM.write(3,max_angle_right);          
+        }
+        else if (pidx == 3){
+        //max angle
+          max_angle_left = car.getVal0();
+          if (max_angle_left > 15) max_angle_left = 15;        
+
+          EEPROM.write(4,max_angle_left);          
+        }
+  }
+}
+
+void checkKeepAliveTimeout(){
+  if ((car.isCarRelease() && isForMe()) || (millis() - tk_rc > RC_TIMEOUT)){
+    #ifdef DEBUG_CAR
+    Serial.println("rec release");
+    #endif
+    SoftPWMSetPercent(MOTOR_PIN, 0);
+    SoftPWMSetPercent(MOTOR_PIN1, 0);
+    car.sendCarReleaseAck(id, rc);
+    delay(50);
+    car.sendCarReleaseAck(id, rc);
+    #ifdef DEBUG_CAR
+    Serial.println("send release ack");
+    #endif
+    acquired = false;
+  }
+}
+
+void checkKeepAlive(){
+  if (car.isRCKeepAlive() && isForMe()){
+     tk_rc = act; //renew the last keep alive
+     #ifdef DEBUG_CAR
+    Serial.println("receive keep alive");
+    #endif
+  }
+}
+
+void checkAcquire(){
+  if (car.isAcquire() && car.getId() == id && !acquired){
+        //check if server is registered
+        #ifdef DEBUG_CAR
+        Serial.print("rec acquire numserv ");Serial.println(car.getServerId());
+        #endif
+        
+        rc = car.getServerId();        
+        for ( i = 0; i < NUM_SERVERS; i++){          
+          if ( servers[i] == rc){            
+            acquired = true;
+            car.sendAcquireAck(id, rc);
+            #ifdef DEBUG_CAR
+            Serial.println("send acquire ack");
+            #endif            
+            steering.write(midang);
+            steering.attach(STEERING_PIN);
+            tk_rc = millis();            
+            break;
+          }
+        }
+    }
+}
+
+bool checkStopCar() {
   if (car.isStopCar() && isForMe()){
         #ifdef DEBUG_CAR
         Serial.println("stopping car");
         #endif
         SoftPWMSetPercent(MOTOR_PIN, 0);
         SoftPWMSetPercent(MOTOR_PIN1, 0);
+        return true;
   }
+  return false;
 }
 
 void resolveId(){
@@ -503,7 +544,13 @@ boolean checkTurn(){
     * the server sends a parcentage of the movement
     * we transform it an angle
     */
-    ang = map (p_angle, 0, 100, 0, max_angle);
+    if (p_dir == 0){
+      ang = map (p_angle, 0, 100, 0, max_angle_right);
+    }
+    else{
+      ang = map (p_angle, 0, 100, 0, max_angle_left);
+    }
+    
     
     //direction
     if (p_dir == 0){
