@@ -14,7 +14,7 @@ CSRD server;
 RH_RF69 driver(10,2);
 //RHReliableDatagram manager(driver, 1);
 
-#define NUM_CARS         10
+#define NUM_CARS         10    //max number of cars
 #define SPEED_UP_PIN     3
 #define SPEED_DOWN_PIN   4
 #define SELECT_PIN       5
@@ -27,16 +27,16 @@ RH_RF69 driver(10,2);
 #define RADIO_RST        A4
 #define ANGLE_LIMIT      100
 
-#define NUM_SERVERS 10
-#define REG_TIMEOUT 2000 //2 secs
-#define RC_TIMEOUT 5000
-#define RC_KEEP_ALIVE 300 //ms
-#define CAR_KEEP_ALIVE_TIMEOUT 5000 //ms
-#define BLINK_RATE 1000
+#define NUM_SERVERS 10       //max number of RCs for auto enum
+#define REG_TIMEOUT 2000 //2 secs. autoenum timeout
+#define RC_TIMEOUT 5000     //time to send the next registration message
+#define RC_KEEP_ALIVE 300 //ms. keep alive sent to the acquired car
+#define CAR_KEEP_ALIVE_TIMEOUT 5000 //ms. time out of not received message from the car
+#define BLINK_RATE 1000   //blink rate when there are registered cars
 #define UNREG_CAR_TIMEOUT 5000 // if a car does not send any message in 5s then unreg.
-#define BLINK_START_RATE 300
-#define TRIMMING_DELAY   500
-#define UNUSED_INDEX     255
+#define BLINK_START_RATE 300  //blink rate showing we start
+#define TRIMMING_DELAY   500  //delay applied between each message sent
+#define UNUSED_INDEX     255  //error code
 
 byte servers[NUM_SERVERS];
 
@@ -55,28 +55,28 @@ CARS cars[NUM_CARS];
 
 uint8_t recbuffer[MESSAGE_SIZE];
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
-byte i;
+byte i;   //generic auxiliar variable
 
-uint8_t serverId=0;
-bool newMessage=false;
-uint8_t carsIdx=0;
+uint8_t serverId=0; //the rc id
+bool newMessage=false; //flag for a new message received
+uint8_t carsIdx=0;  //the amount of cars registered
 long request_register_time = 7000;   // time to send a request for registration if no car is registered
 int  request_register_time_step = 4;  // multiplier of request_register_time to request all cars to register.
-long last_request_register_time = 0;
-byte car;
-byte idx;
+long last_request_register_time = 0;  // the last request register
+byte car; //the acquired car index
+byte idx; //auxiliar variable
 
 long last_request_battery = 0;
 int request_battery_time = 500;   
 int request_battery_time_step = 20;
 
 byte potpin = A7;  
-int val=0;
-int ang=0;/*angle mapped from the potentimeter*/
-int lastang=1;/*last angle selected*/
-byte direction=0;/*car direction*/
+int val=0; //auxiliar variable
+int ang=0;//angle mapped from the potentimeter
+int lastang=1;//last angle selected
+byte direction=0;//car direction
 byte potspeed = A6;
-int speed = 0;/*car speed*/
+int speed = 0;//car speed
 int printang = 0;
 int printspeed = 0;
 int lastspeed = 1;
@@ -93,7 +93,7 @@ long act = 0;
 int t;
 long tblink = 0;
 
-bool resolved = false;
+bool resolved = false; //flag indicating the auto enum is solved
 bool sentreg = false;
 bool select_pressed = false; /*button select was pressed*/
 bool waiting_acquire = false;/*indicates we are acquiring a car*/
@@ -130,6 +130,7 @@ boolean lights_on;
 
 void setup(){
 
+  //blink the leds
   for (i=0;i < 5;i++){
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     delay(BLINK_START_RATE);
@@ -143,6 +144,7 @@ void setup(){
   Serial.println("start");
   #endif
   
+  //reset the radio
   i=0;
   pinMode(RADIO_RST,OUTPUT);
   digitalWrite(RADIO_RST,HIGH);
@@ -688,7 +690,7 @@ void mainloop(){
         #endif
         
         if (server.getStatusType() == RP_INITIALREG){
-          byte idx=insertNode(server.getNodeNumber(),server.getSender());
+          idx=insertNode(server.getNodeNumber(),server.getSender());
           if (idx != 255){
             cars[idx].lastmsg = act;
              #ifdef DEBUG
@@ -713,7 +715,7 @@ void mainloop(){
              Serial.println(server.getVal2());  
              #endif
              
-             byte idx = getCarIdx(server.getNodeNumber()); 
+             idx = getCarIdx(server.getNodeNumber()); 
              if (idx != 255){
                 //cars[idx].requests--;
              }
@@ -973,7 +975,7 @@ void printBuffer(){
 bool getSerialCommand(){
    uint8_t serbuf[12];
    uint16_t id=0;
-   uint16_t val=0;
+   val=0;
    byte snid[3];
    
    if (Serial.available() == 0) return false;
