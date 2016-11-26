@@ -56,6 +56,7 @@ CARS cars[NUM_CARS];
 uint8_t recbuffer[MESSAGE_SIZE];
 byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 byte i;
+byte autoenumidx = 0;
 
 uint8_t serverId=0;
 bool newMessage=false;
@@ -129,7 +130,7 @@ boolean pbd_released = false;
 boolean lights_on;
 
 void setup(){
-
+  digitalWrite(LED_PIN, HIGH);
   for (i=0;i < 5;i++){
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     delay(BLINK_START_RATE);
@@ -547,6 +548,8 @@ void releaseCar(){
       EEPROM.write(5,highByte(potmax));
       EEPROM.write(6,lowByte(potmax));
       #ifdef DEBUG
+      Serial.print("potmin: ");Serial.println(potmin);
+      Serial.print("potmax: ");Serial.println(potmax);
       Serial.println("fine tunning done");
       #endif
     }
@@ -595,7 +598,7 @@ void setSteering(){
     //server.sendAddressedActionMessage(serverId, cars[car].carid, BOARD, AC_TURN, ang, direction);     
     server.sendRCTurn(cars[car].carid, serverId, ang, direction); 
     delay(5); 
-    //Serial.print("steering ");Serial.print(val);Serial.print("\t");Serial.println(ang);  
+    Serial.print("steering ");Serial.print(direction);Serial.print("\t");Serial.println(ang);  
   }
   if (direction == 0){      
       ang = ang * -1;    
@@ -737,14 +740,14 @@ void mainloop(){
 
 void checkServerEnum(){
   if (server.isResolutionId() && !resolved){
-      servers[i] = server.getId();
+      servers[autoenumidx] = server.getId();
       
       #ifdef DEBUG
-      Serial.print ("received id: ");Serial.println(servers[i]);
+      Serial.print ("received id: ");Serial.println(servers[autoenumidx]);
       #endif
       
-      i++;
-      if (i > NUM_SERVERS) i = NUM_SERVERS -1;
+      autoenumidx++;
+      if (autoenumidx > NUM_SERVERS) autoenumidx = NUM_SERVERS -1;
     }
     if (server.isServerAutoEnum()){      
       server.sendId(serverId);
@@ -774,7 +777,7 @@ void resolveId(){
     #endif
     while (f){
       f = false;
-      for (byte j = 0; j < i; j++){
+      for (byte j = 0; j < autoenumidx; j++){
         if (servers[j] == serverId ){
           f = true;
           serverId ++;
