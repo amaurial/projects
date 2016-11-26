@@ -17,10 +17,14 @@ CSRD car;
 RH_RF69 driver(10,2);
 //RHReliableDatagram manager(driver, 1);
 
-#define NUM_CARS    10
-#define NUM_SERVERS 5
-#define REG_TIMEOUT 2000 //2 secs
-#define RC_TIMEOUT  7000 //5 secs
+#define NUM_CARS    10    //number of cars for the auto enum
+#define NUM_SERVERS 5     //number of RCs registered
+#define REG_TIMEOUT 2000 //2 secs. Auto enum timeout
+#define EPROM_ID_ADDR 0;
+#define EPROM_ID_OLD_ADDR 1;
+#define EPROM_MID_ANGLE_ADDR 2;
+#define EPROM_MAX_RIGHT_ANGLE_ADDR 3;
+#define EPROM_MAX_LEFT_ANGLE_ADDR 4;
 
 uint8_t cars[NUM_CARS];
 uint8_t servers[NUM_SERVERS];
@@ -67,22 +71,23 @@ unsigned long t4;
 unsigned long tk = 0;
 //receive rc keep alive
 unsigned long tk_rc = 0;
+//actual time
 unsigned long act = 0;
+//random time value used to address resolution
 unsigned long t;
-unsigned long refresh_registration;
-unsigned long last_registration;
-uint8_t LAST_MESSAGE_TIMEOUT = 30; //30 seconds
-unsigned long last_message = 0;
+//generic multi purpose counter
 long counter = 0;
 /*
  * battery vars
  */
 long bat_send_timer = 0; //time between lowbat level
-
+//resolved car id
 uint8_t id = 0;
+//flag that indicates the address was resolved
 bool resolved = false;
+//flag indicating the registration was sent
 bool sentreg = false;
-bool rc_connected = false;
+//generic aux variable
 uint8_t i = 0;
 
 
@@ -92,17 +97,24 @@ uint8_t i = 0;
  * to refresh the soft servo lib
  */
 SoftwareServo steering;
+//middle angle of the servo when steering. can be dynamically adjusted
 uint8_t midang = 90;
 uint8_t max_angle_right = 10; // the max variation over the midangle. can be changed by configuration
 uint8_t max_angle_left = 10; // the max variation over the midangle. can be changed by configuration
+//last andgle set. used to avoid repeate setting
 uint8_t lastAng = 0;
+//last speed set. used to avoid repeate setting
 uint8_t lastspeed = 0;
-
+//variable indicating the car is being controlled by one rc
 volatile boolean acquired = false;
+//flag indicating a new message was received
 bool newMessage;
+//the remote control id
 uint8_t rc;
 
 //each 20ms
+//used in the timer to refresh the soft servo
+//the servo lib is not used because it clashes with the radio and softpwm
 void refreshSoftServo(int a){  
   if (acquired){
     counter++;
@@ -127,6 +139,7 @@ void setup(){
   SoftwareServo::refresh();
   SoftPWMBegin(SOFTPWM_NORMAL,&refreshSoftServo);
   //SoftPWMBegin(SOFTPWM_NORMAL);
+  //give time to the servo to move
   for (byte i = 0; i < 10; i++){
     SoftwareServo::refresh();
     delay(20);
@@ -153,15 +166,17 @@ void setup(){
   }
   driver.setTxPower(13);
   driver.setModemConfig(RH_RF69::FSK_Rb250Fd250);
+
+  /*read the id*/
   randomSeed(analogRead(apin));
-  id = EEPROM.read(0);
-  if (id != EEPROM.read(1)){
+  id = EEPROM.read(EPROM_ID_ADDR);
+  if (id != EEPROM.read(EPROM_ID_OLD_ADDR)){
     //get a random value if the old one is not the same
     id = random(1 , 255);
   }
 
   /*get the middle angle*/
-  midang = EEPROM.read(2);
+  midang = EEPROM.read(EPROM_MID_ANGLE_ADDR);
   if (midang < 80 || midang > 100){
     midang = 90; 
   }
@@ -169,11 +184,11 @@ void setup(){
   SoftwareServo::refresh();
   
   /* get the max angle for steering */
-  max_angle_right = EEPROM.read(3);
+  max_angle_right = EEPROM.read(EPROM_MAX_RIGHT_ANGLE_ADDR)
   if (max_angle_right > 15 || max_angle_right == 0){
       max_angle_right = 10;
   }
-  max_angle_left = EEPROM.read(4);
+  max_angle_left = EEPROM.read(EPROM_MAX_LEFT_ANGLE_ADDR);
   if (max_angle_left > 15 || max_angle_left == 0){
       max_angle_left = 10;
   }
@@ -184,7 +199,9 @@ void setup(){
   #ifdef DEBUG_CAR
   Serial.print("random id: ");Serial.println(id);
   #endif
+
   t = random(0, 2000);
+
   //retry timer
   #ifdef DEBUG_CAR
   Serial.print("random retry timer: ");Serial.println(t);
@@ -196,9 +213,6 @@ void setup(){
   pinMode(CHARGER_PIN, INPUT);  
   pinMode(BATTERY_PIN, INPUT);
   pinMode(MOTOR_ROTATION_PIN, INPUT);
-  
-  refresh_registration = random(200, 5000);
-  
 }
 
 void loop(){  
@@ -213,16 +227,18 @@ void loop(){
   newMessage = car.readMessage();
   if (newMessage){
     
-    //debuging thing
+  //debuging thing
   #ifdef DEBUG_CAR
     if (car.isRCKeepAlive()){     
       Serial.print("kpa ");Serial.print(car.getId());Serial.print(" ");Serial.println(car.getServerId());    
     }
   #endif
-
+    //do auto enum on start
     checkCarAutoEnum();
+    //check if some rc send acquire
     checkAcquire();
-    
+
+    //avoid non necessary work 
     if ((car.getStatusType() != RP_INITIALREG) || isForMe()){
       
       #ifdef DEBUG_CAR
@@ -230,16 +246,20 @@ void loop(){
       #endif
       
       if (acquired) {
-        SoftwareServo::refresh();        
+        SoftwareServo::refresh();  
+          //check the keep alive from the rc
           checkKeepAlive();
+
           #ifdef DEBUG_CAR
           //Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
           #endif
-          
+          //check messages to move the car          
           if (checkMove()) tk_rc = act; 
+          //check messages to turn left or right
           if (checkTurn()) tk_rc = act; 
+          //check message to stop the car
           if (checkStopCar()) tk_rc = act;
-        
+          //check message to save parameters
           checkSaveParam();
           SoftwareServo::refresh();         
       }   
@@ -248,17 +268,8 @@ void loop(){
 
   if (acquired){
     SoftwareServo::refresh();
+    //check the timeout for not receiving a keep alive from the RC
     checkKeepAliveTimeout();
-    /*
-    if (millis() - tk > T_KEEP_ALIVE){
-        tk = millis();        
-        #ifdef DEBUG_CAR
-        Serial.println("send keep alive");
-        #endif
-        car.sendCarKeepAlive(id, rc);    
-        delay(5);    
-      }   
-      */   
   }
   else{
     steering.detach();
@@ -291,21 +302,21 @@ void checkSaveParam(){
             steering.write(midang);  
           }
           else midang = 90;
-          EEPROM.write(2,midang);          
+          EEPROM.write(EPROM_MID_ANGLE_ADDR,midang);          
         }
         else if (pidx == 2){
         //max angle
           max_angle_right = car.getVal0();
           if (max_angle_right > 15) max_angle_right = 15;        
 
-          EEPROM.write(3,max_angle_right);          
+          EEPROM.write(EPROM_MAX_RIGHT_ANGLE_ADDR,max_angle_right);          
         }
         else if (pidx == 3){
         //max angle
           max_angle_left = car.getVal0();
           if (max_angle_left > 15) max_angle_left = 15;        
 
-          EEPROM.write(4,max_angle_left);          
+          EEPROM.write(EPROM_MAX_LEFT_ANGLE_ADDR,max_angle_left);          
         }
   }
 }
@@ -416,8 +427,8 @@ void resolveId(){
     resolved = true;
     //save to eprom
     //save both value in the 2 first positions, so we can assure we did it
-    EEPROM.write(0,id);
-    EEPROM.write(1,id);
+    EEPROM.write(EPROM_ID_ADDR,id);
+    EEPROM.write(EPROM_OLD_ID_ADDR,id);
   }
 }
 void checkCarAutoEnum(){
