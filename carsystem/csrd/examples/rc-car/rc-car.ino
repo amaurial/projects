@@ -11,7 +11,7 @@
 #define apin A0
 
 //uncomment for debug message
-//#define DEBUG_CAR 1;
+#define DEBUG_CAR 1;
 
 CSRD car;
 RH_RF69 driver(10,2);
@@ -20,11 +20,11 @@ RH_RF69 driver(10,2);
 #define NUM_CARS    10    //number of cars for the auto enum
 #define NUM_SERVERS 5     //number of RCs registered
 #define REG_TIMEOUT 2000 //2 secs. Auto enum timeout
-#define EPROM_ID_ADDR 0;
-#define EPROM_ID_OLD_ADDR 1;
-#define EPROM_MID_ANGLE_ADDR 2;
-#define EPROM_MAX_RIGHT_ANGLE_ADDR 3;
-#define EPROM_MAX_LEFT_ANGLE_ADDR 4;
+#define EPROM_ID_ADDR 0
+#define EPROM_OLD_ID_ADDR 1
+#define EPROM_MID_ANGLE_ADDR 2
+#define EPROM_MAX_RIGHT_ANGLE_ADDR 3
+#define EPROM_MAX_LEFT_ANGLE_ADDR 4
 
 uint8_t cars[NUM_CARS];
 uint8_t servers[NUM_SERVERS];
@@ -41,7 +41,7 @@ uint8_t numrcs = 0;
 #define BATTERY_PIN               A7//A5
 #define CHARGER_PIN               A1
 #define STEERING_PIN              7
-#define T_KEEP_ALIVE              1000 //ms
+#define CAR_KEEP_ALIVE_TIME       1000 //ms
 #define RC_TIMEOUT                2000//ms -receive from rc:w
 
 uint8_t motorpin = MOTOR_PIN;
@@ -77,6 +77,8 @@ unsigned long act = 0;
 unsigned long t;
 //generic multi purpose counter
 long counter = 0;
+//car timeout
+long last_car_keepalive = 0;
 /*
  * battery vars
  */
@@ -170,7 +172,7 @@ void setup(){
   /*read the id*/
   randomSeed(analogRead(apin));
   id = EEPROM.read(EPROM_ID_ADDR);
-  if (id != EEPROM.read(EPROM_ID_OLD_ADDR)){
+  if (id != EEPROM.read(EPROM_OLD_ID_ADDR)){
     //get a random value if the old one is not the same
     id = random(1 , 255);
   }
@@ -184,7 +186,7 @@ void setup(){
   SoftwareServo::refresh();
   
   /* get the max angle for steering */
-  max_angle_right = EEPROM.read(EPROM_MAX_RIGHT_ANGLE_ADDR)
+  max_angle_right = EEPROM.read(EPROM_MAX_RIGHT_ANGLE_ADDR);
   if (max_angle_right > 15 || max_angle_right == 0){
       max_angle_right = 10;
   }
@@ -212,7 +214,7 @@ void setup(){
    */
   pinMode(CHARGER_PIN, INPUT);  
   pinMode(BATTERY_PIN, INPUT);
-  pinMode(MOTOR_ROTATION_PIN, INPUT);
+  pinMode(MOTOR_ROTATION_PIN, INPUT);  
 }
 
 void loop(){  
@@ -229,9 +231,10 @@ void loop(){
     
   //debuging thing
   #ifdef DEBUG_CAR
-    if (car.isRCKeepAlive()){     
-      Serial.print("kpa ");Serial.print(car.getId());Serial.print(" ");Serial.println(car.getServerId());    
-    }
+    printMessageType(car.getByte(0));
+    //if (car.isRCKeepAlive()){     
+    //  Serial.print("kpa ");Serial.print(car.getId());Serial.print(" ");Serial.println(car.getServerId());    
+    //}
   #endif
     //do auto enum on start
     checkCarAutoEnum();
@@ -239,17 +242,17 @@ void loop(){
     checkAcquire();
 
     //avoid non necessary work 
-    if ((car.getStatusType() != RP_INITIALREG) || isForMe()){
+    if (isForMe()){
       
       #ifdef DEBUG_CAR
-      //Serial.print("pwrec ");Serial.println(driver.lastRssi());
+      Serial.println("for me");
       #endif
       
       if (acquired) {
         SoftwareServo::refresh();  
           //check the keep alive from the rc
           checkKeepAlive();
-
+          
           #ifdef DEBUG_CAR
           //Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
           #endif
@@ -258,7 +261,7 @@ void loop(){
           //check messages to turn left or right
           if (checkTurn()) tk_rc = act; 
           //check message to stop the car
-          if (checkStopCar()) tk_rc = act;
+          if (checkStopCar()) tk_rc = act;          
           //check message to save parameters
           checkSaveParam();
           SoftwareServo::refresh();         
@@ -270,6 +273,15 @@ void loop(){
     SoftwareServo::refresh();
     //check the timeout for not receiving a keep alive from the RC
     checkKeepAliveTimeout();
+    checkRelease();
+    
+    if ((act - last_car_keepalive) >= CAR_KEEP_ALIVE_TIME){
+      car.sendCarKeepAlive(id, rc);
+      last_car_keepalive = act;
+      #ifdef DEBUG_CAR
+        Serial.println("send keep alive");
+      #endif
+    }
   }
   else{
     steering.detach();
@@ -279,9 +291,14 @@ void loop(){
    
 }
 
-bool isForMe(){
-  
-  return ((car.getId() == id) && (rc == car.getServerId()));
+bool isForMe(){  
+   #ifdef DEBUG_CAR
+    Serial.print("nodeid ");Serial.println(car.getNodeId());
+    Serial.print("id ");Serial.println(id);
+    Serial.print("rc ");Serial.println(rc);
+    Serial.print("serverid ");Serial.println(car.getServerId());   
+   #endif
+  return ((car.getNodeId() == id) && (rc == car.getServerId()));
 }
 
 void checkSaveParam(){
@@ -321,8 +338,9 @@ void checkSaveParam(){
   }
 }
 
-void checkKeepAliveTimeout(){
-  if ((car.isCarRelease() && isForMe()) || (millis() - tk_rc > RC_TIMEOUT)){
+void checkRelease(){
+  
+  if (car.isCarRelease() && isForMe()){
     #ifdef DEBUG_CAR
     Serial.println("rec release");
     #endif
@@ -338,17 +356,46 @@ void checkKeepAliveTimeout(){
   }
 }
 
-void checkKeepAlive(){
-  if (car.isRCKeepAlive() && isForMe()){
-     tk_rc = act; //renew the last keep alive
-     #ifdef DEBUG_CAR
-    Serial.println("receive keep alive");
+
+void checkKeepAliveTimeout(){
+   
+  if ((act - tk_rc) > RC_TIMEOUT){
+    #ifdef DEBUG_CAR
+    Serial.println("timeout");
+    Serial.print("act ");Serial.println(act);
+    Serial.print("tkrc ");Serial.println(tk_rc);
+    Serial.print("diff ");Serial.println(act - tk_rc);
+    Serial.print("RC_TIMEOUT ");Serial.println(RC_TIMEOUT);
     #endif
+    SoftPWMSetPercent(MOTOR_PIN, 0);
+    SoftPWMSetPercent(MOTOR_PIN1, 0);
+    car.sendCarReleaseAck(id, rc);
+    delay(50);
+    car.sendCarReleaseAck(id, rc);
+    #ifdef DEBUG_CAR
+    Serial.println("send release ack");
+    #endif
+    acquired = false;
+  }
+}
+
+void checkKeepAlive(){
+  if (car.isRCKeepAlive()){
+      #ifdef DEBUG_CAR
+      Serial.println("rec keep alive");
+      #endif
+     if (isForMe()){
+  
+       tk_rc = act; //renew the last keep alive
+       #ifdef DEBUG_CAR
+      Serial.println("keep alive for me");
+      #endif
+     }
   }
 }
 
 void checkAcquire(){
-  if (car.isAcquire() && car.getId() == id && !acquired){
+  if (car.isAcquire() && car.getNodeId() == id && !acquired){
         //check if server is registered
         #ifdef DEBUG_CAR
         Serial.print("rec acquire numserv ");Serial.println(car.getServerId());
@@ -358,13 +405,13 @@ void checkAcquire(){
         for ( i = 0; i < NUM_SERVERS; i++){          
           if ( servers[i] == rc){            
             acquired = true;
-            car.sendAcquireAck(id, rc);
+            car.sendAcquireAck(id, rc);            
             #ifdef DEBUG_CAR
             Serial.println("send acquire ack");
             #endif            
             steering.write(midang);
             steering.attach(STEERING_PIN);
-            tk_rc = millis();            
+            tk_rc = act;            
             break;
           }
         }
@@ -434,7 +481,7 @@ void resolveId(){
 void checkCarAutoEnum(){
     
     if (car.isCarId() && !resolved){
-      cars[i] = car.getId();
+      cars[i] = car.getNodeId();
 
       #ifdef DEBUG_CAR
       Serial.print ("received id: ");Serial.println(servers[i]);
@@ -458,7 +505,7 @@ void checkCarAutoEnum(){
 
     if (car.isRCId()){
       bool rc_exist = false;
-      uint8_t rc = car.getId();
+      uint8_t rc = car.getNodeId();
 
       #ifdef DEBUG_CAR
       Serial.print ("rc rec ");Serial.println(rc);
@@ -470,6 +517,7 @@ void checkCarAutoEnum(){
           #ifdef DEBUG_CAR
           Serial.println ("rc exist");
           #endif
+          if (numrcs == 0) numrcs++;
           break;
         }
       }
@@ -487,13 +535,21 @@ void checkCarAutoEnum(){
 }
 
 void sendCarRegistration(){
+
+  if (acquired) return;
+  
   if (millis() - t3 > RC_TIMEOUT){
+    
     t3 = millis();
     if (!acquired){
+      #ifdef DEBUG_CAR
+        Serial.println("try send reg");
+      #endif
       for (uint8_t j=0;j < numrcs; j++){
-        car.sendInitialRegisterMessage(servers[j], id, ACTIVE, 0, 0, 0);
+        //car.sendInitialRegisterMessage(servers[j], id, ACTIVE, 0, 0, 0);
+        car.sendRCCarRegister(id, servers[j]);
         #ifdef DEBUG_CAR
-        Serial.println("send initial reg");
+        Serial.println("send reg");
         #endif
         delay(10);//give some time between each message
       }
@@ -505,8 +561,8 @@ bool checkMove(){
   if (car.isRCMove() && isForMe()){
     uint8_t p_speed;
     uint8_t p_dir;
-    p_speed = car.getByte(3);  
-    p_dir = car.getByte(4);
+    p_speed = car.getSpeed();  
+    p_dir = car.getDirection();
       
       if (p_dir == 0){
         motorpin = MOTOR_PIN;
@@ -548,8 +604,8 @@ boolean checkTurn(){
     uint8_t p_dir;
     uint8_t ang;
 
-    p_angle = car.getByte(3);  
-    p_dir = car.getByte(4);
+    p_angle = car.getAngle();  
+    p_dir = car.getDirection();
 
     /*
     * the server sends a parcentage of the movement
@@ -691,4 +747,79 @@ void checkBattery(){
     }     
 }
 
+void printMessageType(uint8_t msgtype){
+  Serial.print("message type ");
+  switch (msgtype){
+    case(RP_BROADCAST):
+      Serial.println("RP_BROADCAST");
+      break;
+    case(RP_ADDRESSED):
+      Serial.println("RP_ADDRESSED");
+      break;
+    case(RP_STATUS):
+      Serial.println("RP_STATUS");
+      break;
+    case(RP_ID_RESOLUTION):
+      Serial.println("RP_ID_RESOLUTION");
+      break;
+    case(BR_SERVER_AUTO_ENUM):
+      Serial.println("BR_SERVER_AUTO_ENUM");
+      break;
+    case(BR_CAR_AUTO_ENUM):
+      Serial.println("BR_CAR_AUTO_ENUM");
+      break;
+    case(RC_ID):
+      Serial.println("RC_ID");
+      break;
+    case(CAR_ID):
+      Serial.println("CAR_ID");
+      break;
+    case(CAR_ACQUIRE):
+      Serial.println("CAR_ACQUIRE");
+      break;
+    case(CAR_RELEASE):
+      Serial.println("CAR_RELEASE");
+      break;
+    case(CAR_ACQUIRE_ACK):
+      Serial.println("CAR_ACQUIRE_ACK");
+      break;
+    case(CAR_RELEASE_ACK):
+      Serial.println("CAR_RELEASE_ACK");
+      break;
+    case(CAR_KEEP_ALIVE):
+      Serial.println("CAR_KEEP_ALIVE");
+      break;
+    case(RC_KEEP_ALIVE):
+      Serial.println("RC_KEEP_ALIVE");
+      break;
+    case(SAVE_PARAM):
+      Serial.println("SAVE_PARAM");
+      break;
+    case(RC_LIGHTS):
+      Serial.println("RC_LIGHTS");
+      break;
+    case(RC_BREAK_LIGHTS):
+      Serial.println("RC_BREAK_LIGHTS");
+      break;
+    case(RC_STOP_CAR):
+      Serial.println("RC_STOP_CAR");
+      break;
+    case(RC_MOVE):
+      Serial.println("RC_MOVE");
+      break;
+    case(RC_TURN):
+      Serial.println("RC_TURN");
+      break;
+    case(CAR_ACQUIRE_NACK):
+      Serial.println("CAR_ACQUIRE_NACK");
+      break;
+    case(RC_CAR_REGISTER):
+      Serial.println("RC_CAR_REGISTER");
+      break;
+    case(RC_CAR_REGISTER_ACK):
+      Serial.println("RC_CAR_REGISTER_ACK");
+      break;           
+  }
+  
+}
 

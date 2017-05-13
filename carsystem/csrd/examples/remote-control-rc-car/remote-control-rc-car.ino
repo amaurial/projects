@@ -1,3 +1,17 @@
+/*
+ * This file is for the remote control with 8 push button and 1 joystick
+ * The control works as:
+ * PB1 - Speed up
+ * PB2 - Speed down
+ * Joystick left and right - turn right and left
+ * PB2 - Select car
+ * PB3 - Release car
+ * PBC - Stop car
+ * Combinations (trimmers)
+ * PB2 + (PB1 or PB2) - set the middle angle of the steering
+ * PB2 + PC + PBA or PBB - set the max angle right and left
+ */
+
 #include "Arduino.h"
 #include <SPI.h>
 #include <csrd.h>
@@ -6,7 +20,7 @@
 #include <Wire.h>
 #include <EEPROM.h>
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #define apin A0
 
@@ -29,24 +43,24 @@ RH_RF69 driver(10,2);
 
 #define NUM_SERVERS 10       //max number of RCs for auto enum
 #define REG_TIMEOUT 2000 //2 secs. autoenum timeout
-#define RC_TIMEOUT 5000     //time to send the next registration message
-#define RC_KEEP_ALIVE 300 //ms. keep alive sent to the acquired car
-#define CAR_KEEP_ALIVE_TIMEOUT 5000 //ms. time out of not received message from the car
+#define RC_TIMEOUT 3000     //time to send the next registration message
+#define RC_KEEP_ALIVE 500 //ms. keep alive sent to the acquired car
+#define CAR_KEEP_ALIVE_TIMEOUT 7000 //ms. time out of not received message from the car
 #define BLINK_RATE 1000   //blink rate when there are registered cars
 #define UNREG_CAR_TIMEOUT 5000 // if a car does not send any message in 5s then unreg.
 #define BLINK_START_RATE 300  //blink rate showing we start
 #define TRIMMING_DELAY   500  //delay applied between each message sent
 #define UNUSED_INDEX     255  //error code
 
-byte servers[NUM_SERVERS];
+uint16_t servers[NUM_SERVERS];
 
 //time to keep the release button pressed to free the car
 #define RELEASE_PRESS_TIME 1000
 
 
 typedef struct CARS{
-  uint8_t carid;
-  uint8_t senderid;
+  uint16_t carid;
+  uint16_t senderid;
   bool registered;
   long lastmsg;    
 };
@@ -58,7 +72,7 @@ byte radioBuffer[RH_RF69_MAX_MESSAGE_LEN];
 byte i;   //generic auxiliar variable
 byte autoenumidx = 0;
 
-uint8_t serverId=0; //the rc id
+uint16_t serverId=0; //the rc id
 bool newMessage=false; //flag for a new message received
 uint8_t carsIdx=0;  //the amount of cars registered
 long request_register_time = 7000;   // time to send a request for registration if no car is registered
@@ -250,20 +264,17 @@ void loop(){
   if (newMessage){
     checkServerEnum();    
     confirmAcquire();
-    confirmRelease();    
+    confirmRelease();
+    checkCarRegister();    
 
     //if (server.isCarKeepAlive() && server.getServerId() == serverId && server.getId() == cars[car].carid){
-    if (server.isCarKeepAlive()){
-      tk_car = act;//renew last keep alive  
-      #ifdef DEBUG
-      Serial.print("rec keep alive ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(server.getServerId());      
-      #endif    
-    }    
+       
   }
 
   if (resolved){
     sendRCRegistration();
   }
+  
   if (car_acquired){
 
     doFineTunning();  
@@ -271,34 +282,31 @@ void loop(){
     if (!setparam){
       setSpeed1();
     }  	
+
+    if (server.isCarKeepAlive() && server.getNodeId() == cars[car].carid){
+      tk_car = act;//renew last keep alive  
+      #ifdef DEBUG
+      Serial.print("rec keep alive ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(server.getServerId());      
+      #endif    
+      cars[car].lastmsg = tk_car;
+    } 
+    
     if (act - tk > RC_KEEP_ALIVE){
       server.sendRCKeepAlive(cars[car].carid,serverId);
       #ifdef DEBUG
-      Serial.print("send keep alive ");Serial.print(car);Serial.print(" ");Serial.print(cars[car].carid);Serial.print(" ");Serial.println(serverId);      
+      Serial.print("send keep alive ");Serial.print(car);
+      Serial.print(" ");Serial.print(cars[car].carid);
+      Serial.print(" ");Serial.println(serverId);      
       #endif  
       tk = millis();
-      cars[car].lastmsg = tk;
-    }
+      
+    }    
     stopCar();
     breakLights();
-    turnLights();
-    /*
-    if (act - tk_car > CAR_KEEP_ALIVE_TIMEOUT){
-      
-        server.sendAddressedActionMessage(cars[car].carid, serverId, MOTOR, AC_MOVE, 0, 0);    
-        delay(20);
-        server.sendCarRelease(cars[car].carid, serverId);
-        car_acquired = false;
-        waiting_acquire = false;
-        digitalWrite(LED_PIN, LOW);
-        
-        Serial.print("Releasing car timeout ");Serial.println(cars[car].carid);
-    }
-    */
-  }
-  mainloop();  
+    turnLights();    
+  }  
   blinkLed();
-  unregister();
+  //unregister();
 }
 
 void turnLights(){
@@ -311,6 +319,9 @@ void turnLights(){
   else if (pbb_pressed == true){
     //button released
     server.sendCarLightOnOff(serverId, cars[car].carid);
+    #ifdef DEBUG
+    Serial.print("light on/off");Serial.println(t);
+    #endif
     pbb_pressed = false;
   }
 }
@@ -337,9 +348,13 @@ void stopCar(){
   else if (pbc_pressed == true){
     //button released
     server.sendStopCar(cars[car].carid, serverId); 
+    //server.sendRCMove(cars[car].carid, serverId, 0, 0); 
     pbc_pressed = false;
     sp_counter = 101;
     lastspeed = 0;
+    #ifdef DEBUG
+    Serial.print("stop car");Serial.println(t);
+    #endif
   }
 }
 
@@ -434,20 +449,30 @@ bool doFineTunning(){
 }
 
 bool confirmRelease(){
-  if (server.isCarReleaseAck() && server.getServerId() == serverId && server.getId() == cars[car].carid){
+  if (server.isCarReleaseAck() && server.getServerId() == serverId && server.getNodeId() == cars[car].carid){
        //car aquired
        car_acquired = false;
        waiting_acquire = false;
        acquiring_car = false;
        digitalWrite(LED_PIN, LOW);
+       #ifdef DEBUG
+      Serial.print("car released");Serial.println(t);
+      #endif
        return true;
     }
     return false;
 }
 
 bool confirmAcquire(){
-  if (server.isAcquireAck() && server.getServerId() == serverId && server.getId() == cars[acquiring_car].carid){
+  if (server.isAcquireAck()){
+    #ifdef DEBUG
+      Serial.println("confirm acquire");
+      #endif
+    if (server.getServerId() == serverId && server.getNodeId() == cars[acquiring_car].carid){
        //car aquired
+       #ifdef DEBUG
+      Serial.println("car acquired");
+      #endif
        car_acquired = true;
        car = acquiring_car;
        waiting_acquire = false;
@@ -457,6 +482,7 @@ bool confirmAcquire(){
        sp_counter = 101;
        return true;
     }
+   }
     return false;
 }
 
@@ -565,7 +591,8 @@ void releaseCar(){
         
         release_pressed = false;
         if (car_acquired){
-          server.sendStopCar(cars[car].carid, serverId);     
+          server.sendStopCar(cars[car].carid, serverId); 
+          //server.sendRCMove(cars[car].carid, serverId, 0, 0);     
       	  delay(50);
       	  server.sendCarRelease(cars[car].carid, serverId);
       	  car_acquired = false;
@@ -625,7 +652,8 @@ void setSpeed(){
     }
    
     server.sendAddressedActionMessage(serverId, cars[car].carid, MOTOR, AC_MOVE, speed, direction);  
-    delay(20);  
+    delay(20); 
+     
   }
   if (direction == 1){      
       speed = speed * -1;    
@@ -672,78 +700,27 @@ void setSpeed1(){
   }
 }
 
+void checkCarRegister(){
 
-void mainloop(){
-  #ifdef DEBUG
-  //getSerialCommand();
-  #endif
-  //newMessage = server.readMessage();
+  if (!server.isRCCarRegister()) return;
 
-  if (newMessage){
-    /*
-    Serial.println("New message");
-    dumpMessage();
-    Serial.println();
-    Serial.print ("Reg: ");
-    Serial.println(carsIdx);
-    */
-    if (server.isStatus()){
-      
-        #ifdef DEBUG
-        Serial.println("St msg");
-        #endif
-        
-        if (server.getStatusType() == RP_INITIALREG){
-          idx=insertNode(server.getNodeNumber(),server.getSender());
-          if (idx != 255){
-            cars[idx].lastmsg = act;
-             #ifdef DEBUG
-             Serial.print("reg for ");
-             Serial.println(cars[idx].carid);
-             #endif
-                        
-             server.sendInitialRegisterMessage(cars[idx].carid,serverId,ACTIVE,255,255,255);
-          }
-        }
-        if (server.getStatusType() == STT_ANSWER_VALUE){
-             #ifdef DEBUG
-             Serial.print("St node ");
-             Serial.println(server.getNodeNumber());
-             Serial.print("e: ");
-             Serial.print(server.getElement());
-             Serial.print("\t p0: ");
-             Serial.print(server.getVal0());
-             Serial.print("\t p1: ");
-             Serial.print(server.getVal1());
-             Serial.print("\t p2: ");
-             Serial.println(server.getVal2());  
-             #endif
-             
-             idx = getCarIdx(server.getNodeNumber()); 
-             if (idx != 255){
-                //cars[idx].requests--;
-             }
-        }
-        if (server.getStatusType() == STT_QUERY_VALUE_FAIL){
-             #ifdef DEBUG
-             Serial.println("Qry failed");
-             #endif
-        }
-    }
-    else {
-      
-    }
-        
+  idx=insertNode(server.getNodeId(),server.getServerId());
+  if (idx != 255){
+    cars[idx].lastmsg = act;
+     
+    #ifdef DEBUG
+    Serial.print("reg for ");
+    Serial.println(cars[idx].carid);
+    #endif
+    
+    server.sendRCCarRegisterAck(cars[idx].carid,serverId);                
   }
- 
-  //sendRequestRegister();
-  //requestBatterySpeedLevel(); 
-  //unregister();
+  
 }
 
 void checkServerEnum(){
   if (server.isResolutionId() && !resolved){
-      servers[autoenumidx] = server.getId();
+      servers[autoenumidx] = server.getNodeId();
       
       #ifdef DEBUG
       Serial.print ("received id: ");Serial.println(servers[autoenumidx]);
@@ -753,7 +730,7 @@ void checkServerEnum(){
       if (autoenumidx > NUM_SERVERS) autoenumidx = NUM_SERVERS -1;
     }
     if (server.isServerAutoEnum()){      
-      server.sendId(serverId);
+      server.sendNodeId(serverId);
       #ifdef DEBUG
       Serial.print ("sent my id: ");Serial.println(serverId);
       #endif
@@ -913,7 +890,7 @@ uint8_t insertNode(uint16_t nn,int sender){
   */
   //check if exists and update the radio
   for (i = 0; i < NUM_CARS; i++){
-    if (cars[i].carid == (uint8_t) nn){
+    if (cars[i].carid == nn){
       cars[i].senderid = (uint8_t) sender;
       cars[i].registered = true;
       cars[i].lastmsg = act;
@@ -927,7 +904,7 @@ uint8_t insertNode(uint16_t nn,int sender){
   /*get first space available*/
   for (i = 0; i < NUM_CARS; i++){
     if (cars[i].carid == 0){
-      cars[i].carid = (uint8_t) nn;
+      cars[i].carid = nn;
       cars[i].senderid = (uint8_t) sender;
       cars[i].registered = true;
       cars[i].lastmsg = act;

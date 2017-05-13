@@ -62,6 +62,7 @@ bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
         driver->send(sbuffer, len);
         #ifdef CSRD_DEBUG
                 Serial.println("Packages in buffer.Wait to send");
+				dumpBuffer(sbuffer);
         #endif // CSRD_DEBUG
         driver->waitPacketSent();
         #ifdef CSRD_DEBUG
@@ -70,6 +71,74 @@ bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
         return true;
     }
 }
+
+bool CSRD::readMessage(){
+
+
+    // Wait for a message addressed to us from the client
+    //if (isRadioOn())
+    //{
+        uint8_t from;
+        uint8_t len=radioBuffSize;
+
+        if (manager!=NULL){
+
+                if (manager->recvfromAck(buf, &len, &from))
+                {
+                    #ifdef CSRD_DEBUG
+                      Serial.print("got request from : 0x");
+                      Serial.print(from, HEX);
+                      Serial.print(": ");
+                      Serial.print(" size: ");
+                      Serial.println(length);
+                      Serial.println((char*)buf);
+                    #endif // CSRD_DEBUG
+
+                    //we expect 8 bytes
+                    if (length>MESSAGE_SIZE){
+                        #ifdef CSRD_DEBUG
+                          Serial.print("message bigger than expected: ");
+                          Serial.println(length);
+                        #endif // CSRD_DEBUG
+                        return false;
+                    }
+                    length=len;
+                    if (length>0){
+                        memset(buffer,'\0',MESSAGE_SIZE);
+                        memcpy(buffer,buf,MESSAGE_SIZE);
+                        origin=from;
+						#ifdef CSRD_DEBUG
+                          Serial.print("message received: ");
+                          Serial.println(origin);
+                        #endif // CSRD_DEBUG
+                        return true;
+                    }
+                }
+            }
+
+        else {
+            //driver->setModeRx();
+            if (driver->recv(buf,&len)){
+                length=len;
+                if (length>0){
+                    memset(buffer,'\0',MESSAGE_SIZE);
+                    memcpy(buffer,buf,MESSAGE_SIZE);
+                    origin=from;
+					#ifdef CSRD_DEBUG
+                          Serial.print("msg rec from: ");
+                          Serial.println(origin);
+						  Serial.print("size: ");Serial.println(length);
+						  dumpBuffer(buffer);
+                        #endif // CSRD_DEBUG
+                    return true;
+                }
+            }
+        }
+
+  //}
+    return false;
+}
+
 bool CSRD::sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2){
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_STATUS;
@@ -314,77 +383,77 @@ bool CSRD::sendRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t n
     return sendMessage(buf,MESSAGE_SIZE,nodeAddr);
 }
 
-bool CSRD::sendServerAutoEnum(uint8_t id){
+bool CSRD::sendServerAutoEnum(uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = BR_SERVER_AUTO_ENUM;
-    buf[1] = id;
-    buf[2] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);    
     buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    return sendMessage(buf,MESSAGE_SIZE,id);
+    return sendMessage(buf,MESSAGE_SIZE,nodeid);
 }
 
-bool CSRD::sendCarAutoEnum(uint8_t id){
+bool CSRD::sendCarAutoEnum(uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = BR_CAR_AUTO_ENUM;
-    buf[1] = id;
-    buf[2] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
     buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    return sendMessage(buf,MESSAGE_SIZE,id);
+    return sendMessage(buf,MESSAGE_SIZE,nodeid);
 }
 
-bool CSRD::sendId(uint8_t id){
+bool CSRD::sendNodeId(uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RP_ID_RESOLUTION;
-    buf[1] = id;
-    buf[2] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
     buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    return sendMessage(buf,MESSAGE_SIZE,id);
+    return sendMessage(buf,MESSAGE_SIZE,nodeid);
 }
 
-bool CSRD::sendRCId(uint8_t id){
+bool CSRD::sendRCId(uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_ID;
-    buf[1] = id;
-    buf[2] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
     buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    return sendMessage(buf,MESSAGE_SIZE,id);
+    return sendMessage(buf,MESSAGE_SIZE,nodeid);
 }
 
-bool CSRD::sendCarId(uint8_t id){
+bool CSRD::sendCarId(uint16_t nodeid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_ID;
-    buf[1] = id;
-    buf[2] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
     buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    return sendMessage(buf,MESSAGE_SIZE,id);
+    return sendMessage(buf,MESSAGE_SIZE,nodeid);
 }
 
-bool CSRD::sendAcquire(uint8_t carid, uint8_t serverid){
+bool CSRD::sendAcquire(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_ACQUIRE;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -392,12 +461,12 @@ bool CSRD::sendAcquire(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendAcquireAck(uint8_t carid, uint8_t serverid){
+bool CSRD::sendAcquireAck(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_ACQUIRE_ACK;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid; 
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -405,12 +474,25 @@ bool CSRD::sendAcquireAck(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarRelease(uint8_t carid, uint8_t serverid){
+bool CSRD::sendAcquireNAck(uint16_t nodeid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = CAR_ACQUIRE_NACK;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid; 
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendCarRelease(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_RELEASE;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -418,12 +500,12 @@ bool CSRD::sendCarRelease(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarReleaseAck(uint8_t carid, uint8_t serverid){
+bool CSRD::sendCarReleaseAck(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_RELEASE_ACK;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -431,12 +513,38 @@ bool CSRD::sendCarReleaseAck(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarKeepAlive(uint8_t carid, uint8_t serverid){
+bool CSRD::sendRCCarRegister(uint16_t nodeid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_CAR_REGISTER;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendRCCarRegisterAck(uint16_t nodeid, uint8_t serverid){
+    uint8_t buf[MESSAGE_SIZE];
+    buf[0] = RC_CAR_REGISTER_ACK;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    return sendMessage(buf,MESSAGE_SIZE,serverid);
+}
+
+bool CSRD::sendCarKeepAlive(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = CAR_KEEP_ALIVE;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -444,12 +552,12 @@ bool CSRD::sendCarKeepAlive(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendRCKeepAlive(uint8_t carid, uint8_t serverid){
+bool CSRD::sendRCKeepAlive(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_KEEP_ALIVE;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -457,12 +565,12 @@ bool CSRD::sendRCKeepAlive(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid){
+bool CSRD::sendCarLightOnOff(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_LIGHTS;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -470,12 +578,12 @@ bool CSRD::sendCarLightOnOff(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid){
+bool CSRD::sendCarBreakLightOnOff(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_BREAK_LIGHTS;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -483,12 +591,12 @@ bool CSRD::sendCarBreakLightOnOff(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendStopCar(uint8_t carid, uint8_t serverid){
+bool CSRD::sendStopCar(uint16_t nodeid, uint8_t serverid){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_STOP_CAR;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;    
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
@@ -496,51 +604,51 @@ bool CSRD::sendStopCar(uint8_t carid, uint8_t serverid){
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendRCMove(uint8_t carid, uint8_t serverid,uint8_t speed, uint8_t direction){
+bool CSRD::sendRCMove(uint16_t nodeid, uint8_t serverid,uint8_t speed, uint8_t direction){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_MOVE;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = speed;
-    buf[4] = direction;
-    buf[5] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;
+    buf[4] = speed;
+    buf[5] = direction;    
     buf[6] = 0;
     buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendRCTurn(uint8_t carid, uint8_t serverid,uint8_t angle, uint8_t direction){
+bool CSRD::sendRCTurn(uint16_t nodeid, uint8_t serverid,uint8_t angle, uint8_t direction){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = RC_TURN;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = angle;
-    buf[4] = direction;
-    buf[5] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;
+    buf[4] = angle;
+    buf[5] = direction;    
     buf[6] = 0;
     buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendSaveParam(uint8_t carid, uint8_t serverid, uint8_t idx, uint8_t value){
+bool CSRD::sendSaveParam(uint16_t nodeid, uint8_t serverid, uint8_t idx, uint8_t value){
     uint8_t buf[MESSAGE_SIZE];
     buf[0] = SAVE_PARAM;
-    buf[1] = carid;
-    buf[2] = serverid;
-    buf[3] = idx;
-    buf[4] = value;
-    buf[5] = 0;
+    buf[1] = highByte(nodeid);
+    buf[2] = lowByte(nodeid);
+    buf[3] = serverid;
+    buf[4] = idx;
+    buf[5] = value;    
     buf[6] = 0;
     buf[7] = 0;
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-uint8_t CSRD::getId(){
-   return buffer[1];
+uint16_t CSRD::getNodeId(){
+   return word(buffer[1],buffer[2]);
 }
 
-uint8_t CSRD::getServerId(){
-   return buffer[2];
+uint16_t CSRD::getServerId(){
+   return buffer[3];
 }
 
 uint8_t CSRD::getByte(uint8_t idx){
@@ -561,61 +669,16 @@ uint8_t CSRD::getMessageBuffer(uint8_t *mbuffer){
     return MESSAGE_SIZE;
 }
 
-bool CSRD::readMessage(){
+uint8_t CSRD::getAngle(){
+   return buffer[4];
+}
 
+uint8_t CSRD::getSpeed(){
+   return buffer[4];
+}
 
-    // Wait for a message addressed to us from the client
-    //if (isRadioOn())
-    //{
-        uint8_t from;
-        uint8_t len=radioBuffSize;
-
-        if (manager!=NULL){
-
-                if (manager->recvfromAck(buf, &len, &from))
-                {
-                    #ifdef CSRD_DEBUG
-                      Serial.print("got request from : 0x");
-                      Serial.print(from, HEX);
-                      Serial.print(": ");
-                      Serial.print(" size: ");
-                      Serial.println(length);
-                      Serial.println((char*)buf);
-                    #endif // CSRD_DEBUG
-
-                    //we expect 8 bytes
-                    if (length>MESSAGE_SIZE){
-                        #ifdef CSRD_DEBUG
-                          Serial.print("message bigger than expected: ");
-                          Serial.println(length);
-                        #endif // CSRD_DEBUG
-                        return false;
-                    }
-                    length=len;
-                    if (length>0){
-                        memset(buffer,'\0',MESSAGE_SIZE);
-                        memcpy(buffer,buf,MESSAGE_SIZE);
-                        origin=from;
-                        return true;
-                    }
-                }
-            }
-
-        else {
-            //driver->setModeRx();
-            if (driver->recv(buf,&len)){
-                length=len;
-                if (length>0){
-                    memset(buffer,'\0',MESSAGE_SIZE);
-                    memcpy(buffer,buf,MESSAGE_SIZE);
-                    origin=from;
-                    return true;
-                }
-            }
-        }
-
-  //}
-    return false;
+uint8_t CSRD::getDirection(){
+   return buffer[5];
 }
 
 bool CSRD::isRadioOn(){
@@ -669,6 +732,19 @@ bool CSRD::isAcquire(){
 
 bool CSRD::isAcquireAck(){
     return (buffer[0] == CAR_ACQUIRE_ACK);
+}
+
+bool CSRD::isRCCarRegister(){
+    return (buffer[0] == RC_CAR_REGISTER);
+}
+
+bool CSRD::isRCCarRegisterAck(){
+    return (buffer[0] == RC_CAR_REGISTER_ACK);
+}
+
+
+bool CSRD::isAcquireNAck(){
+    return (buffer[0] == CAR_ACQUIRE_NACK);
 }
 
 bool CSRD::isCarRelease(){
@@ -839,38 +915,26 @@ uint8_t CSRD::getGroup(){
 
 
 uint8_t CSRD::getParamIdx(){
-    if (isSaveParam()){
-        return buffer[3];
-    }
-    else if (isAddressed()){
+    if (isAddressed()){
         return buffer[5];
     }
     return buffer[4];
 }
 
 uint8_t CSRD::getVal0(){
-    if (isSaveParam()){
-        return buffer[4];
-    }
-    else if (isAddressed() && !isStatus() ){
+    if (isAddressed() && !isStatus() ){
         return buffer[6];
     }
     return buffer[5];
 }
 uint8_t CSRD::getVal1(){
-    if (isSaveParam()){
-        return buffer[5];
-    }
-    else if (isAddressed() && !isStatus() ){
+    if (isAddressed() && !isStatus() ){
         return buffer[7];
     }
     return buffer[6];
 }
 uint8_t CSRD::getVal2(){
-    if (isSaveParam()){
-        return buffer[6];
-    }
-    else if (isAddressed() && !isStatus()){
+    if (isAddressed() && !isStatus()){
         return RP_FILLER;
     }
     return buffer[7];

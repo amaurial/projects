@@ -21,6 +21,9 @@
 #define RC_STOP_CAR         16
 #define RC_MOVE             17
 #define RC_TURN             18
+#define CAR_ACQUIRE_NACK    19
+#define RC_CAR_REGISTER     20
+#define RC_CAR_REGISTER_ACK 21
 
 #define RP_WRITE        0 //write data to eprom
 #define RP_OPERATION    1 //controls the changes in states
