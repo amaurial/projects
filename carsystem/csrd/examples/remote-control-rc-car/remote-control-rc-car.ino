@@ -20,7 +20,7 @@
 #include <Wire.h>
 #include <EEPROM.h>
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define apin A0
 

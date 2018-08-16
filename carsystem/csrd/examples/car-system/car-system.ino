@@ -1,3 +1,18 @@
+/*
+ The code implements a machine state with states
+ ACTIVE=0,
+ INACTIVE,
+ CHARGING,
+ PANNE,
+ REGISTERED,
+ NOT_REGISTERED,
+ WAITING_REGISTRATION
+ The firs state is NOT_REGISTERED
+ NOT_REGISTERED -> triggers sendRegistrationMessage -> WAITING_REGISTRATION
+ WAITING_REGISTRATION -> triggers sendRegistrationMessage if timeout, confirmRegistrationMessage
+ if registration is confirmed state -> ACTIVE
+
+*/
 
 #include "Arduino.h"
 #include <csrd.h>
@@ -6,9 +21,8 @@
 #include <SPI.h>
 #include <EEPROM.h>
 #include <SoftPWM.h>
-
 //uncomment for debug message
-//#define DEBUG_CAR 1;
+#define DEBUG_CAR 1;
 
 //PINS
 #define FRONT_LIGHT_PIN           7//A1
@@ -20,19 +34,20 @@
 #define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A6//A3
 #define BATTERY_PIN               A7//A5
-#define IR_RECEIVE_PIN            6 //AUX3
-#define IR_SEND_PIN               A5 //AUX4
+#define IR_RECEIVE_PIN            A5 //AUX3
+#define IR_SEND_PIN               6 //AUX4
 #define CHARGER_PIN               A1
 
 #define BAT_FULL_LEVEL            610 //analog read equivalent to 4V
 #define BAT_LEVEL_READ            680 //by tests 688 the motor stops
 
-#define MAXPARAMS                 5
+#define MAXPARAMS                 5 //Maximum number of parameters for each element
 
-#define MEMORY_REF                23
+#define MEMORY_REF                23 //start of the memory
 #define EPROM_SIZE                512
 
-typedef struct ELEMENTS *ELEMENT;
+//holds the configuration and dynamic data of each element: motor and lights
+typedef struct ELEMENTS *ELEMENT; 
 
 //pointer to the functions that will control the parts
 //actual state,next state, parameters,type,num parameters
@@ -40,21 +55,21 @@ typedef void(*controllers)(ELEMENT);
 
 //structure that holds all important data
 typedef struct ELEMENTS {
-  states state;
-  states next;
-  states tempState;
-  states lastState;
+  states state;      //the current element state
+  states next;       //the current element state
+  states tempState;  //temporary element state
+  states lastState;  //the last element state
   states auxState;
   objects_enum obj;
   byte params[MAXPARAMS];
   byte total_params;
   controllers controller;
   long auxTime;
-  byte port;
+  byte port;          //the hardware port
   byte actual_pwm_val;
 };
 //number of elements
-#define NUM_ELEMENTS 9
+#define NUM_ELEMENTS 9    // the elements: motor, lights, ir sensor, reed sensor
 struct ELEMENTS elements[NUM_ELEMENTS];
 
 //dynamic values
@@ -89,19 +104,20 @@ uint8_t recbuffer[MESSAGE_SIZE];
 STATUS status;
 
 //node number and group
-uint16_t nodeid = 999;
-uint8_t group = 1;
-uint8_t serverStation = 1;
+uint16_t nodeid = 999;     // each car has a node_id
+uint8_t group = 1;         // the cars can be organized as group
+uint8_t serverStation = 1; // and can be several server stations
 
 //message flag
 bool newMessage = false;
 
-//time variables
+// time variables
+// every car sends a registration from time to time
 long refresh_registration;
 long last_registration;
 
 //functions to control the elements
-void controlBreakLeds(ELEMENTS * element);
+//void controlBreakLeds(ELEMENTS * element);
 void controlBlinkLed(ELEMENTS * element);
 void controlMotor(ELEMENTS * element);
 void controlAux(ELEMENTS * element);
@@ -116,25 +132,25 @@ void printStatus() {
 
   switch (status) {
     case WAITING_REGISTRATION:
-      Serial.println("status WAITING_REGISTRATION");
+      Serial.println(F("status WAITING_REGISTRATION"));
       break;
     case ACTIVE:
-      Serial.println("status ACTIVE");
+      Serial.println(F("status ACTIVE"));
       break;
     case NOT_REGISTERED:
-      Serial.println("status NOT_REGISTERED");
+      Serial.println(F("status NOT_REGISTERED"));
       break;
     case INACTIVE:
-      Serial.println("status INACTIVE");
+      Serial.println(F("status INACTIVE"));
       break;
     case CHARGING:
-      Serial.println("status CHARGING");
+      Serial.println(F("status CHARGING"));
       break;
     case PANNE:
-      Serial.println("status PANNE");
+      Serial.println(F("status PANNE"));
       break;
     case REGISTERED:
-      Serial.println("status REGISTERED");
+      Serial.println(F("status REGISTERED"));
       break;
   }
 
@@ -158,9 +174,11 @@ void setup() {
   else{
     nodeid=n;
   }
+  //library that controls the motor
   SoftPWMBegin();
 
-  //if (!car.init(&driver,&manager)){
+  //if (!car.init(&driver,&manager)){ //this is sort of tcp library
+  // initialize the library
   for (byte a=0;a<10;a++){
     if (car.init(&driver, NULL)) {
         r=true;
@@ -170,7 +188,7 @@ void setup() {
    }
    
    if (r==false) {
-    Serial.println("FAILED THE RADIO");
+    Serial.println(F("FAILED THE RADIO"));
     //turn on the sirene to blink indicating failure
     elements[SIRENE_LIGHT].next = BLINKING;
   }
@@ -182,12 +200,12 @@ void setup() {
   initElements();
   randomSeed(analogRead(A0));
   refresh_registration = random(200, 5000);
-  Serial.println("START CLIENT");
+  Serial.println(F("START CLIENT"));
 }
 
 void loop() {
 
-    actime = millis();
+    actime = millis();    
 
     //carry the active actions
     //if (status == ACTIVE) {
@@ -223,8 +241,7 @@ void loop() {
     //msamples++;
     //motor_rotation = (motor_rotation + analogRead(MOTOR_ROTATION_PIN))/2.0;
     dvalues[1] = analogRead(MOTOR_ROTATION_PIN);    
-    checkBattery();
-   
+    checkBattery();   
 }
 
 /*
@@ -234,11 +251,11 @@ void loop() {
 void dumpMessage() {
 
 	#ifdef DEBUG_CAR  
-	  Serial.println("New Message");
+	  Serial.println(F("New Message"));
 	  car.getMessageBuffer(recbuffer);
 	  for (byte i = 0; i < MESSAGE_SIZE; i++) {
-	    Serial.print (recbuffer[i]);
-	    Serial.print ("   ");
+	    Serial.print(recbuffer[i]);
+	    Serial.print(F("   "));
 	  }
 	  Serial.println();
 	#endif
@@ -248,7 +265,7 @@ void dumpMessage() {
 void checkMsgRestoreDefault(){  
     if (car.isRestoreDefaultConfig(nodeid)){
        #ifdef DEBUG_CAR
-            Serial.println("Restore default values");
+            Serial.println(F("Restore default values"));
       #endif
        setDefaultParams();
        initElements();
@@ -258,11 +275,11 @@ void checkMsgRestoreDefault(){
 //confirm we received a registration
 void confirmRegistrationMessage(){
   if (status == WAITING_REGISTRATION) {      
-
+    //this is registration return message
     if (car.isStatus() && car.getNodeNumber() == serverStation && car.getStatus() == ACTIVE) {
       status = ACTIVE;
       #ifdef DEBUG_CAR
-            Serial.println("STATUS ACTIVE");
+            Serial.println(F("STATUS ACTIVE"));
       #endif
     }
   }
@@ -270,11 +287,13 @@ void confirmRegistrationMessage(){
 }
 
 //check broadcast register
+// the stations sends register from time to time
+// this is a way to force re registrations
 void checkBroadcastRegister(){
   if (car.isBroadcastRegister() && car.isMyGroup(group) ){
      //set the timer
      #ifdef DEBUG_CAR
-            Serial.println("BREG received status WAITING REG");
+            Serial.println(F("BREG received status WAITING REG"));
       #endif
      status = WAITING_REGISTRATION;
       //set timer
@@ -293,25 +312,25 @@ void sendRegistrationMessage(){
           #ifdef DEBUG_CAR
           /*
              Serial.println();
-             Serial.println("Need to register?");
+             Serial.println(F("Need to register?"));
              //printStatus();
-             Serial.print("new message: ");
+             Serial.println(F("new message: "));
              Serial.println(newMessage);
-             Serial.print("broadcast reg: ");
+             Serial.println(F("broadcast reg: "));
              Serial.println(car.isBroadcastRegister());
-             Serial.print("is my group: ");
+             Serial.println(F("is my group: "));
              Serial.println(car.isMyGroup(group));
-             Serial.print("refresh registration time: ");
+             Serial.println(F("refresh registration time: "));
              Serial.print(actime - last_registration);
-             Serial.print("\t");
+             Serial.println(F("\t"));
              Serial.println(refresh_registration);   
              Serial.println();
-              Serial.println("Sending initial registration data");
+              Serial.println(F("Sending initial registration data"));
            */   
           #endif
       //send message. change the status
       #ifdef DEBUG_CAR
-            Serial.println("send REG request");
+            Serial.println(F("send REG request"));
       #endif
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
       status = WAITING_REGISTRATION;
@@ -321,7 +340,7 @@ void sendRegistrationMessage(){
       last_registration = millis();
      
       #ifdef DEBUG_CAR
-          //Serial.println("STATUS WAITING REGISTRATION");
+          //Serial.println(F("STATUS WAITING REGISTRATION"));
       #endif
   }
 }
@@ -364,21 +383,7 @@ void checkAction(){
                else {
                   //TODO
                }
-          }
-
-          if (action == AC_SET_PARAM){
-              e = car.getElement();
-              p = car.getParamIdx();
-              v = car.getVal0();                 
-              if (e == MOTOR && e == 0) {   
-                  SoftPWMSetFadeTime(elements[e].port, 0, 0);
-                  //SoftPWMSet(elements[idx].port, init_val); 
-                  //setPWM(e,elements[e].actual_pwm_val,0,0);                   
-                  SoftPWMSetPercent(elements[e].port,v);
-                  return;
-              }
-          }
-                    
+          }                    
        }
     }
 }
@@ -479,7 +484,7 @@ void checkMsgWriteParameter(){
                        SoftPWMSetFadeTime(elements[e].port, aux, aux1);
                        
                        if ((e == MOTOR) && (elements[e].state == ON)) {    
-                          Serial.println("Change motor speed");
+                          Serial.println(F("Change motor speed"));
                           SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
                           return;
                        } 
@@ -575,12 +580,12 @@ void controlBoard(states s){
           }          
           break;
         case (NIGHT):        
-          //Serial.println("night");            
+          //Serial.println(F("night"));            
           elements[BREAK_LIGHT].next = ON;          
           elements[FRONT_LIGHT].next = ON;
           break; 
         case (DAY):           
-          //Serial.println("day");          
+          //Serial.println(F("day"));          
           elements[BREAK_LIGHT].next = OFF;          
           elements[FRONT_LIGHT].next = OFF;
           break; 
@@ -703,13 +708,13 @@ void setDefaultParams(){
 
 void setInitParams(){
   #ifdef DEBUG_CAR
-  Serial.println("Loading from eprom");
+  Serial.println(F("Loading from eprom"));
   #endif
   byte i = 0;
   for (i = 0; i < NUM_ELEMENTS; i++) {
-      Serial.println("get epron");
+      Serial.println(F("get epron"));
       if ((getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
-        Serial.print("Failed to load eprom for element ");
+        Serial.println(F("Failed to load eprom for element "));
         Serial.println(i);
       }
       #ifdef DEBUG_CAR        
@@ -720,25 +725,25 @@ void setInitParams(){
 
 void dumpParameters(){
   for (byte i=0;i<NUM_ELEMENTS;i++){
-    Serial.print("params element: ");
+    Serial.println(F("params element: "));
     Serial.print(i);
-    Serial.print("\t");
+    Serial.println(F("\t"));
     for (byte j=0;j<elements[i].total_params;j++){
       Serial.print(elements[i].params[j]);
-      Serial.print("\t");
+      Serial.println(F("\t"));
     }
     Serial.println();
   }
 }
 
 void setPWM(byte idx,byte init_val,int p1, int p2){  
-  Serial.println("pwm");    
+  Serial.println(F("pwm"));    
   SoftPWMSetFadeTime(elements[idx].port, p1, p2);
   SoftPWMSet(elements[idx].port, init_val);  
 }
 
 void initElements() {
-  Serial.println("Ini elements");
+  Serial.println(F("Ini elements"));
   elements[MOTOR].total_params = 4;
   elements[FRONT_LIGHT].total_params = 4;
   elements[BREAK_LIGHT].total_params = 4;
@@ -751,7 +756,7 @@ void initElements() {
   setInitParams();
 
   //set initial state
-  Serial.println("all OFF");
+  Serial.println(F("all OFF"));
   byte j;
   for (j=0;j<NUM_ELEMENTS;j++){
     elements[j].state = OFF;
@@ -760,7 +765,7 @@ void initElements() {
   byte i = MOTOR;
   int aux, aux1;
   //motor  
-  Serial.println("set motor");
+  Serial.println(F("set motor"));
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
   elements[i].port = MOTOR_PIN;  
@@ -827,7 +832,7 @@ void initElements() {
   elements[i].port = IR_SEND_PIN;
   elements[i].controller = &controlAux; 
   //elements[i].total_params = 1;
-  Serial.println("all set");
+  Serial.println(F("all set"));
 }
 
 void controlAux(ELEMENTS * element) {
@@ -871,7 +876,7 @@ void controlReed(ELEMENTS * element) {
             }
          }
     break;
-    case (1)://blinking
+    case (1)://blinking maybe need change
          if (element->state == ON ){            
             if (element->lastState != ON){
               element->lastState = ON;              
@@ -891,8 +896,9 @@ void controlReed(ELEMENTS * element) {
   return;
 }
 
+/*
 void controlBreakLeds(ELEMENTS * element) {
-  //Serial.println("controlBreakLeds");
+  //Serial.println(F("controlBreakLeds"));
   long t;
   byte aux;
   t = millis();
@@ -903,6 +909,7 @@ void controlBreakLeds(ELEMENTS * element) {
     elements->actual_pwm_val = 0;
     SoftPWMSetPercent(element->port, 0);
   }
+
   if (element->state == OFF && element->next == ON) {
     element->lastState = element->state;
     element->state = ON;
@@ -918,7 +925,7 @@ void controlBreakLeds(ELEMENTS * element) {
   }
 
   if (element->state == BLINKING ) {
-    //Serial.println("blinking");
+    //Serial.println(F("blinking"));
     if (t > element->auxTime) {
       element->auxTime = t + element->params[1] * element->params[2];
       if (element->tempState == OFF) {
@@ -940,6 +947,7 @@ void controlBreakLeds(ELEMENTS * element) {
     elements->actual_pwm_val = element->params[0];
     SoftPWMSetPercent(element->port, element->params[0]);
   }
+
   if (element->next == ON) {
     element->lastState = element->state;
     element->state = OFF;
@@ -949,8 +957,10 @@ void controlBreakLeds(ELEMENTS * element) {
   }
 
 }
+*/
+
 void controlBlinkLed(ELEMENTS * element) {
-  //Serial.println("controlBlinkLed");
+  //Serial.println(F("controlBlinkLed"));
   long t;
   byte aux;
   t = millis();
@@ -1005,7 +1015,7 @@ void controlMotor(ELEMENTS * element) {
   long t;
   byte aux;
 
-  //Serial.println("controlMotor");
+  //Serial.println(F("controlMotor"));
   t = millis();
   if (element->state == ON && element->next == OFF) {
     element->lastState = element->state;
@@ -1078,22 +1088,22 @@ uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
     #ifdef DEBUG_CAR
-          Serial.println("Failed to get eprom. eprom size");
+          Serial.println(F("Failed to get eprom. eprom size"));
     #endif
     return 2;
   }
-  //Serial.print("getting element:");
+  //Serial.println(F("getting element:"));
   //Serial.print(obj);
   //Serial.println();
   for (i = 0; i < numParams; i++) {
     val = EEPROM.read(startpos + i);
     params[i] = val;
     //Serial.print(i);
-    //Serial.print("\t");
+    //Serial.println(F("\t"));
     //Serial.print(val);
-    //Serial.print(" pos:");
+    //Serial.println(F(" pos:"));
     //Serial.print(startpos + i);
-    //Serial.print("\t");
+    //Serial.println(F("\t"));
   }
   //Serial.println();
 return 0;
@@ -1104,7 +1114,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
     #ifdef DEBUG_CAR
-         // Serial.println("Failed to save to eprom maxparam");
+         // Serial.println(F("Failed to save to eprom maxparam"));
      #endif
     return 1;
   }
@@ -1114,20 +1124,20 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
     #ifdef DEBUG_CAR
-          //Serial.println("Failed to save to eprom. eprom size");
+          //Serial.println(F("Failed to save to eprom. eprom size"));
     #endif
     return 2;
   }
-  //Serial.print("saving element:");
+  //Serial.println(F("saving element:"));
   //Serial.print(obj);
   //Serial.println();
   for (i = 0; i < numParams; i++) {    
     //Serial.print(i);
-    //Serial.print("\t");
+    //Serial.println(F("\t"));
     //Serial.print(params[i]);
-    //Serial.print(" pos:");
+    //Serial.println(F(" pos:"));
     //Serial.print(startpos + i);
-    //Serial.print("\t");
+    //Serial.println(F("\t"));
  
     EEPROM.write(startpos + i, params[i]);    
   }

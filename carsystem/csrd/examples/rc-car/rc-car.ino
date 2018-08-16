@@ -1,3 +1,6 @@
+/*
+* This code is for the remote control car with remote  controller
+*/
 #include "Arduino.h"
 #include <SPI.h>
 #include <csrd.h>
@@ -11,7 +14,7 @@
 #define apin A0
 
 //uncomment for debug message
-#define DEBUG_CAR 1;
+//#define DEBUG_CAR 1;
 
 CSRD car;
 RH_RF69 driver(10,2);
@@ -163,7 +166,7 @@ void setup(){
 
   if (!r){
     #ifdef DEBUG_CAR
-    Serial.println("FAILED");
+    Serial.println(F("FAILED"));
     #endif
   }
   driver.setTxPower(13);
@@ -199,14 +202,14 @@ void setup(){
   t3 = t1 - RC_TIMEOUT;//just to guarantee we send it as fast as we can
 
   #ifdef DEBUG_CAR
-  Serial.print("random id: ");Serial.println(id);
+  Serial.print(F("random id: "));Serial.println(id);
   #endif
 
   t = random(0, 2000);
 
   //retry timer
   #ifdef DEBUG_CAR
-  Serial.print("random retry timer: ");Serial.println(t);
+  Serial.print(F("random retry timer: "));Serial.println(t);
   #endif
 
    /*
@@ -233,7 +236,7 @@ void loop(){
   #ifdef DEBUG_CAR
     printMessageType(car.getByte(0));
     //if (car.isRCKeepAlive()){     
-    //  Serial.print("kpa ");Serial.print(car.getId());Serial.print(" ");Serial.println(car.getServerId());    
+    //  Serial.print(F("kpa "));Serial.print(car.getId());Serial.print(F(" "));Serial.println(car.getServerId());    
     //}
   #endif
     //do auto enum on start
@@ -245,7 +248,7 @@ void loop(){
     if (isForMe()){
       
       #ifdef DEBUG_CAR
-      Serial.println("for me");
+      Serial.println(F("for me"));
       #endif
       
       if (acquired) {
@@ -254,7 +257,7 @@ void loop(){
           checkKeepAlive();
           
           #ifdef DEBUG_CAR
-          //Serial.print("sp ");Serial.println(analogRead(MOTOR_ROTATION_PIN));
+          //Serial.print(F("sp "));Serial.println(analogRead(MOTOR_ROTATION_PIN));
           #endif
           //check messages to move the car          
           if (checkMove()) tk_rc = act; 
@@ -279,7 +282,7 @@ void loop(){
       car.sendCarKeepAlive(id, rc);
       last_car_keepalive = act;
       #ifdef DEBUG_CAR
-        Serial.println("send keep alive");
+        Serial.println(F("send keep alive"));
       #endif
     }
   }
@@ -293,10 +296,10 @@ void loop(){
 
 bool isForMe(){  
    #ifdef DEBUG_CAR
-    Serial.print("nodeid ");Serial.println(car.getNodeId());
-    Serial.print("id ");Serial.println(id);
-    Serial.print("rc ");Serial.println(rc);
-    Serial.print("serverid ");Serial.println(car.getServerId());   
+    Serial.print(F("nodeid "));Serial.println(car.getNodeId());
+    Serial.print(F("id "));Serial.println(id);
+    Serial.print(F("rc "));Serial.println(rc);
+    Serial.print(F("serverid "));Serial.println(car.getServerId());   
    #endif
   return ((car.getNodeId() == id) && (rc == car.getServerId()));
 }
@@ -304,7 +307,7 @@ bool isForMe(){
 void checkSaveParam(){
   if (car.isSaveParam() && isForMe()){
         #ifdef DEBUG_CAR
-        Serial.print("trimming ");
+        Serial.print(F("trimming "));
         Serial.println(car.getParamIdx());
         #endif
         uint8_t pidx = car.getParamIdx(); 
@@ -313,7 +316,7 @@ void checkSaveParam(){
           // middle angle
           midang = car.getVal0();
           #ifdef DEBUG_CAR
-          Serial.print("trimming val ");Serial.println(midang);
+          Serial.print(F("trimming val "));Serial.println(midang);
           #endif
           if (midang >= 80 && midang <=100){
             steering.write(midang);  
@@ -342,7 +345,7 @@ void checkRelease(){
   
   if (car.isCarRelease() && isForMe()){
     #ifdef DEBUG_CAR
-    Serial.println("rec release");
+    Serial.println(F("rec release"));
     #endif
     SoftPWMSetPercent(MOTOR_PIN, 0);
     SoftPWMSetPercent(MOTOR_PIN1, 0);
@@ -350,7 +353,7 @@ void checkRelease(){
     delay(50);
     car.sendCarReleaseAck(id, rc);
     #ifdef DEBUG_CAR
-    Serial.println("send release ack");
+    Serial.println(F("send release ack"));
     #endif
     acquired = false;
   }
@@ -361,11 +364,11 @@ void checkKeepAliveTimeout(){
    
   if ((act - tk_rc) > RC_TIMEOUT){
     #ifdef DEBUG_CAR
-    Serial.println("timeout");
-    Serial.print("act ");Serial.println(act);
-    Serial.print("tkrc ");Serial.println(tk_rc);
-    Serial.print("diff ");Serial.println(act - tk_rc);
-    Serial.print("RC_TIMEOUT ");Serial.println(RC_TIMEOUT);
+    Serial.println(F("timeout"));
+    Serial.print(F("act "));Serial.println(act);
+    Serial.print(F("tkrc "));Serial.println(tk_rc);
+    Serial.print(F("diff "));Serial.println(act - tk_rc);
+    Serial.print(F("RC_TIMEOUT "));Serial.println(RC_TIMEOUT);
     #endif
     SoftPWMSetPercent(MOTOR_PIN, 0);
     SoftPWMSetPercent(MOTOR_PIN1, 0);
@@ -373,7 +376,7 @@ void checkKeepAliveTimeout(){
     delay(50);
     car.sendCarReleaseAck(id, rc);
     #ifdef DEBUG_CAR
-    Serial.println("send release ack");
+    Serial.println(F("send release ack"));
     #endif
     acquired = false;
   }
@@ -382,13 +385,13 @@ void checkKeepAliveTimeout(){
 void checkKeepAlive(){
   if (car.isRCKeepAlive()){
       #ifdef DEBUG_CAR
-      Serial.println("rec keep alive");
+      Serial.println(F("rec keep alive"));
       #endif
      if (isForMe()){
   
        tk_rc = act; //renew the last keep alive
        #ifdef DEBUG_CAR
-      Serial.println("keep alive for me");
+      Serial.println(F("keep alive for me"));
       #endif
      }
   }
@@ -398,7 +401,7 @@ void checkAcquire(){
   if (car.isAcquire() && car.getNodeId() == id && !acquired){
         //check if server is registered
         #ifdef DEBUG_CAR
-        Serial.print("rec acquire numserv ");Serial.println(car.getServerId());
+        Serial.print(F("rec acquire numserv "));Serial.println(car.getServerId());
         #endif
         
         rc = car.getServerId();        
@@ -407,7 +410,7 @@ void checkAcquire(){
             acquired = true;
             car.sendAcquireAck(id, rc);            
             #ifdef DEBUG_CAR
-            Serial.println("send acquire ack");
+            Serial.println(F("send acquire ack"));
             #endif            
             steering.write(midang);
             steering.attach(STEERING_PIN);
@@ -421,7 +424,7 @@ void checkAcquire(){
 bool checkStopCar() {
   if (car.isStopCar() && isForMe()){
         #ifdef DEBUG_CAR
-        Serial.println("stopping car");
+        Serial.println(F("stopping car"));
         #endif
         SoftPWMSetPercent(MOTOR_PIN, 0);
         SoftPWMSetPercent(MOTOR_PIN1, 0);
@@ -440,7 +443,7 @@ void resolveId(){
       sentreg = true;
       t2 = millis();
       #ifdef DEBUG_CAR
-      Serial.println("send auto enum");
+      Serial.println(F("send auto enum"));
       #endif
     }
   }    
@@ -450,7 +453,7 @@ void resolveId(){
     boolean f = true;
     
     #ifdef DEBUG_CAR
-    Serial.println ("resolving the id");
+    Serial.println ("resolving the id"));
     #endif
     
     while (f){
@@ -468,7 +471,7 @@ void resolveId(){
     }
 
     #ifdef DEBUG_CAR
-    Serial.print ("valid id: ");Serial.println(id);
+    Serial.print ("valid id: "));Serial.println(id);
     #endif
     
     resolved = true;
@@ -484,7 +487,7 @@ void checkCarAutoEnum(){
       cars[i] = car.getNodeId();
 
       #ifdef DEBUG_CAR
-      Serial.print ("received id: ");Serial.println(servers[i]);
+      Serial.print ("received id: "));Serial.println(servers[i]);
       #endif
       
       i++;
@@ -494,11 +497,11 @@ void checkCarAutoEnum(){
     if (car.isCarAutoEnum()){      
       car.sendCarId(id);
       #ifdef DEBUG_CAR
-      Serial.println("send id for autoenum");
+      Serial.println(F("send id for autoenum"));
       #endif
       
       #ifdef DEBUG_CAR
-      Serial.print ("sent my id: ");Serial.println(id);
+      Serial.print(F("sent my id: "));Serial.println(id);
       #endif
       
     }
@@ -508,14 +511,14 @@ void checkCarAutoEnum(){
       uint8_t rc = car.getNodeId();
 
       #ifdef DEBUG_CAR
-      Serial.print ("rc rec ");Serial.println(rc);
+      Serial.print(F("rc rec "));Serial.println(rc);
       #endif
       
       for (i=0; i < NUM_SERVERS; i++){
         if (servers[i] == rc){
           rc_exist = true;
           #ifdef DEBUG_CAR
-          Serial.println ("rc exist");
+          Serial.println(F("rc exist"));
           #endif
           if (numrcs == 0) numrcs++;
           break;
@@ -524,7 +527,7 @@ void checkCarAutoEnum(){
       if (!rc_exist){
         servers[numrcs] = rc;
         #ifdef DEBUG_CAR
-          Serial.print ("rc registered ");Serial.println(numrcs);
+          Serial.print(F("rc registered "));Serial.println(numrcs);
         #endif
         numrcs ++;
         if (numrcs >= NUM_SERVERS) {
@@ -543,13 +546,13 @@ void sendCarRegistration(){
     t3 = millis();
     if (!acquired){
       #ifdef DEBUG_CAR
-        Serial.println("try send reg");
+        Serial.println(F("try send reg"));
       #endif
       for (uint8_t j=0;j < numrcs; j++){
         //car.sendInitialRegisterMessage(servers[j], id, ACTIVE, 0, 0, 0);
         car.sendRCCarRegister(id, servers[j]);
         #ifdef DEBUG_CAR
-        Serial.println("send reg");
+        Serial.println(F("send reg"));
         #endif
         delay(10);//give some time between each message
       }
@@ -571,7 +574,7 @@ bool checkMove(){
         motorpin = MOTOR_PIN1;
       }
       #ifdef DEBUG_CAR
-      Serial.print("speed ");Serial.println(p_speed);
+      Serial.print(F("speed "));Serial.println(p_speed);
       #endif
       if (p_dir == lastspeed){                    
         SoftPWMSetPercent(motorpin,p_speed);                     
@@ -681,7 +684,7 @@ boolean checkAction(){
                     motorpin = MOTOR_PIN1;
                   }
                   #ifdef DEBUG_CAR
-                  Serial.print("speed ");Serial.println(v);
+                  Serial.print(F("speed "));Serial.println(v);
                   #endif
                   if (v1 == lastspeed){                    
                     SoftPWMSetPercent(motorpin,v);                     
@@ -740,7 +743,7 @@ void checkBattery(){
       if (bat_send_timer < (millis() + 5000 )){ //wait 5 sec to send again
         car.sendLowBattery(rc,id);
         #ifdef DEBUG_CAR
-        Serial.println("send low bat");
+        Serial.println(F("send low bat"));
         #endif
         bat_send_timer = millis();
       }      
@@ -748,76 +751,76 @@ void checkBattery(){
 }
 
 void printMessageType(uint8_t msgtype){
-  Serial.print("message type ");
+  Serial.print(F("message type "));
   switch (msgtype){
     case(RP_BROADCAST):
-      Serial.println("RP_BROADCAST");
+      Serial.println(F("RP_BROADCAST"));
       break;
     case(RP_ADDRESSED):
-      Serial.println("RP_ADDRESSED");
+      Serial.println(F("RP_ADDRESSED"));
       break;
     case(RP_STATUS):
-      Serial.println("RP_STATUS");
+      Serial.println(F("RP_STATUS"));
       break;
     case(RP_ID_RESOLUTION):
-      Serial.println("RP_ID_RESOLUTION");
+      Serial.println(F("RP_ID_RESOLUTION"));
       break;
     case(BR_SERVER_AUTO_ENUM):
-      Serial.println("BR_SERVER_AUTO_ENUM");
+      Serial.println(F("BR_SERVER_AUTO_ENUM"));
       break;
     case(BR_CAR_AUTO_ENUM):
-      Serial.println("BR_CAR_AUTO_ENUM");
+      Serial.println(F("BR_CAR_AUTO_ENUM"));
       break;
     case(RC_ID):
-      Serial.println("RC_ID");
+      Serial.println(F("RC_ID"));
       break;
     case(CAR_ID):
-      Serial.println("CAR_ID");
+      Serial.println(F("CAR_ID"));
       break;
     case(CAR_ACQUIRE):
-      Serial.println("CAR_ACQUIRE");
+      Serial.println(F("CAR_ACQUIRE"));
       break;
     case(CAR_RELEASE):
-      Serial.println("CAR_RELEASE");
+      Serial.println(F("CAR_RELEASE"));
       break;
     case(CAR_ACQUIRE_ACK):
-      Serial.println("CAR_ACQUIRE_ACK");
+      Serial.println(F("CAR_ACQUIRE_ACK"));
       break;
     case(CAR_RELEASE_ACK):
-      Serial.println("CAR_RELEASE_ACK");
+      Serial.println(F("CAR_RELEASE_ACK"));
       break;
     case(CAR_KEEP_ALIVE):
-      Serial.println("CAR_KEEP_ALIVE");
+      Serial.println(F("CAR_KEEP_ALIVE"));
       break;
     case(RC_KEEP_ALIVE):
-      Serial.println("RC_KEEP_ALIVE");
+      Serial.println(F("RC_KEEP_ALIVE"));
       break;
     case(SAVE_PARAM):
-      Serial.println("SAVE_PARAM");
+      Serial.println(F("SAVE_PARAM"));
       break;
     case(RC_LIGHTS):
-      Serial.println("RC_LIGHTS");
+      Serial.println(F("RC_LIGHTS"));
       break;
     case(RC_BREAK_LIGHTS):
-      Serial.println("RC_BREAK_LIGHTS");
+      Serial.println(F("RC_BREAK_LIGHTS"));
       break;
     case(RC_STOP_CAR):
-      Serial.println("RC_STOP_CAR");
+      Serial.println(F("RC_STOP_CAR"));
       break;
     case(RC_MOVE):
-      Serial.println("RC_MOVE");
+      Serial.println(F("RC_MOVE"));
       break;
     case(RC_TURN):
-      Serial.println("RC_TURN");
+      Serial.println(F("RC_TURN"));
       break;
     case(CAR_ACQUIRE_NACK):
-      Serial.println("CAR_ACQUIRE_NACK");
+      Serial.println(F("CAR_ACQUIRE_NACK"));
       break;
     case(RC_CAR_REGISTER):
-      Serial.println("RC_CAR_REGISTER");
+      Serial.println(F("RC_CAR_REGISTER"));
       break;
     case(RC_CAR_REGISTER_ACK):
-      Serial.println("RC_CAR_REGISTER_ACK");
+      Serial.println(F("RC_CAR_REGISTER_ACK"));
       break;           
   }
   

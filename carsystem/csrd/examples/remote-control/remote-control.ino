@@ -1,12 +1,37 @@
+/*
+* Arduino remote to control for the RC car
+* This is another arduino that receives serial input to
+* command the cars
+* see getSerialCommand for command examples
+* elements:
+* LEFT_LIGHT=0,
+  RIGHT_LIGHT,//1
+  BREAK_LIGHT,//2
+  REED,//3
+  SIRENE_LIGHT,//4
+  FRONT_LIGHT,//5
+  MOTOR,//6
+  IR_RECEIVE,//7
+  IR_SEND,//8
+  BOARD=9
+  status
+  OFF=0,
+   ON,//1
+   STOPING,//2
+   ACCELERATING,//3
+   BLINKING,//4
+   EMERGENCY,//5
+   NORMAL,//6
+   NIGHT,//7
+   DAY,//8
+   ALL_BLINKING//9
+*/
+
 #include "Arduino.h"
 #include <SPI.h>
 #include <csrd.h>
 #include <RH_RF69.h>
 #include <RHReliableDatagram.h>
-
-#define POT_PIN;
-#define LCD_PIN;
-#define POWER_LED
 
 CSRD server;
 RH_RF69 driver;
@@ -359,7 +384,7 @@ bool getSerialCommand(){
           return server.sendAddressedReadMessage(serverId,id,charToInt(serbuf[5]),charToInt(serbuf[6]));
       }
       if (serbuf[1] == 'O' || serbuf[1] == 'o') {
-          //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=ON
+          //example: AO33360 -> A=addressed O=operation 333=node 6=element_motor 0=OFF
           //bool sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1);
           //Serial.println("C AO");
            Serial.println("Send addressed operation");
@@ -411,51 +436,4 @@ uint16_t getNN(byte *snn){
 byte charToInt(byte v){
     return v - '0';
 }
-
-//specific for car movements
-//move forward or reverse
-byte moveCar(byte carIndex,byte direction,byte speed ){
-    ACTIONS ac;
-    ac = direction>0?AC_MOVE_FORWARD:AC_MOVE_BACKWARD;
-    server.sendAddressedActionMessage(serverId, cars[carIndex].carid, BOARD,ac,speed,0);
-}
-
-//direction = 0 LEFT 1 RIGHT
-byte turnCar(byte carIndex,byte direction,byte angle){
-    ACTIONS ac;
-    ac = direction>0?AC_TURN_RIGHT:AC_TURN_LEFT;
-    server.sendAddressedActionMessage(serverId, cars[carIndex].carid, BOARD,ac,angle,0);
-}
-
-//aquire car
-byte acquireCar(byte carIndex){
-    server.sendAddressedActionMessage(serverId, cars[carIndex].carid, BOARD,AC_ACQUIRE,0,0);
-}
-
-byte releaseCar(byte carIndex){
-    server.sendAddressedActionMessage(serverId, cars[carIndex].carid, BOARD,AC_RELEASE,0,0);
-}
-
-//car blink ligths
-//direction = 0 LEFT 1 RIGHT
-byte blinkCar(byte carIndex,byte direction, byte on){
-    states ac;
-    objects_enum e;
-    ac = on>0?ON:OFF;
-    e = direction>0?RIGHT_LIGHT:LEFT_LIGHT;
-    return server.sendAddressedOPMessage(serverId, cars[carIndex].carid, e ,ac,0,0);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 

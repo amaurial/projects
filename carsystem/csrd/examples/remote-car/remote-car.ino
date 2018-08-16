@@ -1,3 +1,8 @@
+/*
+* The code that controls the remote car that goes on the magnet
+* equivalent to the Faller car system
+*/
+
 #include "Arduino.h"
 #include <csrd.h>
 #include <RHReliableDatagram.h>
@@ -194,7 +199,7 @@ void setup() {
    
   if (r==false) {
     #ifdef DEBUG_CAR
-    Serial.println("FAILED THE RADIO");
+    Serial.println(F("FAILED THE RADIO"));
     #endif
     //turn on the sirene to blink indicating failure
     elements[SIRENE_LIGHT].next = BLINKING;
@@ -208,7 +213,7 @@ void setup() {
   refresh_registration = random(200, 5000);
   
   #ifdef DEBUG_CAR
-  Serial.println("START CLIENT");
+  Serial.println(F("START CLIENT"));
   #endif
 }
 
@@ -262,11 +267,11 @@ void loop() {
 */
 #ifdef DEBUG_CAR
 void dumpMessage() {	  
-	  Serial.println("New Message");
+	  Serial.println(F("New Message"));
 	  car.getMessageBuffer(recbuffer);
 	  for (byte i = 0; i < MESSAGE_SIZE; i++) {
-	    Serial.print (recbuffer[i]);
-	    Serial.print ("   ");
+	    Serial.print(recbuffer[i]);
+	    Serial.print(F("   "));
 	  }
 	  Serial.println();	
 }
@@ -276,7 +281,7 @@ void dumpMessage() {
 void checkMsgRestoreDefault(){  
     if (car.isRestoreDefaultConfig(nodeid)){
        #ifdef DEBUG_CAR
-            Serial.println("Restore default values");
+            Serial.println(F("Restore default values"));
       #endif
        setDefaultParams();
        initElements();
@@ -290,7 +295,7 @@ void confirmRegistrationMessage(){
     if (car.isStatus() && car.getNodeNumber() == serverStation && car.getStatus() == ACTIVE) {
       status = ACTIVE;
       #ifdef DEBUG_CAR
-            Serial.println("STATUS ACTIVE");
+            Serial.println(F("STATUS ACTIVE"));
       #endif
     }
   }
@@ -301,7 +306,7 @@ void checkBroadcastRegister(){
   if (car.isBroadcastRegister() && car.isMyGroup(group) ){
      /* set the timer */
      #ifdef DEBUG_CAR
-            Serial.println("BREG received status WAITING REG");
+            Serial.println(F("BREG received status WAITING REG"));
       #endif
      status = WAITING_REGISTRATION;
       /* set timer */
@@ -319,7 +324,7 @@ void sendRegistrationMessage(){
           
       /* send message. change the status */
       #ifdef DEBUG_CAR
-            Serial.println("send REG request");
+            Serial.println(F("send REG request"));
       #endif
       car.sendInitialRegisterMessage(serverStation, nodeid, ACTIVE, 0, 0, 0);
       status = WAITING_REGISTRATION;
@@ -462,13 +467,13 @@ void checkAction(){
 void checkQuery(){  
     if (car.isStatus()){
       #ifdef DEBUG_CAR
-        Serial.println("st msg");
+        Serial.println(F("st msg"));
       #endif
        if ( car.getNodeNumber() == nodeid ){
 	        uint8_t sttype=car.getStatusType();          
           if (sttype == STT_QUERY_VALUE){
               #ifdef DEBUG_CAR
-                Serial.println("qry msg");
+                Serial.println(F("qry msg"));
               #endif
               uint8_t e = car.getElement();
               uint8_t p0 = car.getVal0();
@@ -493,7 +498,7 @@ void checkQuery(){
                       */
                       byte bperc = (byte)(100*((BAT_LEVEL_READ - dvalues[p0])/(float)(BAT_LEVEL_READ-BAT_FULL_LEVEL)));
                       #ifdef DEBUG_CAR
-                         Serial.println("Send battery msg");
+                         Serial.println(F("Send battery msg"));
                       #endif
                       byte v= dvalues[p1]*0.049;    
                      
@@ -666,12 +671,12 @@ void controlBoard(states s){
           }          
           break;
         case (NIGHT):        
-          //Serial.println("night");            
+          //Serial.println(F("night"));            
           elements[BREAK_LIGHT].next = ON;          
           elements[FRONT_LIGHT].next = ON;
           break; 
         case (DAY):           
-          //Serial.println("day");          
+          //Serial.println(F("day"));          
           elements[BREAK_LIGHT].next = OFF;          
           elements[FRONT_LIGHT].next = OFF;
           break; 
@@ -752,16 +757,16 @@ void setDefaultParams(){
 
 void setInitParams(){
   #ifdef DEBUG_CAR
-  Serial.println("Loading from eprom");
+  Serial.println(F("Loading from eprom"));
   #endif
   
   for (byte i = 0; i < NUM_ELEMENTS; i++) {
 	  #ifdef DEBUG_CAR 
-      Serial.println("get epron");
+      Serial.println(F("get epron"));
 	  #endif
       if ((getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
 	     #ifdef DEBUG_CAR 
-        Serial.print("Failed to load eprom for element ");
+        Serial.print(F("Failed to load eprom for element "));
         Serial.println(i);
 	    #endif
       }
@@ -775,12 +780,12 @@ void setInitParams(){
 
 void dumpParameters(){
   for (byte i=0;i<NUM_ELEMENTS;i++){
-    Serial.print("params element: ");
+    Serial.print(F("params element: "));
     Serial.print(i);
-    Serial.print("\t");
+    Serial.print(F("\t"));
     for (byte j=0;j<elements[i].total_params;j++){
       Serial.print(elements[i].params[j]);
-      Serial.print("\t");
+      Serial.print(F("\t"));
     }
     Serial.println();
   }
@@ -794,7 +799,7 @@ void setPWM(byte idx,byte init_val,int p1, int p2){
 
 void initElements() {
   #ifdef DEBUG_CAR
-  Serial.println("Ini elements");
+  Serial.println(F("Ini elements"));
   #endif
   elements[MOTOR].total_params = 4;
   elements[FRONT_LIGHT].total_params = 4;
@@ -809,7 +814,7 @@ void initElements() {
 
   //set initial state
   #ifdef DEBUG_CAR
-  Serial.println("all OFF");
+  Serial.println(F("all OFF"));
   #endif
   byte j;
   for (j=0;j<NUM_ELEMENTS;j++){
@@ -820,7 +825,7 @@ void initElements() {
   int aux, aux1;
   //motor  
   #ifdef DEBUG_CAR
-  Serial.println("set motor");
+  Serial.println(F("set motor"));
   #endif
   elements[i].obj = MOTOR;
   elements[i].controller = &controlMotor;
@@ -897,7 +902,7 @@ void initElements() {
   boardParams[4] = 0 ;
   
   #ifdef DEBUG_CAR
-  Serial.println("all set");
+  Serial.println(F("all set"));
   #endif
 }
 
@@ -959,7 +964,7 @@ void controlReed(ELEMENTS * element) {
 }
 
 void controlBreakLeds(ELEMENTS * element) {
-  //Serial.println("controlBreakLeds");
+  //Serial.println(F("controlBreakLeds"));
   long t;
   byte aux;
   t = millis();
@@ -1143,7 +1148,7 @@ uint8_t getParameterFromEprom(byte *params, byte numParams, byte obj) {
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
     #ifdef DEBUG_CAR
-          Serial.println("Failed to get eprom. eprom size");
+          Serial.println(F("Failed to get eprom. eprom size"));
     #endif
     return 2;
   }
@@ -1161,7 +1166,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if (numParams > MAXPARAMS) {
     #ifdef DEBUG_CAR
-         // Serial.println("Failed to save to eprom maxparam");
+         // Serial.println(F("Failed to save to eprom maxparam"));
      #endif
     return 1;
   }
@@ -1171,7 +1176,7 @@ uint8_t saveParameterToEprom(byte *params, byte numParams, byte obj) {
 
   if ((startpos + MEMORY_REF) > EPROM_SIZE) {
     #ifdef DEBUG_CAR
-          //Serial.println("Failed to save to eprom. eprom size");
+          //Serial.println(F("Failed to save to eprom. eprom size"));
     #endif
     return 2;
   }

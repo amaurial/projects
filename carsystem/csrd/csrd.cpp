@@ -10,34 +10,34 @@ CSRD::CSRD(){
 bool CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
 
     #ifdef CSRD_DEBUG
-        Serial.println("CSRD Initialization.");
+        Serial.println(F("CSRD Initialization"));
     #endif // CSRD_DEBUG
     this->driver=driver;
     this->manager=manager;
     if (this->manager!=NULL){
         #ifdef CSRD_DEBUG
-            Serial.println("Using manager.");
+            Serial.println(F("Using manager"));
         #endif // CSRD_DEBUG
         if (!this->manager->init()){
         #ifdef CSRD_DEBUG
-            Serial.println("Radio failed.");
+            Serial.println(F("Radio failed"));
         #endif // CSRD_DEBUG
             return false;
         }
     }
     else{
         #ifdef CSRD_DEBUG
-            Serial.println("Using radio std.");
+            Serial.println(F("Using radio std"));
         #endif // CSRD_DEBUG
         if (!driver->init()){
             #ifdef CSRD_DEBUG
-                Serial.println("Radio start failed.");
+                Serial.println(F("Radio start failed"));
             #endif // CSRD_DEBUG
             return false;
         }
         if (!driver->setFrequency(433)){
             #ifdef CSRD_DEBUG
-                Serial.println("Radio freq set failed.");
+                Serial.println(F("Radio freq set failed"));
             #endif // CSRD_DEBUG
             return false;
         }
@@ -51,22 +51,22 @@ bool CSRD::init(RH_RF69 *driver,RHReliableDatagram *manager){
 bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
     if (this->manager!=NULL){
         #ifdef CSRD_DEBUG
-                Serial.println("Send message by the manager.");
+                Serial.println(F("Send message by the manager"));
             #endif // CSRD_DEBUG
         return manager->sendtoWait(sbuffer, len, serverAddr);
     }else{
         //driver->setModeTx();
         #ifdef CSRD_DEBUG
-                Serial.println("Send message by the driver.");
+                Serial.println(F("Send message by the driver"));
         #endif // CSRD_DEBUG
         driver->send(sbuffer, len);
         #ifdef CSRD_DEBUG
-                Serial.println("Packages in buffer.Wait to send");
+                Serial.println(F("Packages in buffer.Wait to send"));
 				dumpBuffer(sbuffer);
         #endif // CSRD_DEBUG
         driver->waitPacketSent();
         #ifdef CSRD_DEBUG
-                Serial.println("Sent");
+                Serial.println(F("Sent"));
         #endif // CSRD_DEBUG
         return true;
     }
@@ -86,10 +86,10 @@ bool CSRD::readMessage(){
                 if (manager->recvfromAck(buf, &len, &from))
                 {
                     #ifdef CSRD_DEBUG
-                      Serial.print("got request from : 0x");
+                      Serial.print(F("got request from : 0x"));
                       Serial.print(from, HEX);
-                      Serial.print(": ");
-                      Serial.print(" size: ");
+                      Serial.print(F(": "));
+                      Serial.print(F(" size: "));
                       Serial.println(length);
                       Serial.println((char*)buf);
                     #endif // CSRD_DEBUG
@@ -97,7 +97,7 @@ bool CSRD::readMessage(){
                     //we expect 8 bytes
                     if (length>MESSAGE_SIZE){
                         #ifdef CSRD_DEBUG
-                          Serial.print("message bigger than expected: ");
+                          Serial.print(F("message bigger than expected: "));
                           Serial.println(length);
                         #endif // CSRD_DEBUG
                         return false;
@@ -108,7 +108,7 @@ bool CSRD::readMessage(){
                         memcpy(buffer,buf,MESSAGE_SIZE);
                         origin=from;
 						#ifdef CSRD_DEBUG
-                          Serial.print("message received: ");
+                          Serial.print(F("message received: "));
                           Serial.println(origin);
                         #endif // CSRD_DEBUG
                         return true;
@@ -125,9 +125,9 @@ bool CSRD::readMessage(){
                     memcpy(buffer,buf,MESSAGE_SIZE);
                     origin=from;
 					#ifdef CSRD_DEBUG
-                          Serial.print("msg rec from: ");
+                          Serial.print(F("msg rec from: "));
                           Serial.println(origin);
-						  Serial.print("size: ");Serial.println(length);
+						  Serial.print(F("size: "));Serial.println(length);
 						  dumpBuffer(buffer);
                         #endif // CSRD_DEBUG
                     return true;
@@ -150,9 +150,9 @@ bool CSRD::sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     buf[6]=val1;
     buf[7]=val2;
     #ifdef CSRD_DEBUG
-        Serial.println("sendInitialRegisterMessage");
+        Serial.println(F("sendInitialRegisterMessage"));
     #endif // CSRD_DEBUG
-    //Serial.print("CSRD:sendInitialRegisterMessage message to: ");
+    //Serial.print(F("CSRD:sendInitialRegisterMessage message to: "));
     //Serial.println(serverAddr);
     //dumpBuffer(buf);
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
@@ -272,7 +272,7 @@ bool CSRD::sendAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t ele
     buf[5] = state;
     buf[6] = val0;
     buf[7] = val1;
-    //Serial.print("CSRD::sendAddressedOPMessage message to: ");
+    //Serial.print(F("CSRD::sendAddressedOPMessage message to: "));
     //Serial.println(serverAddr);
     //dumpBuffer(buf);
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
@@ -288,7 +288,7 @@ bool CSRD::sendAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     buf[5] = action;
     buf[6] = val0;
     buf[7] = val1;
-    //Serial.print("CSRD::sendAddressedOPMessage message to: ");
+    //Serial.print(F("CSRD::sendAddressedOPMessage message to: "));
     //Serial.println(serverAddr);
     //dumpBuffer(buf);
     return sendMessage(buf,MESSAGE_SIZE,serverAddr);
@@ -683,7 +683,7 @@ uint8_t CSRD::getDirection(){
 
 bool CSRD::isRadioOn(){
     #ifdef CSRD_DEBUG
-        //Serial.print("radio status: ");
+        //Serial.print(F("radio status: "));
         //Serial.println(manager->available());
     #endif // CSRD_DEBUG
     if (manager!=NULL){
@@ -989,7 +989,7 @@ states CSRD::convertFromInt(uint8_t s){
   }
 }
 void CSRD::dumpBuffer(uint8_t *pbuf){
-    Serial.println("CSRD buffer:");
+    Serial.println(F("CSRD buffer:"));
     for (int8_t i=0;i<8;i++){
         Serial.print(pbuf[i]);
         Serial.print("\t");
