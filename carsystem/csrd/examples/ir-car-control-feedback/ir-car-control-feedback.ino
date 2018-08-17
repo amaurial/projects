@@ -10,13 +10,13 @@
 #define IRPIN A0
 #define MOTORPIN A4
 
-#define STOP_FORCE 500
-#define DISTANCE 200 // maior mais longe
-#define RATE_DOWN 30
-#define RATE_UP 30
-#define MAX_LEVEL 700
-#define VARIATION_ALLOWED 100
-#define MOTOR_TURNOFF 150
+#define STOP_FORCE 150//500 ;0 to 255
+#define DISTANCE 20//200 // maior mais longe 0 to 255
+#define RATE_DOWN 2
+#define RATE_UP 2
+#define MAX_LEVEL 60//700 percentage
+#define VARIATION_ALLOWED 5//100 ; 0 to 255
+#define MOTOR_TURNOFF 10//150 // percentage
 float SENSITIVITY = 0.5; // in percentage
 int motor = MAX_LEVEL;
 int lastlevel = 0;
@@ -33,8 +33,9 @@ void setup() {
   pinMode(MOTORPIN, OUTPUT);
   SoftPWMBegin();  
   // the max value for SoftPWMSet is 255, so we need to map the motor value
-  p = map(motor, 0, 1023, 0, 255);
-  SoftPWMSet(MOTORPIN, p);
+  //p = map(motor, 0, 1023, 0, 255);
+  //SoftPWMSet(MOTORPIN, p);
+  SoftPWMSetPercent(MOTORPIN, motor);
   //analogWrite(MOTORPIN, p);
   Serial.println("start");
   delay(100);
@@ -92,8 +93,9 @@ void speedcontrol(unsigned int f) {
     if (motor > MAX_LEVEL) motor = MAX_LEVEL;
     if (motor < MOTOR_TURNOFF ) motor = 0;    
     //if ( motor != lastlevel) {
-      p = map(motor, 0, 1023, 0, 255);         
-      SoftPWMSet(MOTORPIN, p); 
+      //p = map(motor, 0, 1023, 0, 255);         
+      //SoftPWMSet(MOTORPIN, p); 
+      SoftPWMSetPercent(MOTORPIN, motor);
       //analogWrite(MOTORPIN, p);     
     //}
     lastlevel = motor;
@@ -108,7 +110,8 @@ int readlevel(byte readtimes) {
   }
   r = (val / readtimes) * SENSITIVITY;
   if (r < 0) r = 0;
-  return int(r);
+  return map((int)r, 0, 1023, 0, 255);  
+  //return int(r);
 }
 
 bool time_is_over(uint32_t wait_time, uint32_t start_time) {

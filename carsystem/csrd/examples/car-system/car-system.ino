@@ -34,7 +34,7 @@
 #define MOTOR_PIN                 A4
 #define MOTOR_ROTATION_PIN        A6//A3
 #define BATTERY_PIN               A7//A5
-#define IR_RECEIVE_PIN            A5 //AUX3
+#define IR_RECEIVE_PIN            A0 //AUX3
 #define IR_SEND_PIN               6 //AUX4
 #define CHARGER_PIN               A1
 
@@ -478,14 +478,14 @@ void checkMsgWriteParameter(){
                       aux=aux1;
                    }
                    //send ack
-                   car.sendACKMessage(serverStation, nodeid,e,result);
+                   car.sendACKMessage(serverStation, nodeid, e, result);
                    if (e!=REED){//Reed has no fade
                    
                        SoftPWMSetFadeTime(elements[e].port, aux, aux1);
                        
                        if ((e == MOTOR) && (elements[e].state == ON)) {    
                           Serial.println(F("Change motor speed"));
-                          SoftPWMSetPercent(elements[e].port,elements[e].actual_pwm_val);
+                          SoftPWMSetPercent(elements[e].port, elements[e].actual_pwm_val);
                           return;
                        } 
                        else 
@@ -499,7 +499,7 @@ void checkMsgWriteParameter(){
           else if (e == BOARD){
             uint8_t p = car.getParamIdx();
               if (p==0){//Node id
-                uint16_t n = word(car.getVal1(),car.getVal0());
+                uint16_t n = word(car.getVal1(), car.getVal0());
                 saveNodeIdToEprom(n);
                 nodeid=n;
                 status = NOT_REGISTERED;
@@ -601,22 +601,23 @@ void checkBattery(){
     if (bperc < 20){
       //send message
       if (bat_send_timer < (millis() + 5000 )){ //wait 5 sec to send again
-        car.sendLowBattery(serverStation,nodeid);
+        car.sendLowBattery(serverStation, nodeid);
         bat_send_timer = millis();
       }      
     }     
 }
 
-uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1, uint8_t p2, uint8_t p3){
+uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4){
     uint8_t params[MAXPARAMS];
     uint8_t r;
-    params[0] = p0;//max speed %
-    params[1] = p1;//base breaking time ms
-    params[2] = p2;//acc time(ms)=this*params[1].time to reach the max speed after start
-    params[3] = p3;//breaking time(ms)=this*params[1]
+    params[0] = p0;
+    params[1] = p1;
+    params[2] = p2;
+    params[3] = p3;
+    params[4] = p4;
     r = saveParameterToEprom(params , num_param , element);  
     if (r != 0 ){
-	  car.sendACKMessage(serverStation, nodeid,element,r);
+	  car.sendACKMessage(serverStation, nodeid, element, r);
         return r;
     }
     return 0;
@@ -625,83 +626,105 @@ uint8_t setAndCheckParam(uint8_t element,uint8_t num_param,uint8_t p0,uint8_t p1
 void setDefaultParams(){  
   uint8_t r;
   bool ok = true;
-  //MOTOR
-  //params[0] = 50;//max speed %
-  //params[1] = 250;//base breaking time ms
-  //params[2] = 4;//acc time(ms)=this*params[1].time to reach the max speed after start
-  //params[3] = 3;//breaking time(ms)=this*params[1]
-  if (setAndCheckParam(MOTOR,4,30,250,10,8) != 0){
+  /*
+  MOTOR
+  params[0] = 50; max speed %
+  params[1] = 250; base breaking time ms
+  params[2] = 4; acc time(ms)=this*params[1].time to reach the max speed after start
+  params[3] = 3; breaking time(ms)=this*params[1]
+  params[4] = 15; Value that below this the motor does/should not move anymore. Used by IR
+  */
+  if (setAndCheckParam(MOTOR, MAXPARAMS, 30, 250, 10, 8, 15) != 0){
       ok = false;
   }
   
-
-  //front light
-  //params[0] = 50; //max bright % 
-  //params[1] = 20; //base blink
-  //params[2] = 20; //blink time=this*base blink
-  //params[3] = 10; //blink time emergency=this*base blink 
-  if (setAndCheckParam(FRONT_LIGHT,4,10,20,20,20) != 0){
+  /*
+  front light
+  params[0] = 50; max bright % 
+  params[1] = 20; base blink
+  params[2] = 20; blink time=this*base blink
+  params[3] = 10; blink time emergency=this*base blink 
+  */
+  if (setAndCheckParam(FRONT_LIGHT, MAXPARAMS, 10, 20, 20, 20, 0) != 0){
       ok = false;
   }
   
-  //break light
-  //params[0] = 50; //max bright %
-  //params[1] = 30; //base blink
-  //params[2] = 30; //blink time=this*base blink
-  //params[3] = 20; //blink time emergency=this*base blink
-  if (setAndCheckParam(BREAK_LIGHT,4,10,30,20,20) != 0){
+  /*
+  break light
+  params[0] = 50; max bright %
+  params[1] = 30; base blink
+  params[2] = 30; blink time=this*base blink
+  params[3] = 20; blink time emergency=this*base blink
+  */
+  if (setAndCheckParam(BREAK_LIGHT, MAXPARAMS, 10, 30, 20, 20, 0) != 0){
       ok = false;
   }  
 
-  //left light
-  //params[0] = 50; //max bright %
-  //params[1] = 20; //base blink
-  //params[2] = 20; //blink time=this*base blink
-  //params[3] = 10; //blink time emergency=this*base blink  
-  if (setAndCheckParam(LEFT_LIGHT,4,10,15,15,10) != 0){
+  /*
+  left light
+  params[0] = 50; max bright %
+  params[1] = 20; base blink
+  params[2] = 20; blink time=this*base blink
+  params[3] = 10; blink time emergency=this*base blink  
+  */
+  if (setAndCheckParam(LEFT_LIGHT, MAXPARAMS, 10, 15, 15, 10, 0) != 0){
       ok = false;
   }
-  //right light
-  //params[0] = 50; //max bright %
-  //params[1] = 20; //base blink
-  //params[2] = 20; //blink time=this*base blink
-  //params[3] = 10; //blink time emergency=this*base blink  
-  if (setAndCheckParam(RIGHT_LIGHT,4,10,15,15,10) != 0){
+  /*
+  right light
+  params[0] = 50; max bright %
+  params[1] = 20; base blink
+  params[2] = 20; blink time=this*base blink
+  params[3] = 10; blink time emergency=this*base blink  
+  */
+  if (setAndCheckParam(RIGHT_LIGHT, MAXPARAMS, 10, 15, 15, 10, 0) != 0){
       ok = false;
   }
 
-  //sirene light
-  //params[0] = 50; //max bright %
-  //params[1] = 20; //base blink
-  //params[2] = 20; //blink time=this*base blink
-  //params[3] = 3; //blink time emergency=this*base blink
-  if (setAndCheckParam(SIRENE_LIGHT,4,20,20,20,10) != 0){
+  /*
+  sirene light
+  params[0] = 50; max bright %
+  params[1] = 20; base blink
+  params[2] = 20; blink time=this*base blink
+  params[3] = 3; blink time emergency=this*base blink
+  */
+  if (setAndCheckParam(SIRENE_LIGHT, MAXPARAMS, 20, 20, 20, 10, 0) != 0){
       ok = false;
   }  
 
-  //reed
-  //params[0] = 0; //action when detected: 0=stop,1=blinking
-  //params[1] = 0; //toogle 0 is default
-  //params[2] = 0; //spare
-  //params[3] = 0; //spare 
-  if (setAndCheckParam(REED,0,0,0,0,0) != 0){
+  /*
+  reed
+  params[0] = 0; action when detected: 0=stop,1=blinking
+  params[1] = 0; toogle 0 is default
+  params[2] = 0; spare
+  params[3] = 0; spare 
+  */
+  if (setAndCheckParam(REED, 0, 0, 0, 0, 0, 0) != 0){
       ok = false;
   }  
 
-  //ir receive
-  //params[0] = 50; //max bright %  
-  if (setAndCheckParam(IR_RECEIVE,1,20,0,0,0) != 0){
+  /*
+  ir receive
+  params[0] = 85; Sensitivity 1 to 100. It will become a flot 85/100. Used to control the result of IR reading
+  params[1] = 30; Accelarion and breaking rate
+  params[2] = 100; A value used to compare the IR levels with to decide to act or not
+  params[3] = STOP_FORCE; The IR reading indicating the car should stop
+  params[4] = DISTANCE; The value subtracted to stop force to indicate the car should start breaking
+  */
+  if (setAndCheckParam(IR_RECEIVE, MAXPARAMS, 85, 30, 100, 0, 0) != 0){
       ok = false;
   }
 
-  //ir send
-  //params[0] = 50; //max bright %
-  if (setAndCheckParam(IR_SEND,1,20,0,0,0) != 0){
+  /*
+  ir send
+  params[0] = 50; max bright %
+  */
+  if (setAndCheckParam(IR_SEND, 1, 20, 0, 0, 0) != 0){
       ok = false;
   }
 
   if (ok){
-     car.sendACKMessage(serverStation, nodeid,254,0);
+     car.sendACKMessage(serverStation, nodeid, 254, 0);
   }
 
 }
@@ -713,7 +736,7 @@ void setInitParams(){
   byte i = 0;
   for (i = 0; i < NUM_ELEMENTS; i++) {
       Serial.println(F("get epron"));
-      if ((getParameterFromEprom(elements[i].params,elements[i].total_params,i)) != 0){
+      if ((getParameterFromEprom(elements[i].params, elements[i].total_params, i)) != 0){
         Serial.println(F("Failed to load eprom for element "));
         Serial.println(i);
       }
@@ -751,7 +774,7 @@ void initElements() {
   elements[RIGHT_LIGHT].total_params = 4;
   elements[SIRENE_LIGHT].total_params = 4;
   elements[REED].total_params = 4;
-  elements[IR_RECEIVE].total_params = 1;
+  elements[IR_RECEIVE].total_params = 5;
   elements[IR_SEND].total_params = 1;
   setInitParams();
 
@@ -824,7 +847,7 @@ void initElements() {
   i = IR_RECEIVE;  
   elements[i].obj = IR_RECEIVE;
   elements[i].port = IR_RECEIVE_PIN;
-  elements[i].controller = &controlAux;    
+  elements[i].controller = &controlIRReceive;      
 
   //IR_SEND
   i = IR_SEND;  
@@ -836,6 +859,11 @@ void initElements() {
 }
 
 void controlAux(ELEMENTS * element) {
+  return;
+}
+
+// Control the car distance based on IR sensor
+void controlIRReceive(ELEMENTS * element) {
   return;
 }
 
