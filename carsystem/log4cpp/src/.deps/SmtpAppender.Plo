@@ -1,0 +1,4 @@
+SmtpAppender.lo: SmtpAppender.cpp \
+ /home/user/amauriala/x-tools/armv8-rpi3-linux-gnueabihf/armv8-rpi3-linux-gnueabihf/sysroot/usr/include/stdc-predef.h
+
+/home/user/amauriala/x-tools/armv8-rpi3-linux-gnueabihf/armv8-rpi3-linux-gnueabihf/sysroot/usr/include/stdc-predef.h:
