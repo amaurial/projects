@@ -6,6 +6,7 @@
 #include <RHReliableDatagram.h>
 #include "radio_protocol.h"
 #define MESSAGE_SIZE 8
+#define RF_FREQUENCY 915.0
 
 //#define CSRD_DEBUG 1
 
@@ -74,7 +75,7 @@ class CSRD {
 
 public:
     CSRD();
-    bool init(RH_RF69 *driver,RHReliableDatagram *manager);
+    bool init(RH_RF69 *driver, RHReliableDatagram *manager);
 
     bool sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr);
     uint8_t getMessage(uint8_t *mbuffer);
