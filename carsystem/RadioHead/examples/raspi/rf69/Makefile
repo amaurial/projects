@@ -3,16 +3,21 @@
 # Caution: requires bcm2835 library to be already installed
 # http://www.airspayce.com/mikem/bcm2835/
 
-CC            = g++
-CFLAGS        = -DRASPBERRY_PI -DBCM2835_NO_DELAY_COMPATIBILITY -D__BASEFILE__=\"$*\"
-LIBS          = -lbcm2835
+CC            = armv8-rpi3-linux-gnueabihf-g++
+CFLAGS        = -DRASPBERRY_PI -DBCM2835_NO_DELAY_COMPATIBILITY -D__BASEFILE__=\"$*\" 
+#LFLAGS        = -static
+LIBS          = -L/home/amauri/pi/bcm2835-1.59/src -lbcm2835
 RADIOHEADBASE = ../../..
-INCLUDE       = -I$(RADIOHEADBASE)
+LIBBCM_INCLUDE= /home/amauri/pi/bcm2835-1.59/src
+INCLUDE       = -I$(RADIOHEADBASE) -I$(LIBBCM_INCLUDE)
 
-all: rf69_client rf69_server
+all: rf69_client rf69_server rf69_dual_server
 
 RasPi.o: $(RADIOHEADBASE)/RHutil/RasPi.cpp
 				$(CC) $(CFLAGS) -c $(RADIOHEADBASE)/RHutil/RasPi.cpp $(INCLUDE)
+
+rf69_dual_server.o: rf69_dual_server.cpp
+				$(CC) $(CFLAGS) -c $(INCLUDE) $<
 
 rf69_client.o: rf69_client.cpp
 				$(CC) $(CFLAGS) -c $(INCLUDE) $<
@@ -38,11 +43,14 @@ RHGenericDriver.o: $(RADIOHEADBASE)/RHGenericDriver.cpp
 RHGenericSPI.o: $(RADIOHEADBASE)/RHGenericSPI.cpp
 				$(CC) $(CFLAGS) -c $(INCLUDE) $<
 
-rf69_client: rf69_client.o RH_RF69.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o
-				$(CC) $^ $(LIBS) -o rf69_client
+rf69_client: rf69_client.o RH_RF69.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o 
+				$(CC) $^ $(LIBS) $(LFLAGS) -o rf69_client
 
 rf69_server: rf69_server.o RH_RF69.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o
-				$(CC) $^ $(LIBS) -o rf69_server
+				$(CC) $^ $(LIBS) $(LFLAGS) -o rf69_server
+
+rf69_dual_server: rf69_dual_server.o RH_RF69.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o
+				$(CC) $^ $(LIBS) $(LFLAGS) -o rf69_dual_server
 
 clean:
-				rm -rf *.o rf69_client rf69_server
+				rm -rf *.o rf69_client rf69_server rf69_dual_server
