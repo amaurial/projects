@@ -1,0 +1,25 @@
+radio1:
+  frequency: 915.00
+  id: 1
+  group: 1
+  cspin: 8
+  irqpin: 25
+  promiscuous: true
+  power: 14
+  readtimeout: 5
+radio2:
+  frequency: 915.00
+  id: 2
+  group: 1
+  cspin: 7
+  irqpin: 16
+  promiscuous: true
+  power: 14
+  readtimeout: 5
+logger:
+  level: DEBUG
+  console: true
+  filename: control-station.log
+  append: false
+  size: 5M
+  files: 10
