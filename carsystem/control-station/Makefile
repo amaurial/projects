@@ -6,7 +6,7 @@ ROOTFS = /home/amauri/pi/x-tools/armv8-rpi3-linux-gnueabihf/armv8-rpi3-linux-gnu
 CFLAGS = -std=c++11 --sysroot $(ROOTFS) -c -Wall -fpermissive -Wno-deprecated -lm -std=c++11 -g -Iinclude -I$(ROOTFS)/usr/include -I$(ROOTFS)/include -I/$(BCM2835)/src
 #LDFLAGS= -L/usr/local/lib -L/usr/lib -Llib -L/home/amauri/pi/toolchain/rootfs/lib
 LDFLAGS = --sysroot $(ROOTFS) -Llib -L$(ROOTFS)/usr/lib -L$(ROOTFS)/lib -L$(BCM2835)/src
-SOURCES = src/main.cpp src/radio_handler.cpp src/csrd.cpp
+SOURCES = src/main.cpp src/radioHandler.cpp src/csrd.cpp src/client.cpp src/tcpServer.cpp src/tcpClient.cpp 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = control-station
 

@@ -1,4 +1,4 @@
-#include "radio_handler.hpp"
+#include "radioHandler.hpp"
 
 radioHandler::radioHandler(log4cpp::Category *logger)
 {
@@ -69,9 +69,7 @@ void radioHandler::run_in(void* param){
     logger->debug("[radioHandler] run_in running");        
     while (running){
         checkMessages(&radio1, YAML_RADIO1);
-        checkMessages(&radio2, YAML_RADIO2);
-        //logger->debug("[radioHandler] run_in");
-        //usleep(1000000);
+        checkMessages(&radio2, YAML_RADIO2);        
     }
 }
 
@@ -102,23 +100,21 @@ void radioHandler::run_queue_reader(void* param){
             // get the message and print
             CSRD message = in_msgs.front();
             in_msgs.pop();
-            logger->debug("Extracting message from queue");
-            local_len = message.getMessageBuffer(local_buffer);
-            printMessage(local_buffer, local_len);
+            //logger->debug("Extracting message from queue");
+            //local_len = message.getMessageBuffer(local_buffer);
+            //printMessage(local_buffer, local_len);
         }
         else{
             logger->debug("[radioHandler] run_queue_reader");
             usleep(5000000);
-        } 
-        //usleep(1000000);       
+        }         
     }
 }
 
 bool radioHandler::checkMessages(RH_RF69 *radio, string radioName){
 	
-    //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());                
-
-    //if (radio->waitAvailableTimeout( READ_TIMEOUT )) {        
+    //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());
+    
     if (radio->available()) {
         uint8_t len = RH_RF69_MAX_MESSAGE_LEN;         
         memset(buffer, '\0', RH_RF69_MAX_MESSAGE_LEN);
@@ -134,9 +130,9 @@ bool radioHandler::checkMessages(RH_RF69 *radio, string radioName){
                 radio->setModeRx();
                 //logger->debug("Radio: %s len: %02d from: %d to: %d ssi: %ddB id: %d",radioName.c_str(), len, from, to, rssi, id);
                 CSRD message = CSRD(logger, 0, buffer, len);
-                in_msgs.push(message);            
-                logger->debug("%s received message: [%s]", radioName.c_str(), buffer);            
-                //printMessage(buffer, len); 
+                in_msgs.push(message);  
+                message.dumpBuffer();          
+                logger->debug("%s received message: [%s]", radioName.c_str(), buffer);                            
             }           
         }         
     }    
@@ -154,6 +150,11 @@ void radioHandler::printMessage(uint8_t *pbuf, int len){
     logger->debug("message: %s",ss.str().c_str());
 }
 
+int radioHandler::put_to_out_queue(char *msg, int size){
+    //TODO
+    return 0;
+}
+
 bool radioHandler::startRadio(RH_RF69 *radio, string radioName){
     uint8_t cs;
     uint8_t irq;
@@ -164,12 +165,7 @@ bool radioHandler::startRadio(RH_RF69 *radio, string radioName){
     bool promiscuos = false;
     int radio_readtimeout = READ_TIMEOUT;
 
-    try{        
-
-        if (radio != NULL){
-            logger->error("Can't config radio. Radio seems to be configured already");
-            //return false;
-        }
+    try{
 
         logger->debug("Getting configuration for radio %s", radioName.c_str());
         YAML::Node radioConfig = (*configurator)[radioName];
@@ -259,8 +255,8 @@ bool radioHandler::startRadio(RH_RF69 *radio, string radioName){
         radio->setWaitTimeout((uint16_t)radio_readtimeout);
         // set Network ID (by sync words)
         uint8_t syncwords[2];
-        syncwords[0] = 0x2d;
-        syncwords[1] = (uint8_t)group;   
+        syncwords[0] = 0x10;
+        syncwords[1] = 0x10;; //(uint8_t)group;   
         cout << "sync words:" << syncwords[0] << ";" << syncwords[1] << endl;     
         radio->setSyncWords(syncwords, sizeof(syncwords));
         radio->setPromiscuous(promiscuos);  

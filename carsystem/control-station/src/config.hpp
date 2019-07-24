@@ -19,5 +19,7 @@
 #define YAML_PROMISCUOS     "promiscuous"
 #define YAML_POWER          "power"
 #define YAML_READTIMEOUT    "readtimeout"
+#define YAML_TCP_SERVER     "tcpserver"
+#define YAML_PORT           "port"
 
 #endif // CONFIG_H

@@ -3,8 +3,7 @@
 #include <cstring>
 #include <stdint.h>
 #include <log4cpp/Category.hh>
-#include "radio_protocol.h"
-#define MESSAGE_SIZE 8
+#include "radioProtocol.h"
 
 //#define CSRD_DEBUG 1
 
@@ -175,6 +174,8 @@ public:
     uint8_t createLowBattery(uint8_t serverAddr,uint16_t nodeid);
     uint8_t createStopCar(uint16_t carid, uint8_t serverAddr);
 
+    void dumpBuffer();
+    void dumpRadioBuffer();
     void resetToDefault();    
     states convertFromInt(uint8_t s);
 protected:
@@ -188,9 +189,7 @@ private:
     uint16_t nodenumber;
     uint16_t origin;
     uint8_t radioBuffer[MESSAGE_SIZE];// the message created by the create methods    
-    uint8_t radioMessageLength;
-    void dumpBuffer(uint8_t *pbuf);
-    void dumpRadioBuffer(uint8_t *pbuf);
+    uint8_t radioMessageLength;    
     uint16_t word(uint8_t a, uint8_t b);
     uint8_t lowByte(uint16_t);
     uint8_t highByte(uint16_t);

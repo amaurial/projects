@@ -833,12 +833,12 @@ states CSRD::convertFromInt(uint8_t s){
   }
 }
 
-void CSRD::dumpBuffer(uint8_t *pbuf){
+void CSRD::dumpBuffer(){
     logger->debug("CSRD buffer: %X %X %X %X %X %X %X %X",
     buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);    
 }
 
-void CSRD::dumpRadioBuffer(uint8_t *pbuf){
+void CSRD::dumpRadioBuffer(){
     logger->debug("CSRD buffer: %X %X %X %X %X %X %X %X",
     radioBuffer[0], radioBuffer[1], radioBuffer[2], radioBuffer[3], radioBuffer[4], radioBuffer[5], radioBuffer[6], radioBuffer[7]);    
 }

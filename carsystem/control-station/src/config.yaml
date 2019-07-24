@@ -23,3 +23,5 @@ logger:
   append: false
   size: 5M
   files: 10
+tcpserver:
+  port: 2020

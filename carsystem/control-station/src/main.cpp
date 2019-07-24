@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <algorithm>
 #include <exception>
+#include <unistd.h>
 // boost libraries
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -34,7 +35,8 @@
 
 #include <bcm2835.h>
 // radios
-#include "radio_handler.hpp"
+#include "radioHandler.hpp"
+#include "tcpServer.h"
 
 
 namespace po = boost::program_options;
@@ -147,22 +149,38 @@ int main(int argc, char * argv[])
     
     logger.info("Logger initated with level %s", level.c_str());
 
-    // start the radio handler
-    //start the CAN
+    // start the radio handler    
     radioHandler radio = radioHandler(&logger);
     //set the configurator
     radio.setConfigurator(&config);    
 
-    //start the CAN threads
+    //start the radio threads
     if (!radio.start()){
         logger.error("Failed to start radio Handler.");
         return 1;
     };
 
+    // start the tcp tcp server
+    int port = 2020;
+    if (config[YAML_TCP_SERVER]){
+        if (config[YAML_TCP_SERVER][YAML_PORT]){
+            port = config[YAML_TCP_SERVER][YAML_PORT].as<int>();
+        }
+    }
+    
+    tcpServer server = tcpServer(&logger, port, &radio);
+    server.setConfigurator(&config);
+    if (!server.start()){
+        logger.error("Failed to start tcp server on port %d", port);
+        radio.stop();
+        running = false;
+    }    
+
     //keep looping forever
     while (running){usleep(1000000);};
 
     // stop the threads
+    server.stop();
     radio.stop();
 
     //clear the stuff

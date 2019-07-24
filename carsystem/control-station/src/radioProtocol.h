@@ -1,6 +1,8 @@
 #ifndef __RADIO__PROTOCOL__
 #define __RADIO__PROTOCOL__
 
+#define MESSAGE_SIZE 8
+
 #define RP_BROADCAST        0xff
 #define RP_ADDRESSED        0
 #define RP_STATUS           1
