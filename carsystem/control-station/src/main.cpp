@@ -9,6 +9,7 @@
 #include <boost/algorithm/string.hpp>
 // yamls
 #include <yaml-cpp/yaml.h>
+#include "nlohmann/json.hpp"
 #include "config.hpp"
 
 // logger
@@ -35,19 +36,20 @@
 
 #include <bcm2835.h>
 // radios
-#include "radioHandler.hpp"
-#include "tcpServer.h"
+#include "radio_handler.hpp"
+#include "tcp_server.h"
 
 
 namespace po = boost::program_options;
 namespace ba = boost::algorithm;
 using namespace std;
+using namespace nlohmann;
 
 bool running = true;
 bool log_console = true;
 bool log_file = true;
 bool log_append = false;
-string config_file = "config.yaml";
+string config_file = "control-station.yaml";
 string logfile = "control-station.log";
 
 
@@ -150,7 +152,7 @@ int main(int argc, char * argv[])
     logger.info("Logger initated with level %s", level.c_str());
 
     // start the radio handler    
-    radioHandler radio = radioHandler(&logger);
+    RadioHandler radio = RadioHandler(&logger);
     //set the configurator
     radio.setConfigurator(&config);    
 
@@ -166,16 +168,34 @@ int main(int argc, char * argv[])
         if (config[YAML_TCP_SERVER][YAML_PORT]){
             port = config[YAML_TCP_SERVER][YAML_PORT].as<int>();
         }
-    }
+    }  
+
     
-    tcpServer server = tcpServer(&logger, port, &radio);
+    TcpServer server = TcpServer(&logger, port, &radio);    
     server.setConfigurator(&config);
+    logger.debug("Starting tcp server");    
     if (!server.start()){
         logger.error("Failed to start tcp server on port %d", port);
         radio.stop();
         running = false;
     }    
-
+    
+   /*
+    json j2 = {
+        {"pi", 3.141},
+        {"happy", true},
+        {"name", "Niels"},
+        {"nothing", nullptr},
+        {"answer", {
+            {"everything", 42}
+            }},
+        {"list", {1, 0, 2}},
+        {"object", {
+            {"currency", "USD"},
+            {"value", 42.99}
+        }}
+    };
+    */
     //keep looping forever
     while (running){usleep(1000000);};
 

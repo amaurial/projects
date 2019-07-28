@@ -1,6 +1,6 @@
-#include "radioHandler.hpp"
+#include "radio_handler.hpp"
 
-radioHandler::radioHandler(log4cpp::Category *logger)
+RadioHandler::RadioHandler(log4cpp::Category *logger)
 {
     //ctor    
     this->logger = logger;
@@ -10,7 +10,7 @@ radioHandler::radioHandler(log4cpp::Category *logger)
     pthread_cond_init(&m_condv_in, NULL);          
 }
 
-radioHandler::~radioHandler()
+RadioHandler::~RadioHandler()
 {
     //dtor    
     pthread_mutex_destroy(&m_mutex);
@@ -19,11 +19,39 @@ radioHandler::~radioHandler()
     pthread_cond_destroy(&m_condv_in);
 }
 
-void radioHandler::setConfigurator(YAML::Node* config){
+void RadioHandler::setConfigurator(YAML::Node* config){
     this->configurator = config;
 }
 
-bool radioHandler::start(){    	
+bool RadioHandler::register_consumer(string name, MessageConsumer *consumer){
+    logger->debug("Registering consumer with name %s", name.c_str());
+    if (mapConsumer.find(name) != mapConsumer.end()){
+        logger->debug("Consumer with this name is already registered.");
+        return false;
+    }
+    logger->debug("Consumer registered %s", name.c_str());
+    mapConsumer.insert(std::pair<string, MessageConsumer*>(name, consumer));
+    return true;
+}
+
+bool RadioHandler::unregister_consumer(string name){
+    try {
+        if (mapConsumer.find(name) != mapConsumer.end()){
+            logger->debug("[RadioHandler] Removing consumer with id: %s", name);
+            mapConsumer.erase(name);
+        }
+        else{
+            logger->debug("[RadioHandler] Could not find consumer with id: %s", name);
+        }
+    }
+    catch(...){
+        logger->error("[RadioHandler] Failed to remove a consumer %s", name);
+        return false;
+    }
+    return true;
+}
+
+bool RadioHandler::start(){    	
 	
     logger->debug("Initializing bcm2835.");
     if (!bcm2835_init()) 
@@ -44,74 +72,119 @@ bool radioHandler::start(){
 
     running = true;    
     
-	logger->debug("[radioHandler] Starting the queue reader thread");
-	pthread_create(&queueReader,nullptr,radioHandler::thread_entry_in_reader,this);
+	logger->debug("[RadioHandler] Starting the queue reader thread");
+	pthread_create(&queueReader,nullptr,RadioHandler::thread_entry_in_reader,this);
 
-	logger->debug("[radioHandler] Starting the queue writer thread");
-	pthread_create(&queueWriter,nullptr,radioHandler::thread_entry_out,this);	
+	logger->debug("[RadioHandler] Starting the queue writer thread");
+	pthread_create(&queueWriter,nullptr,RadioHandler::thread_entry_out,this);	
 
-    logger->debug("[radioHandler] Start the radio handler reader");
-	pthread_create(&radioReader,nullptr,radioHandler::thread_entry_in,this);
+    logger->debug("[RadioHandler] Start the radio handler reader");
+	pthread_create(&radioReader,nullptr,RadioHandler::thread_entry_in,this);
 
     return true;
 }
 
-bool radioHandler::stop(){    
+bool RadioHandler::stop(){    
     running = false;
+    logger->debug("[RadioHandler] Removing the registered consumers");
+    mapConsumer.clear();    
     return true;
 }
 
 /*
 * Get the messages from the radios and put in a queue
 */
-void radioHandler::run_in(void* param){
+void RadioHandler::run_in(void* param){
 
-    logger->debug("[radioHandler] run_in running");        
+    logger->debug("[RadioHandler] run_in running");   
+    // get the thread sleep time
+    long thread_sleep = RADIO_SLEEP;
+    if ((*configurator)[YAML_LIMITS]){
+        if ((*configurator)[YAML_LIMITS][YAML_RADIO_SLEEP]){
+            thread_sleep = (*configurator)[YAML_LIMITS][YAML_RADIO_SLEEP].as<int>();
+        }                    
+    }
+
     while (running){
         checkMessages(&radio1, YAML_RADIO1);
-        checkMessages(&radio2, YAML_RADIO2);        
+        checkMessages(&radio2, YAML_RADIO2);    
+        usleep(thread_sleep);    
     }
 }
 
 /*
 * Get the messages from the queue and send through the radios
 */
-void radioHandler::run_out(void* param){
-    logger->debug("[radioHandler] run_out running");        
+void RadioHandler::run_out(void* param){
+    logger->debug("[RadioHandler] run_out running");   
+
+    // get the thread sleep time
+    long thread_sleep = QUEUE_READER_SLEEP;
+    if ((*configurator)[YAML_LIMITS]){
+        if ((*configurator)[YAML_LIMITS][YAML_RADIO_OUT_QUEUE_THREAD_SLEEP]){
+            thread_sleep = (*configurator)[YAML_LIMITS][YAML_RADIO_OUT_QUEUE_THREAD_SLEEP].as<int>();
+        }                    
+    }
+
     while (running){        
-        logger->debug("[radioHandler] run_out");        
-        usleep(5000000);
+        //logger->debug("[RadioHandler] run_out");        
+        usleep(thread_sleep);
     }
 }
 
 /*
-* Used for the tcp connections
-* Not sure what it will do for now
+* Consume the radio messages
 */
-void radioHandler::run_queue_reader(void* param){
-    // defined in CSRD
-    uint8_t local_buffer [MESSAGE_SIZE];
-    uint8_t local_len = 0;
+void RadioHandler::run_queue_reader(void* param){    
+    
+    logger->debug("[RadioHandler] run_queue_reader running");        
 
-    logger->debug("[radioHandler] run_queue_reader running");        
+    // get the max queue size
+    long max_queue_size = RADIO_IN_QUEUE_SIZE;
+    if ((*configurator)[YAML_LIMITS]){
+        if ((*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_SIZE]){
+            max_queue_size = (*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_SIZE].as<int>();
+        }                    
+    }
+
+    // get the thread sleep time
+    long thread_sleep = QUEUE_READER_SLEEP;
+    if ((*configurator)[YAML_LIMITS]){
+        if ((*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_THREAD_SLEEP]){
+            max_queue_size = (*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_THREAD_SLEEP].as<int>();
+        }                    
+    }
 
     while (running){
         if (!in_msgs.empty()){
-            // get the message and print
-            CSRD message = in_msgs.front();
-            in_msgs.pop();
-            //logger->debug("Extracting message from queue");
-            //local_len = message.getMessageBuffer(local_buffer);
-            //printMessage(local_buffer, local_len);
+            // send message for all registered consumers
+            if (!mapConsumer.empty()){
+                CSRD message = in_msgs.front();
+                in_msgs.pop();
+                std::map<string, MessageConsumer*>::iterator it = mapConsumer.begin();
+                while(it != mapConsumer.end())
+                {
+                    logger->debug("[RadioHandler] Sending message to consumer %s", it->first.c_str());
+                    it->second->putMessage(message);
+                    it++;
+                }                                 
+            }
+            else{
+                // check the amount of message is higher that what is configured and delete the last
+                while (in_msgs.size() > max_queue_size){
+                    logger->debug("[RadioHandler] Radio in queue limit reached: %d. Removing messages", in_msgs.size());
+                    in_msgs.pop();
+                }
+            }            
         }
-        else{
-            logger->debug("[radioHandler] run_queue_reader");
-            usleep(5000000);
-        }         
+        // else{            
+        //     usleep(thread_sleep);
+        // }  
+        usleep(thread_sleep);       
     }
 }
 
-bool radioHandler::checkMessages(RH_RF69 *radio, string radioName){
+bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
 	
     //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());
     
@@ -139,7 +212,7 @@ bool radioHandler::checkMessages(RH_RF69 *radio, string radioName){
     return false;
 }
 
-void radioHandler::printMessage(uint8_t *pbuf, int len){
+void RadioHandler::printMessage(uint8_t *pbuf, int len){
     stringstream ss;
 
     for (int i = 0; i < len; i++){
@@ -150,12 +223,12 @@ void radioHandler::printMessage(uint8_t *pbuf, int len){
     logger->debug("message: %s",ss.str().c_str());
 }
 
-int radioHandler::put_to_out_queue(char *msg, int size){
+int RadioHandler::put_to_out_queue(char *msg, int size){
     //TODO
     return 0;
 }
 
-bool radioHandler::startRadio(RH_RF69 *radio, string radioName){
+bool RadioHandler::startRadio(RH_RF69 *radio, string radioName){
     uint8_t cs;
     uint8_t irq;
     uint8_t power = 14;

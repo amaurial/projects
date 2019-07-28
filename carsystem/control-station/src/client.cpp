@@ -38,7 +38,7 @@ Client& Client::setLogger(log4cpp::Category *logger){
     return *this;
 }
 
-Client& Client::setRadioHandler(radioHandler *radio){
+Client& Client::setRadioHandler(RadioHandler *radio){
     this->radio = radio;
     return *this;
 }
@@ -53,7 +53,7 @@ Client& Client::setSockAddr(struct sockaddr_in client_addr){
     return *this;
 }
 
-Client& Client::setServer(tcpServer *server){
+Client& Client::setServer(TcpServer *server){
     this->server = server;
     return *this;
 }

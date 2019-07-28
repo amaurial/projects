@@ -726,6 +726,8 @@
 #define RH_PLATFORM_STM32F2          12
 #define RH_PLATFORM_CHIPKIT_CORE     13
 
+#define RH_PLATFORM RH_PLATFORM_RASPI
+
 ////////////////////////////////////////////////////
 // Select platform automatically, if possible
 #ifndef RH_PLATFORM
@@ -854,7 +856,7 @@
  #define RH_HAVE_HARDWARE_SPI
  #define RH_HAVE_SERIAL
  #define PROGMEM
- #include <RHutil/RasPi.h>
+ #include <RasPi.h>
  #include <string.h>
  //Define SS for CS0 or pin 24
  #define SS 8
@@ -864,11 +866,11 @@
  #define PROGMEM
   #include <Arduino.h>
 
-#elif (RH_PLATFORM == RH_PLATFORM_UNIX) 
+//#elif (RH_PLATFORM == RH_PLATFORM_UNIX) 
  // Simulate the sketch on Linux and OSX
- #include <RHutil/simulator.h>
- #define RH_HAVE_SERIAL
-#include <netinet/in.h> // For htons and friends
+ //#include <RHutil/simulator.h>
+// #define RH_HAVE_SERIAL
+//#include <netinet/in.h> // For htons and friends
 
 #else
  #error Platform unknown!

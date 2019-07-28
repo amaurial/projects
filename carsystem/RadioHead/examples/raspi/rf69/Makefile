@@ -13,8 +13,8 @@ INCLUDE       = -I$(RADIOHEADBASE) -I$(LIBBCM_INCLUDE)
 
 all: rf69_client rf69_server rf69_dual_server
 
-RasPi.o: $(RADIOHEADBASE)/RHutil/RasPi.cpp
-				$(CC) $(CFLAGS) -c $(RADIOHEADBASE)/RHutil/RasPi.cpp $(INCLUDE)
+RasPi.o: $(RADIOHEADBASE)/RasPi.cpp
+				$(CC) $(CFLAGS) -c $(RADIOHEADBASE)/RasPi.cpp $(INCLUDE)
 
 rf69_dual_server.o: rf69_dual_server.cpp
 				$(CC) $(CFLAGS) -c $(INCLUDE) $<

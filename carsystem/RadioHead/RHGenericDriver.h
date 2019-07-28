@@ -120,6 +120,10 @@ public:
     /// \return true if a message is available
     virtual bool            waitAvailableTimeout(uint16_t timeout);
 
+    // Store the default timeout for the function waitAvailableTimeout
+    void                    setWaitTimeout(uint16_t timeout);
+    uint16_t                getWaitTimeout();
+
     // Bent G Christensen (bentor@gmail.com), 08/15/2016
     /// Channel Activity Detection (CAD).
     /// Blocks until channel activity is finished or CAD timeout occurs.
@@ -297,6 +301,9 @@ protected:
     /// Channel activity detected
     volatile bool       _cad;
     unsigned int        _cad_timeout;
+
+    // default wait for available in milliseconds
+    uint16_t _wait_timeout = 5;
     
 private:
 

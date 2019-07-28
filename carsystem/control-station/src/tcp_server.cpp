@@ -1,38 +1,35 @@
-#include "tcpServer.h"
-#include "tcpClient.h"
+#include "tcp_server.h"
+#include "tcp_client.h"
 
-tcpServer::tcpServer(log4cpp::Category *logger, int port, radioHandler* radio)
+TcpServer::TcpServer(log4cpp::Category *logger, int port, RadioHandler* radio):MessageConsumer(logger)
 {
     //ctor
-    this->logger = logger;
+    //this->setLogger(logger);
     this->setPort(port);
     this->radio = radio;
-    counter = 0;
+    this->counter = 0;
 }
 
-tcpServer::~tcpServer()
+TcpServer::~TcpServer()
 {
     //dtor
 }
 
-void tcpServer::setConfigurator(YAML::Node *config){
-    this->config = config;
-}
-
-void tcpServer::setPort(int port){
+void TcpServer::setPort(int port){
     this->port = port;
 }
-int tcpServer::getPort(){
+int TcpServer::getPort(){
     return port;
 }
 
-void tcpServer::stop(){
-    removeClients();
+bool TcpServer::stop(){
+    removeClients();    
     running = false;
+    return running;
 }
 
 // Add message to the client
-void tcpServer::addMessage(const CSRD msg){    
+bool TcpServer::putMessage(const CSRD msg){    
 
     if (!clients.empty()){
         std::map<int, Client*>::iterator it = clients.begin();
@@ -42,15 +39,16 @@ void tcpServer::addMessage(const CSRD msg){
             it++;
         }
     }
+    return true;
 }
 
-bool tcpServer::start(){
-    //Create socket
-    logger->info("[tcpServer] Starting tcp server on port %d", port);
+bool TcpServer::start(){
+    //Create socket    
+    logger->info("[TcpServer] Starting tcp server on port %d", this->port);        
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
     {
-        logger->error("[tcpServer] Could not create socket");
+        logger->error("[TcpServer] Could not create socket");
     }
 
     //Prepare the sockaddr_in structure
@@ -64,29 +62,32 @@ bool tcpServer::start(){
     if( bind(socket_desc,(struct sockaddr *)&server_addr , sizeof(server_addr)) < 0)
     {
         //print the error message
-        logger->error("[tcpServer] Tcp server bind failed for port %d", port);
+        logger->error("[TcpServer] Tcp server bind failed for port %d", port);
         return false;
     }
 
-    logger->debug("[tcpServer] Start tcp listener");
+    logger->debug("[TcpServer] Start tcp listener");
     listen(socket_desc, 5);
     running = true;
 
-    logger->debug("[tcpServer] Start tcp thread");
+    logger->debug("[TcpServer] Start tcp thread");
 
-    pthread_create(&serverThread, nullptr, tcpServer::thread_entry_run, this);
+    pthread_create(&serverThread, nullptr, TcpServer::thread_entry_run, this);
 
-    return true;
+    return running;
 }
 
-void tcpServer::run(void* param){
-    logger->info("[tcpServer] Waiting for connections on port %d", port);
+void TcpServer::run(void* param){
+    logger->info("[TcpServer] Waiting for connections on port %d", port);
 
     struct sockaddr_in client_addr;
     vector<pthread_t> threads;
     char *s = NULL;
     socklen_t len = sizeof(client_addr);
-    logger->info("[tcpServer] Tcp server running");
+    logger->info("[TcpServer] Tcp server running");
+
+    // we can now register for messages
+    this->radio->register_consumer(consumer_name, this);
 
     while (running){
         try{
@@ -94,7 +95,7 @@ void tcpServer::run(void* param){
 
             if (client_sock < 0)
             {
-                logger->debug("[tcpServer] Cannot accept connection");
+                logger->debug("[TcpServer] Cannot accept connection");
             }
             else
             {
@@ -114,22 +115,23 @@ void tcpServer::run(void* param){
                     default:
                         break;
                 }
-                logger->info("[tcpServer] Creating client for ip:%s id:%d",s, counter);
+                logger->info("[TcpServer] Creating client for ip:%s id:%d",s, counter);
                 Client *client;                                
-                client = new tcpClient(logger, this, radio, client_sock, client_addr, counter, config);
+                client = new TcpClient(logger, this, radio, client_sock, client_addr, counter, config);
                 client->setIp(s);
                 free(s);
-                tempClient = client;
-                logger->debug("[tcpServer] Creating client thread %d", counter);
+                tempClient = client; // to be used in run_client
+                logger->debug("[TcpServer] Creating client thread %d", counter);
                 pthread_t clientThread;
-                pthread_create(&clientThread, nullptr, tcpServer::thread_entry_run_client, this);
-                clients.insert(std::pair<int,Client*>(counter, client));
+                pthread_create(&clientThread, nullptr, TcpServer::thread_entry_run_client, this);
+                clients.insert(std::pair<int, Client*>(counter, client));
                 threads.push_back(clientThread);
                 counter++;
+                if (counter > MAX_COUNTER_VALUE) counter = 0;
             }
         }
         catch(...){
-            logger->error("[tcpServer] TCP server failed while running.");
+            logger->error("[TcpServer] TCP server failed while running.");
         }
     }
 
@@ -139,19 +141,19 @@ void tcpServer::run(void* param){
     threads.clear();
 }
 
-void tcpServer::run_client(void* param){
-    logger->info("[tcpServer] Starting client thread %d", counter);
+void TcpServer::run_client(void* param){
+    logger->info("[TcpServer] Starting client thread %d", counter);
     tempClient->start(nullptr);
 }
 
-void tcpServer::removeClients(){
+void TcpServer::removeClients(){
     try{
 
-        logger->info("[tcpServer] Stopping client connections");
+        logger->info("[TcpServer] Stopping client connections");
         std::map<int,Client*>::iterator it = clients.begin();
         while(it != clients.end())
         {
-            logger->info("[tcpServer] Stop client %d", it->second->getId());
+            logger->info("[TcpServer] Stop client %d", it->second->getId());
             it->second->stop();
             it++;
         }
@@ -159,37 +161,22 @@ void tcpServer::removeClients(){
         clients.clear();
     }
     catch(...){
-        logger->error("[tcpServer] Failed to remove all clients");
+        logger->error("[TcpServer] Failed to remove all clients");
     }
 }
 
-void tcpServer::removeClient(Client *client){
+void TcpServer::removeClient(Client *client){
     try {
         if (clients.find(client->getId()) != clients.end()){
-        logger->debug("[tcpServer] Removing tcp client with id: %d", client->getId());
-        clients.erase(client->getId());
+            logger->debug("[TcpServer] Removing tcp client with id: %d", client->getId());
+            clients.erase(clients.find(client->getId()));
         }
         else{
-            logger->debug("[tcpServer] Could not remove tcp client with id: %d", client->getId());
+            logger->debug("[TcpServer] Could not remove tcp client with id: %d", client->getId());
         }
         delete client;
     }
     catch(...){
-        logger->error("[tcpServer] Failed to remove a client");
+        logger->error("[TcpServer] Failed to remove a client");
     }
 }
-
-void tcpServer::postMessageToAllClients(int clientId, CSRD msg, int msize){
-    //transverse the clients and send the message to all except the clientId    
-    std::map<int, Client*>::iterator it = clients.begin();
-    
-    while(it != clients.end())
-    {
-        if (it->second->getId() != clientId){
-            logger->info("[tcpServer] Sending msg from Client %d to Client %d", clientId, it->second->getId());
-            it->second->radioMessage(msg);
-        }
-        it++;
-    }
-}
-

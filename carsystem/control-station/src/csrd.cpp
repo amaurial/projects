@@ -21,6 +21,7 @@ uint8_t CSRD::setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_siz
     memcpy(buffer, mbuffer, s);
     messageLength = s;
     this->radioID = radioID;
+    time(&time_received);
     return s;
 }
 
@@ -831,6 +832,38 @@ states CSRD::convertFromInt(uint8_t s){
     default:
       return OFF;
   }
+}
+
+string CSRD::bufferToHexString(){
+    char tempbuf[50];
+    memset(tempbuf, '\0', sizeof(tempbuf));
+    sprintf(tempbuf,"%02X %02X %02X %02X %02X %02X %02X %02X",
+                    buffer[0],
+                    buffer[1],
+                    buffer[2],
+                    buffer[3],
+                    buffer[4],
+                    buffer[5],
+                    buffer[6],
+                    buffer[7]);
+    string s(tempbuf);
+    return s;
+}
+
+string CSRD::radioBufferToHexString(){
+    char tempbuf[50];
+    memset(tempbuf, '\0', sizeof(tempbuf));
+    sprintf(tempbuf,"%02X %02X %02X %02X %02X %02X %02X %02X",
+                    radioBuffer[0],
+                    radioBuffer[1],
+                    radioBuffer[2],
+                    radioBuffer[3],
+                    radioBuffer[4],
+                    radioBuffer[5],
+                    radioBuffer[6],
+                    radioBuffer[7]);
+    string s(tempbuf);
+    return s;
 }
 
 void CSRD::dumpBuffer(){

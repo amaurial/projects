@@ -21,5 +21,10 @@
 #define YAML_READTIMEOUT    "readtimeout"
 #define YAML_TCP_SERVER     "tcpserver"
 #define YAML_PORT           "port"
+#define YAML_LIMITS         "limits"
+#define YAML_RADIO_IN_QUEUE_SIZE    "radio_in_queue_size"
+#define YAML_RADIO_IN_QUEUE_THREAD_SLEEP     "radio_in_queue_thread_sleep"
+#define YAML_RADIO_OUT_QUEUE_THREAD_SLEEP     "radio_out_queue_thread_sleep"
+#define YAML_RADIO_SLEEP    "radio_read_sleep"
 
 #endif // CONFIG_H

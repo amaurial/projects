@@ -1,9 +1,11 @@
 #ifndef __CSRD__H
 #define __CSRD__H
+#include <string>
 #include <cstring>
 #include <stdint.h>
+#include <time.h>
 #include <log4cpp/Category.hh>
-#include "radioProtocol.h"
+#include "radio_protocol.h"
 
 //#define CSRD_DEBUG 1
 
@@ -68,6 +70,7 @@ enum objects_enum {
   BOARD=9
 };
 
+using namespace std;
 class CSRD {
 
 public:
@@ -178,6 +181,11 @@ public:
     void dumpRadioBuffer();
     void resetToDefault();    
     states convertFromInt(uint8_t s);
+    string bufferToHexString();
+    string radioBufferToHexString();
+    string bufferToJson();
+    string radioBufferToJson();
+
 protected:
 
 private:
@@ -193,6 +201,8 @@ private:
     uint16_t word(uint8_t a, uint8_t b);
     uint8_t lowByte(uint16_t);
     uint8_t highByte(uint16_t);
+    int8_t ssi; //signal level
+    time_t time_received;
 };
 
 #endif // __CSRD__H

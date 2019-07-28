@@ -7,15 +7,15 @@
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
 #include "config.hpp"
-#include "tcpServer.h"
-#include "radioHandler.hpp"
+#include "tcp_server.h"
+#include "radio_handler.hpp"
 #include "csrd.h"
 
 
 using namespace std;
 
-class tcpServer;
-class radioHandler;
+class TcpServer;
+class RadioHandler;
 class CSRD;
 
 
@@ -28,26 +28,24 @@ class Client
         virtual void stop()=0;
         virtual void radioMessage(const CSRD msg)=0;
 
-
         Client& setIp(char *ip);
         string getIp();
 
         int getId();
         Client& setId(int id);
         Client& setLogger(log4cpp::Category *logger);
-        Client& setRadioHandler(radioHandler *radio);
+        Client& setRadioHandler(RadioHandler *radio);
         Client& setClientSocket(int client_socket);
         Client& setSockAddr(struct sockaddr_in client_addr);
-        Client& setServer(tcpServer *server);
+        Client& setServer(TcpServer *server);
         Client& setConfigurator(YAML::Node *config);
-
 
     protected:
         int id;
         string ip;
         log4cpp::Category *logger;
-        tcpServer *server;
-        radioHandler *radio;
+        TcpServer *server;
+        RadioHandler *radio;
         int client_sock;
         struct sockaddr_in client_addr;        
         vector<string> & split(const string &s, char delim, vector<string> &elems);

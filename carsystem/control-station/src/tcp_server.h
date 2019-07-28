@@ -7,35 +7,36 @@
 #include <yaml-cpp/yaml.h>
 #include <map>
 #include "client.h"
-#include "radioHandler.hpp"
+#include "radio_handler.hpp"
 #include "config.hpp"
+#include "message_consumer.h"
+
+#define MAX_COUNTER_VALUE 1000000
 
 class Client;
-class radioHandler;
+class RadioHandler;
 
-class tcpServer
+class TcpServer: public MessageConsumer
 {
     public:
-        tcpServer(log4cpp::Category *logger, int port, radioHandler* radio);
-        virtual ~tcpServer();
+        TcpServer(log4cpp::Category *logger, int port, RadioHandler* radio);
+        ~TcpServer();
         bool start();
         void setPort(int port);
         int getPort();
-        void stop();
+        bool stop();
         void removeClient(Client* client);
-        void addMessage(const CSRD msg);        
-        void postMessageToAllClients(int clientId, CSRD msg, int msize);
-        void setConfigurator(YAML::Node* config);
+        bool putMessage(const CSRD msg);                        
     protected:
     private:
-        radioHandler *radio;
+        RadioHandler *radio;
         Client *tempClient;        
         bool running;
         int port;
         int socket_desc, client_sock ,read_size;
         struct sockaddr_in server_addr;
-        int counter;        
-        log4cpp::Category *logger;
+        uint counter;     
+        string consumer_name = "tcpserver";        
         std::map<int, Client*> clients;
         pthread_t serverThread;        
         YAML::Node *config;
@@ -45,12 +46,12 @@ class tcpServer
         void run_client(void* param);
 
         static void* thread_entry_run(void *classPtr){
-            ((tcpServer*)classPtr)->run(nullptr);
+            ((TcpServer*)classPtr)->run(nullptr);
             return nullptr;
         }
 
         static void* thread_entry_run_client(void *classPtr){
-            ((tcpServer*)classPtr)->run_client(classPtr);
+            ((TcpServer*)classPtr)->run_client(classPtr);
             return nullptr;
         }
 };

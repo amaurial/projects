@@ -208,6 +208,14 @@ void RHGenericDriver::setCADTimeout(unsigned long cad_timeout)
     _cad_timeout = cad_timeout;
 }
 
+void RHGenericDriver::setWaitTimeout(uint16_t timeout) {
+    _wait_timeout = timeout;
+}
+
+uint16_t RHGenericDriver::getWaitTimeout() {
+    return _wait_timeout;
+}
+
 #if (RH_PLATFORM == RH_PLATFORM_ARDUINO) && defined(RH_PLATFORM_ATTINY)
 // Tinycore does not have __cxa_pure_virtual, so without this we
 // get linking complaints from the default code generated for pure virtual functions

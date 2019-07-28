@@ -12,6 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <regex>
+#include <queue>
 
 #define BUFFER_SIZE 1024
 
@@ -19,17 +20,17 @@
 
 using namespace std;
 
-class tcpClient : public Client
+class TcpClient : public Client
 {
     public:
-        tcpClient(log4cpp::Category *logger,
-                  tcpServer *server,
-                  radioHandler* radio,
+        TcpClient(log4cpp::Category *logger,
+                  TcpServer *server,
+                  RadioHandler* radio,
                   int client_sock,
                   struct sockaddr_in client_addr,
                   int id,
                   YAML::Node *config);
-        virtual ~tcpClient();
+        virtual ~TcpClient();
         void start(void *param);
         void stop();
         void radioMessage(const CSRD msg);        
@@ -41,15 +42,14 @@ class tcpClient : public Client
         pthread_cond_t  m_condv_in_cli;
 
         void run(void * param);
-        void handleRadio(uint8_t *msg);        
+        void handleRadio(CSRD message);        
         void processRadioQueue(void *param);
         void sendToClient(string msg);        
-        void handleClientMessages(char* msgptr);        
-        void handleRadioMessages(char* msgptr);
+        void handleClientMessages(char* msgptr);                
         void shutdown();        
         
          static void* thread_processradio(void *classPtr){
-            ((tcpClient*)classPtr)->processRadioQueue(classPtr);
+            ((TcpClient*)classPtr)->processRadioQueue(classPtr);
             return nullptr;
         }
 };

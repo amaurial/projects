@@ -13,6 +13,7 @@
 #include <condition_variable>
 #include <iomanip>
 #include <exception>
+#include <map>
 
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
@@ -20,22 +21,27 @@
 #include <RH_RF69.h>
 #include "csrd.h"
 #include "config.hpp"
+#include "message_consumer.h"
 
 #define READ_TIMEOUT 5
+#define RADIO_IN_QUEUE_SIZE 100000
+#define QUEUE_READER_SLEEP 500000
+#define RADIO_SLEEP 1000
 
 using namespace std;
 
-class radioHandler
+class RadioHandler
 {
     public:
-        radioHandler(log4cpp::Category *logger);
-        virtual ~radioHandler();
+        RadioHandler(log4cpp::Category *logger);
+        virtual ~RadioHandler();
         bool start();
         bool stop();
         int put_to_out_queue(char *msg, int size);        
         int put_to_incoming_queue(char *msg, int size);
         void setConfigurator(YAML::Node* config);
-
+        bool register_consumer(string name, MessageConsumer *consumer);
+        bool unregister_consumer(string name);
 
     private:
         bool running = false;
@@ -44,6 +50,7 @@ class radioHandler
         RH_RF69 radio1;
         RH_RF69 radio2;        
         uint8_t buffer[RH_RF69_MAX_MESSAGE_LEN];
+        map<string, MessageConsumer*> mapConsumer;
 
         pthread_t radioReader;
         pthread_t queueReader;
@@ -60,15 +67,15 @@ class radioHandler
         void run_queue_reader(void* param);
 
         static void* thread_entry_in(void *classPtr){
-            ((radioHandler*)classPtr)->run_in(nullptr);
+            ((RadioHandler*)classPtr)->run_in(nullptr);
             return nullptr;
         }
         static void* thread_entry_out(void *classPtr){
-            ((radioHandler*)classPtr)->run_out(nullptr);
+            ((RadioHandler*)classPtr)->run_out(nullptr);
             return nullptr;
         }
         static void* thread_entry_in_reader(void *classPtr){
-            ((radioHandler*)classPtr)->run_queue_reader(nullptr);
+            ((RadioHandler*)classPtr)->run_queue_reader(nullptr);
             return nullptr;
         }
 
