@@ -113,6 +113,6 @@ void Client::sendRadioMessage(CSRD message){
     uint8_t msg[MESSAGE_SIZE];
     uint8_t len = MESSAGE_SIZE;
 
-    len = message.getRadioMessageBuffer(msg);
+    len = message.getMessageBuffer(msg);
     sendRadioMessage(len, msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7]);
 }

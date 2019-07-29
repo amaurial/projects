@@ -25,505 +25,500 @@ uint8_t CSRD::setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_siz
     return s;
 }
 
-uint8_t CSRD::getRadioMessageBuffer(uint8_t *mbuffer){    
-    memcpy(mbuffer, this->radioBuffer, radioMessageLength);
-    return radioMessageLength;    
-}
-
 uint8_t CSRD::getMessageBuffer(uint8_t *mbuffer){
     memcpy(mbuffer, this->buffer, messageLength);
     return messageLength;
 }
 
 uint8_t CSRD::createInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2){   
-    radioMessageLength = 8;
-    radioBuffer[0]=RP_STATUS;
-    radioBuffer[1]=RP_INITIALREG;
-    radioBuffer[2]=lowByte(nodeid);
-    radioBuffer[3]=lowByte(nodeid);
-    radioBuffer[4]=status;
-    radioBuffer[5]=val0;
-    radioBuffer[6]=val1;
-    radioBuffer[7]=val2;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0]=RP_STATUS;
+    buffer[1]=RP_INITIALREG;
+    buffer[2]=lowByte(nodeid);
+    buffer[3]=lowByte(nodeid);
+    buffer[4]=status;
+    buffer[5]=val0;
+    buffer[6]=val1;
+    buffer[7]=val2;    
+    return messageLength;
     //logger->debug("create Initial Register Message");        
 }
 
 uint8_t CSRD::createStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){    
-    radioMessageLength = 6;
-    radioBuffer[0]=RP_STATUS;
-    radioBuffer[1]=RP_REPORT_STATUS;
-    radioBuffer[2]=highByte(nodeid);
-    radioBuffer[3]=lowByte(nodeid);
-    radioBuffer[4]=status;
-    radioBuffer[5]=serverAddr;
-    radioBuffer[6]=0;
-    radioBuffer[7]=0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0]=RP_STATUS;
+    buffer[1]=RP_REPORT_STATUS;
+    buffer[2]=highByte(nodeid);
+    buffer[3]=lowByte(nodeid);
+    buffer[4]=status;
+    buffer[5]=serverAddr;
+    buffer[6]=0;
+    buffer[7]=0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t status){    
-    radioMessageLength = 6;
-    radioBuffer[0]=RP_STATUS;
-    radioBuffer[1]=RP_REPORT_ACK;
-    radioBuffer[2]=highByte(nodeid);
-    radioBuffer[3]=lowByte(nodeid);
-    radioBuffer[4]=element;
-    radioBuffer[5]=status;
-    radioBuffer[6]=0;
-    radioBuffer[7]=0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0]=RP_STATUS;
+    buffer[1]=RP_REPORT_ACK;
+    buffer[2]=highByte(nodeid);
+    buffer[3]=lowByte(nodeid);
+    buffer[4]=element;
+    buffer[5]=status;
+    buffer[6]=0;
+    buffer[7]=0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createBroadcastOPMessage(uint8_t group,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1,uint8_t val2){    
-    radioMessageLength = 8;
-    radioBuffer[0]=RP_BROADCAST;
-    radioBuffer[1]=RP_OPERATION;
-    radioBuffer[2]=group;
-    radioBuffer[3]=element;
-    radioBuffer[4]=state;
-    radioBuffer[5]=val0;
-    radioBuffer[6]=val1;
-    radioBuffer[7]=val2;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0]=RP_BROADCAST;
+    buffer[1]=RP_OPERATION;
+    buffer[2]=group;
+    buffer[3]=element;
+    buffer[4]=state;
+    buffer[5]=val0;
+    buffer[6]=val1;
+    buffer[7]=val2;    
+    return messageLength;
 
 }
 
 uint8_t CSRD::createBroadcastActionMessage(uint8_t group,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1,uint8_t val2){
-    radioMessageLength = 8;
-    radioBuffer[0]=RP_BROADCAST;
-    radioBuffer[1]=RP_ACTION;
-    radioBuffer[2]=group;
-    radioBuffer[3]=element;
-    radioBuffer[4]=action;
-    radioBuffer[5]=val0;
-    radioBuffer[6]=val1;
-    radioBuffer[7]=val2;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0]=RP_BROADCAST;
+    buffer[1]=RP_ACTION;
+    buffer[2]=group;
+    buffer[3]=element;
+    buffer[4]=action;
+    buffer[5]=val0;
+    buffer[6]=val1;
+    buffer[7]=val2;    
+    return messageLength;
 }
 
 uint8_t CSRD::createBroadcastRequestRegister(uint8_t group){    
-    radioMessageLength = 5;
-    radioBuffer[0]=RP_BROADCAST;
-    radioBuffer[1]=RP_ACTION;
-    radioBuffer[2]=group;
-    radioBuffer[3]=0xff;
-    radioBuffer[4]=RP_AC_REGISTER;
-    radioBuffer[5]=0;
-    radioBuffer[6]=0;
-    radioBuffer[7]=0;    
-    return radioMessageLength;
+    messageLength = 5;
+    buffer[0]=RP_BROADCAST;
+    buffer[1]=RP_ACTION;
+    buffer[2]=group;
+    buffer[3]=0xff;
+    buffer[4]=RP_AC_REGISTER;
+    buffer[5]=0;
+    buffer[6]=0;
+    buffer[7]=0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createBroadcastWriteMessage(uint8_t group,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1,uint8_t val2){    
-    radioMessageLength = 8;
-    radioBuffer[0] = RP_BROADCAST;
-    radioBuffer[1] = RP_WRITE;
-    radioBuffer[2] = group;
-    radioBuffer[3] = element;
-    radioBuffer[4] = param_idx;
-    radioBuffer[5] = val0;
-    radioBuffer[6] = val1;
-    radioBuffer[7] = val2;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0] = RP_BROADCAST;
+    buffer[1] = RP_WRITE;
+    buffer[2] = group;
+    buffer[3] = element;
+    buffer[4] = param_idx;
+    buffer[5] = val0;
+    buffer[6] = val1;
+    buffer[7] = val2;    
+    return messageLength;
 }
 uint8_t CSRD::createAddressedWriteMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx,uint8_t val0,uint8_t val1){    
-    radioMessageLength = 8;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_WRITE;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = element;
-    radioBuffer[5] = param_idx;
-    radioBuffer[6] = val0;
-    radioBuffer[7] = val1;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_WRITE;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = param_idx;
+    buffer[6] = val0;
+    buffer[7] = val1;    
+    return messageLength;
 }
 uint8_t CSRD::createAddressedReadMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t param_idx){    
-    radioMessageLength = 6;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_READ;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = element;
-    radioBuffer[5] = param_idx;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_READ;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = param_idx;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 uint8_t CSRD::createAddressedOPMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t state,uint8_t val0,uint8_t val1){    
-    radioMessageLength = 8;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_OPERATION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = element;
-    radioBuffer[5] = state;
-    radioBuffer[6] = val0;
-    radioBuffer[7] = val1;    
-    return radioMessageLength;    
+    messageLength = 8;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_OPERATION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = state;
+    buffer[6] = val0;
+    buffer[7] = val1;    
+    return messageLength;    
 }
 
 uint8_t CSRD::createAddressedActionMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t action,uint8_t val0,uint8_t val1){    
-    radioMessageLength = 8;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_ACTION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = element;
-    radioBuffer[5] = action;
-    radioBuffer[6] = val0;
-    radioBuffer[7] = val1;    
-    return radioMessageLength;    
+    messageLength = 8;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_ACTION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = action;
+    buffer[6] = val0;
+    buffer[7] = val1;    
+    return messageLength;    
 }
 
 uint8_t CSRD::createAddressedStatusMessage(uint8_t status_code, uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t p0,uint8_t p1,uint8_t p2){    
-    radioMessageLength = 8;
-    radioBuffer[0] = RP_STATUS;
-    radioBuffer[1] = status_code;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = element;
-    radioBuffer[5] = p0;
-    radioBuffer[6] = p1;
-    radioBuffer[7] = p2;    
-    return radioMessageLength;
+    messageLength = 8;
+    buffer[0] = RP_STATUS;
+    buffer[1] = status_code;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = p0;
+    buffer[6] = p1;
+    buffer[7] = p2;    
+    return messageLength;
 }
 
 uint8_t CSRD::createEmergencyBroadcast(uint8_t group){    
-    radioMessageLength = 5;
-    radioBuffer[0] = RP_BROADCAST;
-    radioBuffer[1] = RP_OPERATION;
-    radioBuffer[2] = group;
-    radioBuffer[3] = 255;
-    radioBuffer[4] = EMERGENCY;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 5;
+    buffer[0] = RP_BROADCAST;
+    buffer[1] = RP_OPERATION;
+    buffer[2] = group;
+    buffer[3] = 255;
+    buffer[4] = EMERGENCY;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 uint8_t CSRD::createEmergency(uint8_t serverAddr,uint16_t nodeid){    
-    radioMessageLength = 6;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_OPERATION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = 255;
-    radioBuffer[5] = EMERGENCY;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_OPERATION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 255;
+    buffer[5] = EMERGENCY;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createBackToNormalBroadcast(uint8_t group){    
-    radioMessageLength = 5;
-    radioBuffer[0] = RP_BROADCAST;
-    radioBuffer[1] = RP_OPERATION;
-    radioBuffer[2] = group;
-    radioBuffer[3] = 255;
-    radioBuffer[4] = NORMAL;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 5;
+    buffer[0] = RP_BROADCAST;
+    buffer[1] = RP_OPERATION;
+    buffer[2] = group;
+    buffer[3] = 255;
+    buffer[4] = NORMAL;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 uint8_t CSRD::createBackToNormal(uint8_t serverAddr,uint16_t nodeid){    
-    radioMessageLength = 6;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_OPERATION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = 255;
-    radioBuffer[5] = NORMAL;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_OPERATION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 255;
+    buffer[5] = NORMAL;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createLowBattery(uint8_t serverAddr,uint16_t nodeid){    
-    radioMessageLength = 7;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_ACTION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = 255;
-    radioBuffer[5] = AC_LOWBATTERY;
-    radioBuffer[6] = serverAddr;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 7;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_ACTION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 255;
+    buffer[5] = AC_LOWBATTERY;
+    buffer[6] = serverAddr;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRestoreDefaultConfig(uint8_t serverAddr,uint16_t nodeid,uint8_t nodeAddr){    
-    radioMessageLength = 7;
-    radioBuffer[0] = RP_ADDRESSED;
-    radioBuffer[1] = RP_ACTION;
-    radioBuffer[2] = highByte(nodeid);
-    radioBuffer[3] = lowByte(nodeid);
-    radioBuffer[4] = 255;
-    radioBuffer[5] = AC_RESTORE_DEFAULT_PARAMS;
-    radioBuffer[6] = serverAddr;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 7;
+    buffer[0] = RP_ADDRESSED;
+    buffer[1] = RP_ACTION;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 255;
+    buffer[5] = AC_RESTORE_DEFAULT_PARAMS;
+    buffer[6] = serverAddr;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createServerAutoEnum(uint16_t nodeid){    
-    radioMessageLength = 3;
-    radioBuffer[0] = BR_SERVER_AUTO_ENUM;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);    
-    radioBuffer[3] = 0;
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 3;
+    buffer[0] = BR_SERVER_AUTO_ENUM;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);    
+    buffer[3] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarAutoEnum(uint16_t nodeid){    
-    radioMessageLength = 3;
-    radioBuffer[0] = BR_CAR_AUTO_ENUM;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = 0;
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 3;
+    buffer[0] = BR_CAR_AUTO_ENUM;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createNodeId(uint16_t nodeid){    
-    radioMessageLength = 3;
-    radioBuffer[0] = RP_ID_RESOLUTION;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = 0;
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 3;
+    buffer[0] = RP_ID_RESOLUTION;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCId(uint16_t nodeid){    
-    radioMessageLength = 3;
-    radioBuffer[0] = RC_ID;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = 0;
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 3;
+    buffer[0] = RC_ID;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarId(uint16_t nodeid){    
-    radioMessageLength = 3;
-    radioBuffer[0] = CAR_ID;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = 0;
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 3;
+    buffer[0] = CAR_ID;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createAcquire(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_ACQUIRE;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_ACQUIRE;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createAcquireAck(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_ACQUIRE_ACK;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid; 
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_ACQUIRE_ACK;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid; 
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createAcquireNAck(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_ACQUIRE_NACK;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid; 
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_ACQUIRE_NACK;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid; 
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarRelease(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_RELEASE;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_RELEASE;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarReleaseAck(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_RELEASE_ACK;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_RELEASE_ACK;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCCarRegister(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_CAR_REGISTER;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_CAR_REGISTER;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCCarRegisterAck(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_CAR_REGISTER_ACK;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_CAR_REGISTER_ACK;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarKeepAlive(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = CAR_KEEP_ALIVE;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = CAR_KEEP_ALIVE;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCKeepAlive(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_KEEP_ALIVE;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_KEEP_ALIVE;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarLightOnOff(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_LIGHTS;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_LIGHTS;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createCarBreakLightOnOff(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_BREAK_LIGHTS;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_BREAK_LIGHTS;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createStopCar(uint16_t nodeid, uint8_t serverid){    
-    radioMessageLength = 4;
-    radioBuffer[0] = RC_STOP_CAR;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;    
-    radioBuffer[4] = 0;
-    radioBuffer[5] = 0;
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 4;
+    buffer[0] = RC_STOP_CAR;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;    
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCMove(uint16_t nodeid, uint8_t serverid,uint8_t speed, uint8_t direction){    
-    radioMessageLength = 6;
-    radioBuffer[0] = RC_MOVE;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;
-    radioBuffer[4] = speed;
-    radioBuffer[5] = direction;    
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = RC_MOVE;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;
+    buffer[4] = speed;
+    buffer[5] = direction;    
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createRCTurn(uint16_t nodeid, uint8_t serverid,uint8_t angle, uint8_t direction){    
-    radioMessageLength = 6;
-    radioBuffer[0] = RC_TURN;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;
-    radioBuffer[4] = angle;
-    radioBuffer[5] = direction;    
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = RC_TURN;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;
+    buffer[4] = angle;
+    buffer[5] = direction;    
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint8_t CSRD::createSaveParam(uint16_t nodeid, uint8_t serverid, uint8_t idx, uint8_t value){    
-    radioMessageLength = 6;
-    radioBuffer[0] = SAVE_PARAM;
-    radioBuffer[1] = highByte(nodeid);
-    radioBuffer[2] = lowByte(nodeid);
-    radioBuffer[3] = serverid;
-    radioBuffer[4] = idx;
-    radioBuffer[5] = value;    
-    radioBuffer[6] = 0;
-    radioBuffer[7] = 0;    
-    return radioMessageLength;
+    messageLength = 6;
+    buffer[0] = SAVE_PARAM;
+    buffer[1] = highByte(nodeid);
+    buffer[2] = lowByte(nodeid);
+    buffer[3] = serverid;
+    buffer[4] = idx;
+    buffer[5] = value;    
+    buffer[6] = 0;
+    buffer[7] = 0;    
+    return messageLength;
 }
 
 uint16_t CSRD::getNodeId(){   
@@ -850,30 +845,9 @@ string CSRD::bufferToHexString(){
     return s;
 }
 
-string CSRD::radioBufferToHexString(){
-    char tempbuf[50];
-    memset(tempbuf, '\0', sizeof(tempbuf));
-    sprintf(tempbuf,"%02X %02X %02X %02X %02X %02X %02X %02X",
-                    radioBuffer[0],
-                    radioBuffer[1],
-                    radioBuffer[2],
-                    radioBuffer[3],
-                    radioBuffer[4],
-                    radioBuffer[5],
-                    radioBuffer[6],
-                    radioBuffer[7]);
-    string s(tempbuf);
-    return s;
-}
-
 void CSRD::dumpBuffer(){
     logger->debug("CSRD buffer: %X %X %X %X %X %X %X %X",
     buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);    
-}
-
-void CSRD::dumpRadioBuffer(){
-    logger->debug("CSRD buffer: %X %X %X %X %X %X %X %X",
-    radioBuffer[0], radioBuffer[1], radioBuffer[2], radioBuffer[3], radioBuffer[4], radioBuffer[5], radioBuffer[6], radioBuffer[7]);    
 }
 
 uint16_t CSRD::word(uint8_t a, uint8_t b){
@@ -889,4 +863,8 @@ uint8_t CSRD::lowByte(uint16_t a){
 uint8_t CSRD::highByte(uint16_t a){
     uint8_t b = a >> 8;
     return b;
+}
+
+string CSRD::bufferToJson(){
+    return nullptr;
 }

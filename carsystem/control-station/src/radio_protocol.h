@@ -88,9 +88,12 @@ If Broadcast
             F,G,H is the action param
 
 If addressed message
-    B indicates the type of action: store value (RP_WRITE), perform some operation RP_OPERATION or read parameter RP_READ, RP_ACTION
+    B indicates the type of action: 
+      store value (RP_WRITE), perform some operation 
+      RP_OPERATION or read parameter RP_READ, RP_ACTION
     C and D is the node id
-    E is the element .0xff is the board element else is (motor, left light,sirene, aux0, aux1, etc..)
+    E is the element .0xff is the board element else is 
+      (motor, left light,sirene, aux0, aux1, etc..)
         Case write
             F is param index
             G H are values

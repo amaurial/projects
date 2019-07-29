@@ -77,12 +77,10 @@ public:
     CSRD(log4cpp::Category *logger);    
     CSRD(log4cpp::Category *logger, uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);
 
-    uint8_t setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);    
-    uint8_t getMessage(uint8_t *mbuffer);
+    uint8_t setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);        
     uint8_t getMessageBuffer(uint8_t *mbuffer);
     uint8_t getRadioMessageBuffer(uint8_t *mbuffer);
-    uint8_t getMessageLength(){return messageLength;};
-    uint8_t getRadioMessageLength(){return radioMessageLength;};
+    uint8_t getMessageLength(){return messageLength;};    
     uint16_t getRadioID(){return radioID;};
     
     bool isBroadcast();
@@ -177,14 +175,11 @@ public:
     uint8_t createLowBattery(uint8_t serverAddr,uint16_t nodeid);
     uint8_t createStopCar(uint16_t carid, uint8_t serverAddr);
 
-    void dumpBuffer();
-    void dumpRadioBuffer();
+    void dumpBuffer();    
     void resetToDefault();    
     states convertFromInt(uint8_t s);
-    string bufferToHexString();
-    string radioBufferToHexString();
-    string bufferToJson();
-    string radioBufferToJson();
+    string bufferToHexString();    
+    string bufferToJson();    
 
 protected:
 
@@ -195,9 +190,7 @@ private:
     uint8_t messageLength;
     uint8_t params[PARAMETERS_SIZE];
     uint16_t nodenumber;
-    uint16_t origin;
-    uint8_t radioBuffer[MESSAGE_SIZE];// the message created by the create methods    
-    uint8_t radioMessageLength;    
+    uint16_t origin;    
     uint16_t word(uint8_t a, uint8_t b);
     uint8_t lowByte(uint16_t);
     uint8_t highByte(uint16_t);

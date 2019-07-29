@@ -1,0 +1,233 @@
+
+/*message format
+8 bytes
+<A><B><C><D><E><F><G><H>
+
+"A" indicates if it is a broadcast message (RP_BROADCAST) or an addressed message (RP_ADDRESSED) or status messages RP_STATUS
+
+If Broadcast
+    B indicates the type of action: store value (RP_WRITE) or perform some operation RP_OPERATION, RP_ACTION
+    C is the group. If equal to 0 means all groups
+    D is the element. .0xff is the board element else (motor, left light,sirene, aux0, aux1, etc..)
+
+        Case store value
+            E is param index
+            F G H are values
+
+        Case Operation
+            E is the next state
+            F G H are general values
+
+        case action
+            E is the action
+            F,G,H is the action param
+
+If addressed message
+    B indicates the type of action: store value (RP_WRITE), perform some operation RP_OPERATION or read parameter RP_READ, RP_ACTION
+    C and D is the node id
+    E is the element .0xff is the board element else is (motor, left light,sirene, aux0, aux1, etc..)
+        Case write
+            F is param index
+            G H are values
+        Case read
+            F is param index . 0xff indicate return all parameters
+        case operation
+            F is the next state
+            G H are a general value
+        case action
+            F is the action
+            G,H is the action param
+
+
+Status messages
+    Initial register message
+        B = 0x00
+        C and D = node id
+        F = status (ACTIVE,INACTIVE,CHARGING,PANNE)
+        G,H = optional values
+    Query status
+        B = 0x01
+        C and D = node id
+        F = status (ACTIVE,INACTIVE,CHARGING,PANNE)
+        G,H = optional values
+    Answer status
+        B = 0x02
+        C and D = node id
+        F = status (ACTIVE,INACTIVE,CHARGING,PANNE)
+        G,H = optional values
+    Query value
+        B=0x03
+        C and D = node id
+        E=element
+	F=param1
+	G=param2
+	H=param3
+    Answer query
+        B=0x04
+	C and D = node id
+        E=element
+	F=param1 value
+	G=param2 value
+	H=param3 value
+    ACK
+        B=0x04
+        C and D = node id
+        E = element
+        F = status
+Action messages
+
+*/
+// Broadcast message
+{
+    {"date": 2019-07-25 18:00:00:150},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "server", "id": "server123"}
+            },
+            {"to":
+                {"name": "car", "id": "1234"}
+            },
+            "type" : "BROADCAST", //A parameter
+            "action_type" : "WRITE or READ or OPERATION or ACTION", //B parameter
+            "group" : "", // byte C 
+            "element": "", // byte D
+            "nextstate": "", // byte E if operation
+            "param_index": "", // byte E if WRITE           
+            "action": "", // byte E if ACTION 
+            {"values": [0 , 1 , 2]} // bytes F, G and H
+    }
+}
+
+// template for broadcast message
+{
+    {"date": "$DATE"},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "$FROM_NAME", "id": "$FROM_ID"}
+            },
+            {"to":
+                {"name": "$TO_NAME", "id": "$TO_ID"}
+            },
+            "type" : "BROADCAST", //A parameter
+            "action_type" : "$ACTION_TYPE", //B parameter
+            "group" : "$GROUP", // byte C 
+            "element": "$ELEMENT", // byte D
+            "nextstate": "$NEXT_STATE", // byte E if operation
+            "param_index": "$PARAM_INDEX", // byte E if WRITE           
+            "action": "$ACTION", // byte E if ACTION 
+            {"values": [$VAL_F , $VAL_G , $VAL_H]} // bytes F, G and H
+    }
+}
+
+// Addressed message
+{
+    {"date": 2019-07-25 18:00:00:150},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "server", "id": "server123"}
+            },
+            {"to":
+                {"name": "car", "id": "1234"}
+            },
+            "type" : "ADDRESSED", //A byte
+            "action_type" : "WRITE or READ or OPERATION or ACTION", //B byte
+            "nodeid" : "", // bytes C and D            
+            "element": "", // byte E
+            "param_index" : "", // byte F if WRITE/READ 255 is all parameters
+            "nextstate": "", // byte F if OPERATION
+            "action": "", // byte F if ACTION
+            {"values": [0 , 1 ]} // bytes G and H
+    }
+}
+
+// Template for addressed message
+{
+    {"date": "$DATE},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "$FROM_NAME", "id": "$FROM_ID"}
+            },
+            {"to":
+                {"name": "$TO_NAME", "id": "$TO_ID"}
+            },
+            "type" : "ADDRESSED", //A byte
+            "action_type" : "$ACTION_TYPE", //B byte
+            "nodeid" : "$NODEID", // bytes C and D            
+            "element": "$ELEMENT", // byte E
+            "param_index" : "$PARAM_INDEX", // byte F if WRITE/READ 255 is all parameters
+            "nextstate": "$NEXT_STATE", // byte F if OPERATION
+            "action": "$ACTION", // byte F if ACTION
+            {"values": [$VAL_G , $VAL_H ]} // bytes G and H
+    }
+}
+
+// Status message
+{
+    {"date": 2019-07-25 18:00:00:150},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "server", "id": "server123"}
+            },
+            {"to":
+                {"name": "car", "id": "1234"}
+            },
+            "type" : "STATUS", //A parameter
+            "status_type" : "REGISTER, QUERY_STATUS, ANSWER_STATUS, QUERY_VALUE, QUERY_ANSWER, ACK", //B parameter
+            "nodeid" : "", //bytes C and D
+            "element": "", // byte E if QUERY_VALUE/ QUERY_ANSWER  or ACK           
+            "status" : "ACTIVE, INACTIVE, CHARGING, PANNE", // byte F for REGISTER, QUERY_STATUS, ANSWER_STATUS            
+            {"params" : [0, 1, 2]} //params for QUERY_STATUS. bytes F to H                        
+    }
+}
+
+// Status message template
+{
+    {"date": "$DATE},
+    {
+        "csrd": 
+            {"from": 
+                {"name": "$FROM_NAME", "id": "$FROM_ID"}
+            },
+            {"to":
+                {"name": "$TO_NAME", "id": "$TO_ID"}
+            },
+            "type" : "STATUS", //A parameter
+            "status_type" : "REGISTER, QUERY_STATUS, ANSWER_STATUS, QUERY_VALUE, QUERY_ANSWER, ACK", //B parameter
+            "nodeid" : "", //bytes C and D
+            "element": "", // byte E if QUERY_VALUE/ QUERY_ANSWER  or ACK           
+            "status" : "ACTIVE, INACTIVE, CHARGING, PANNE", // byte F for REGISTER, QUERY_STATUS, ANSWER_STATUS            
+            {"params" : [0, 1, 2]} //params for QUERY_STATUS. bytes F to H                        
+    }
+}
+
+{
+        {"pi", 3.141},
+        {"happy", true},
+        {"name", "Niels"},
+        {"nothing", nullptr},
+        {"answer", {
+            {"everything", 42}
+            }},
+        {"list", {1, 0, 2}},
+        {"object", {
+            {"currency", "USD"},
+            {"value", 42.99}
+        }}
+    }
+
+    {"menu": {
+  "id": "file",
+  "value": "File",
+  "popup": {
+    "menuitem": [
+      {"value": "New", "onclick": "CreateNewDoc()"},
+      {"value": "Open", "onclick": "OpenDoc()"},
+      {"value": "Close", "onclick": "CloseDoc()"}
+    ]
+  }
+}}

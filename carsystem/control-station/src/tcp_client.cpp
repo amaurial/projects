@@ -118,9 +118,11 @@ void TcpClient::processRadioQueue(void *param){
             }
             catch(runtime_error &ex){
                 logger->debug("[%d] [TcpClient] Failed to process the radio message",id);
+                logger->debug("%s", ex.what());
             }
-            catch(...){
+            catch(const exception &ex){
                 logger->debug("[%d] [TcpClient] Failed to process the radio message",id);
+                logger->debug("%s", ex.what());
             }
         }
         usleep(10000);
@@ -129,8 +131,11 @@ void TcpClient::processRadioQueue(void *param){
 
 void TcpClient::handleRadio(CSRD message){     
     logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
-    sendToClient(message.bufferToHexString());
-    sendToClient("\n");    
+    string json_message = csrdToJson(&message);
+    sendToClient(message.bufferToHexString());    
+    sendToClient("\n");
+    sendToClient(json_message);
+    sendToClient("\n");
     // TODO
     
 }

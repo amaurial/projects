@@ -8,7 +8,7 @@ INCLUDES = -Iinclude -I$(ROOTFS)/usr/include -I$(ROOTFS)/include -I/$(BCM2835)/s
 CFLAGS = -std=c++11 --sysroot $(ROOTFS) -c $(NOERRORFLAGS) -lm -g $(INCLUDES)
 #LDFLAGS= -L/usr/local/lib -L/usr/lib -Llib -L/home/amauri/pi/toolchain/rootfs/lib
 LDFLAGS = --sysroot $(ROOTFS) -Llib -L$(ROOTFS)/usr/lib -L$(ROOTFS)/lib -L$(BCM2835)/src
-SOURCES = src/main.cpp src/radio_handler.cpp src/csrd.cpp src/client.cpp src/tcp_server.cpp src/tcp_client.cpp src/message_consumer.cpp
+SOURCES = src/main.cpp src/radio_handler.cpp src/csrd.cpp src/client.cpp src/tcp_server.cpp src/tcp_client.cpp src/message_consumer.cpp src/utils.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = control-station
 
