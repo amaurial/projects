@@ -25,6 +25,50 @@ uint8_t CSRD::setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_siz
     return s;
 }
 
+time_t CSRD::getTime(){
+    return time_received;
+}
+
+string CSRD::getTimeAsString(string time_locale){
+    //struct tm t = *localtime(&time_received);
+    stringstream ss;
+    ss.imbue(locale(time_locale));
+    ss << put_time(gmtime(&time_received), "%c");
+    return ss.str();
+}
+
+void CSRD::setTo(uint8_t to){
+    this->to = to;
+}
+
+uint8_t CSRD::getTo(){
+    return to;
+}
+
+void CSRD::setFrom(uint8_t from){
+    this->from = from;
+}
+
+uint8_t CSRD::getFrom(){
+    return from;
+}
+
+void CSRD::setRssi(uint8_t rssi){
+    this->rssi = rssi;
+}
+
+uint8_t CSRD::getRssi(){
+    return rssi;
+}
+
+void CSRD::setFlags(uint8_t flags){
+    this->flags = flags;
+}
+
+uint8_t CSRD::getFlags(){
+    return flags;
+}
+
 uint8_t CSRD::getMessageBuffer(uint8_t *mbuffer){
     memcpy(mbuffer, this->buffer, messageLength);
     return messageLength;

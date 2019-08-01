@@ -4,6 +4,7 @@
 #include <cstring>
 #include <stdint.h>
 #include <time.h>
+#include <iomanip>
 #include <log4cpp/Category.hh>
 #include "radio_protocol.h"
 
@@ -82,6 +83,16 @@ public:
     uint8_t getRadioMessageBuffer(uint8_t *mbuffer);
     uint8_t getMessageLength(){return messageLength;};    
     uint16_t getRadioID(){return radioID;};
+    time_t getTime();
+    string getTimeAsString(string time_locale);
+    void setTo(uint8_t to);
+    uint8_t getTo();
+    void setFrom(uint8_t from);
+    uint8_t getFrom();
+    void setRssi(uint8_t rssi);
+    uint8_t getRssi();
+    void setFlags(uint8_t flags);
+    uint8_t getFlags();
     
     bool isBroadcast();
     bool isAddressed();
@@ -194,7 +205,11 @@ private:
     uint16_t word(uint8_t a, uint8_t b);
     uint8_t lowByte(uint16_t);
     uint8_t highByte(uint16_t);
-    int8_t ssi; //signal level
+    int8_t rssi; //signal level
+    uint8_t id;
+    uint8_t to;
+    uint8_t from;
+    uint8_t flags;
     time_t time_received;
 };
 

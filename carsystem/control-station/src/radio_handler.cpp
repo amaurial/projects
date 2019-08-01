@@ -203,6 +203,10 @@ bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
                 radio->setModeRx();
                 //logger->debug("Radio: %s len: %02d from: %d to: %d ssi: %ddB id: %d",radioName.c_str(), len, from, to, rssi, id);
                 CSRD message = CSRD(logger, 0, buffer, len);
+                message.setTo(to);
+                message.setFrom(from);
+                message.setRssi(rssi);
+                message.setFlags(flags);
                 in_msgs.push(message);  
                 message.dumpBuffer();          
                 logger->debug("%s received message: [%s]", radioName.c_str(), buffer);                            

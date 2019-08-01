@@ -28,9 +28,9 @@ TcpClient::~TcpClient()
 
 void TcpClient::start(void *param){
     running = true;
-    stringstream ss;
-    ss << "Hello";ss << "\n";
-    sendToClient(ss.str());    
+    //stringstream ss;
+    //ss << "Hello";ss << "\n";
+    //sendToClient(ss.str());    
     run(nullptr);
 }
 

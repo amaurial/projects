@@ -32,6 +32,14 @@ string csrdToJson(CSRD *message){
             result = EMPTY_MESSAGE;                        
             break;
     }
+    
+    //todo make locale configurable
+    // locale -a list the possible locales
+    boost::algorithm::replace_all(result, "$DATE", message->getTimeAsString("en_GB.utf8"));
+    boost::algorithm::replace_all(result, "$TO_ID", to_string(message->getTo()));
+    boost::algorithm::replace_all(result, "$TO_NAME", to_string(message->getTo()));
+    boost::algorithm::replace_all(result, "$FROM_ID", to_string(message->getFrom()));
+    boost::algorithm::replace_all(result, "$FROM_NAME", to_string(message->getFrom()));
     cout << result << endl;
     j = json::parse(result);
     return j.dump();    
