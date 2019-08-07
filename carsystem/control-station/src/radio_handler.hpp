@@ -20,7 +20,7 @@
 #include <bcm2835.h>
 #include <RH_RF69.h>
 #include "csrd.h"
-#include "config.hpp"
+#include "config_tokens.hpp"
 #include "message_consumer.h"
 
 #define READ_TIMEOUT 5

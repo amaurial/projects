@@ -25,7 +25,16 @@ logger:
   files: 10
 tcpserver:
   port: 2020
+  output_format: json
 limits:
   radio_read_sleep: 1000
   radio_in_queue_thread_sleep: 100000
   radio_out_queue_thread_sleep: 10000000
+mosquitto:
+  broker_address: localhost
+  publish_topic: "csrd/control_station/out"
+  register_to_topic: "csrd/control_station/in"
+  timeout: 10
+  retries: 10
+  retry_interval: 10
+  keep_alive: 60

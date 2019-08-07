@@ -10,7 +10,7 @@
 // yamls
 #include <yaml-cpp/yaml.h>
 #include "nlohmann/json.hpp"
-#include "config.hpp"
+#include "config_tokens.hpp"
 
 // logger
 #include "log4cpp/Portability.hh"

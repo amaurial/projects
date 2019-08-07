@@ -37,7 +37,8 @@ class TcpClient : public Client
         void radioMessage(const CSRD msg);        
     protected:
     private:
-        bool running;        
+        bool running;    
+        bool json_output = false;    
         std::queue<CSRD> in_msgs;
         pthread_mutex_t m_mutex_in_cli;
         pthread_cond_t  m_condv_in_cli;

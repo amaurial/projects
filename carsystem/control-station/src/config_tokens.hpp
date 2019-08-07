@@ -1,0 +1,38 @@
+// This file has the node names defined in config.yaml
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define YAML_LOGGER         "logger"
+#define YAML_RADIO1         "radio1"
+#define YAML_RADIO2         "radio2"
+#define YAML_FREQUENCY      "frequency"
+#define YAML_ID             "id"
+#define YAML_GROUP          "group"
+#define YAML_LEVEL          "level"
+#define YAML_CONSOLE        "console"
+#define YAML_FILENAME       "filename"
+#define YAML_APPEND         "append"
+#define YAML_SIZE           "size"
+#define YAML_FILES          "files"
+#define YAML_CSPIN          "cspin"
+#define YAML_IRQPIN         "irqpin"
+#define YAML_PROMISCUOS     "promiscuous"
+#define YAML_POWER          "power"
+#define YAML_READTIMEOUT    "readtimeout"
+#define YAML_TCP_SERVER     "tcpserver"
+#define YAML_PORT           "port"
+#define YAML_LIMITS         "limits"
+#define YAML_RADIO_IN_QUEUE_SIZE    "radio_in_queue_size"
+#define YAML_RADIO_IN_QUEUE_THREAD_SLEEP     "radio_in_queue_thread_sleep"
+#define YAML_RADIO_OUT_QUEUE_THREAD_SLEEP     "radio_out_queue_thread_sleep"
+#define YAML_RADIO_SLEEP    "radio_read_sleep"
+#define YAML_OUTPUT_FORMAT  "output_format"
+#define YAML_MOSQUITTO      "mosquitto"
+#define YAML_BROKER_ADDRESS "broker_address"
+#define YAML_PUBLISH_TOPIC  "publish_topic"
+#define YAML_REGISTER_TO_TOPIC "register_to_topic"
+#define YAML_TIMEOUT         "timeout"
+#define YAML_RETRIES         "retries"
+#define YAML_RETRY_INTERVAL  "retry_interval"
+
+#endif // CONFIG_H

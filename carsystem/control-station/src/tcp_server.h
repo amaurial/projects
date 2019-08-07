@@ -8,7 +8,6 @@
 #include <map>
 #include "client.h"
 #include "radio_handler.hpp"
-#include "config.hpp"
 #include "message_consumer.h"
 
 #define MAX_COUNTER_VALUE 1000000

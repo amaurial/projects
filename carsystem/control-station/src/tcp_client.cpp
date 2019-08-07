@@ -13,7 +13,12 @@ TcpClient::TcpClient(log4cpp::Category *logger, TcpServer *server,
     this->client_addr = client_addr;
     this->logger = logger;
     this->id = id;
-    this->config = config;    
+    this->configurator = config;
+    if ((*configurator)[YAML_TCP_SERVER]){
+        if ((*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT]){
+            this->json_output = (*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT].as<bool>();
+        }                    
+    }
     logger->debug("Client %d created", id);   
 
     pthread_mutex_init(&m_mutex_in_cli, NULL);
@@ -130,14 +135,17 @@ void TcpClient::processRadioQueue(void *param){
 }
 
 void TcpClient::handleRadio(CSRD message){     
-    logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
-    string json_message = csrdToJson(&message);
-    sendToClient(message.bufferToHexString());    
-    sendToClient("\n");
-    sendToClient(json_message);
-    sendToClient("\n");
-    // TODO
-    
+    if (json_output){        
+        string json_message = csrdToJson(&message);        
+        logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, json_message.c_str());  
+        sendToClient(json_message);
+        sendToClient("\n");
+    }
+    else{
+        logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
+        sendToClient(message.bufferToHexString());    
+        sendToClient("\n");
+    }    
 }
 
 void TcpClient::sendToClient(string msg){

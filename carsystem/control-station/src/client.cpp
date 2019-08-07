@@ -16,7 +16,7 @@ Client& Client::setIp(char *ip){
 }
 
 Client& Client::setConfigurator(YAML::Node *config){
-    this->config = config;
+    this->configurator = config;
     return *this;
 }
 

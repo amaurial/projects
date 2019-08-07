@@ -9,7 +9,7 @@
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
 #include "csrd.h"
-#include "config.hpp"
+#include "config_tokens.hpp"
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 #include <arpa/inet.h> //inet_addr
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
-#include "config.hpp"
+#include "config_tokens.hpp"
 #include "tcp_server.h"
 #include "radio_handler.hpp"
 #include "csrd.h"
@@ -49,7 +49,7 @@ class Client
         int client_sock;
         struct sockaddr_in client_addr;        
         vector<string> & split(const string &s, char delim, vector<string> &elems);
-        YAML::Node *config;
+        YAML::Node *configurator;
 
         void sendRadioMessage(int nbytes,byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
         void sendRadioMessage(byte b0);
