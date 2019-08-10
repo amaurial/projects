@@ -6,7 +6,7 @@
 #include <arpa/inet.h> //inet_addr
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
-#include "config_tokens.hpp"
+#include "config_tokens.h"
 #include "tcp_server.h"
 #include "radio_handler.hpp"
 #include "csrd.h"

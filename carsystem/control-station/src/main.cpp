@@ -10,7 +10,7 @@
 // yamls
 #include <yaml-cpp/yaml.h>
 #include "nlohmann/json.hpp"
-#include "config_tokens.hpp"
+#include "config_tokens.h"
 
 // logger
 #include "log4cpp/Portability.hh"
@@ -38,6 +38,7 @@
 // radios
 #include "radio_handler.hpp"
 #include "tcp_server.h"
+#include "mosquitto_message_consumer.h"
 
 
 namespace po = boost::program_options;
@@ -171,8 +172,8 @@ int main(int argc, char * argv[])
     }  
 
     
-    TcpServer server = TcpServer(&logger, port, &radio);    
-    server.setConfigurator(&config);
+    TcpServer server = TcpServer(&logger, &config, port, &radio);    
+    
     logger.debug("Starting tcp server");    
     if (!server.start()){
         logger.error("Failed to start tcp server on port %d", port);
@@ -180,27 +181,16 @@ int main(int argc, char * argv[])
         running = false;
     }    
     
-   /*
-    json j2 = {
-        {"pi", 3.141},
-        {"happy", true},
-        {"name", "Niels"},
-        {"nothing", nullptr},
-        {"answer", {
-            {"everything", 42}
-            }},
-        {"list", {1, 0, 2}},
-        {"object", {
-            {"currency", "USD"},
-            {"value", 42.99}
-        }}
-    };
-    */
+    // start mosquito handler
+    MosquittoMessageConsumer mosquittoMessageConsumer = MosquittoMessageConsumer(&logger, &config, &radio);
+    mosquittoMessageConsumer.start();
+  
     //keep looping forever
     while (running){usleep(1000000);};
 
     // stop the threads
     server.stop();
+    mosquittoMessageConsumer.stop();
     radio.stop();
 
     //clear the stuff

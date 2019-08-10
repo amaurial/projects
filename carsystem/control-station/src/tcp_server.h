@@ -18,7 +18,7 @@ class RadioHandler;
 class TcpServer: public MessageConsumer
 {
     public:
-        TcpServer(log4cpp::Category *logger, int port, RadioHandler* radio);
+        TcpServer(log4cpp::Category *logger, YAML::Node *configurator, int port, RadioHandler* radio);
         ~TcpServer();
         bool start();
         void setPort(int port);

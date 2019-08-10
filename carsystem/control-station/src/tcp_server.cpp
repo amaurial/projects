@@ -1,10 +1,12 @@
 #include "tcp_server.h"
 #include "tcp_client.h"
 
-TcpServer::TcpServer(log4cpp::Category *logger, int port, RadioHandler* radio):MessageConsumer(logger)
+TcpServer::TcpServer(log4cpp::Category *logger,
+                     YAML::Node *configurator,
+                     int port,
+                     RadioHandler* radio):MessageConsumer(logger, configurator)
 {
-    //ctor
-    //this->setLogger(logger);
+    //ctor    
     this->setPort(port);
     this->radio = radio;
     this->counter = 0;

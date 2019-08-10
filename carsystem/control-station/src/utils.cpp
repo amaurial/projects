@@ -6,7 +6,7 @@ string csrdToJson(CSRD *message){
     string result;
     uint8_t buf[MESSAGE_SIZE];
     json j;
-
+    
     if (message == NULL){        
         j = json::parse(EMPTY_MESSAGE);
         return j.dump();        
@@ -42,7 +42,8 @@ string csrdToJson(CSRD *message){
     boost::algorithm::replace_all(result, "$FROM_NAME", to_string(message->getFrom()));
     cout << result << endl;
     j = json::parse(result);
-    return j.dump();    
+    return j.dump();       
+
 }
 
 string convertBroadcastMessage(uint8_t *buf, uint8_t size){

@@ -14,11 +14,21 @@ TcpClient::TcpClient(log4cpp::Category *logger, TcpServer *server,
     this->logger = logger;
     this->id = id;
     this->configurator = config;
+    
     if ((*configurator)[YAML_TCP_SERVER]){
         if ((*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT]){
-            this->json_output = (*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT].as<bool>();
+            
+            string output_format = (*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT].as<string>();
+            if (output_format == "json"){
+                logger->debug("Setting output format to json");
+                this->json_output = true;
+            }
+            else{
+                logger->debug("Setting output format to hexa string");
+            }
         }                    
     }
+    
     logger->debug("Client %d created", id);   
 
     pthread_mutex_init(&m_mutex_in_cli, NULL);
@@ -134,18 +144,23 @@ void TcpClient::processRadioQueue(void *param){
     }
 }
 
-void TcpClient::handleRadio(CSRD message){     
-    if (json_output){        
-        string json_message = csrdToJson(&message);        
-        logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, json_message.c_str());  
-        sendToClient(json_message);
-        sendToClient("\n");
-    }
-    else{
-        logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
-        sendToClient(message.bufferToHexString());    
-        sendToClient("\n");
-    }    
+void TcpClient::handleRadio(CSRD message){   
+    try{  
+        if (json_output){        
+            string json_message = csrdToJson(&message);        
+            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, json_message.c_str());  
+            sendToClient(json_message);
+            sendToClient("\n");
+        }
+        else{
+            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
+            sendToClient(message.bufferToHexString());    
+            sendToClient("\n");
+        }
+    }   
+    catch(const exception &ex){
+        logger->error("Failed to generate json message. %s", ex.what());               
+    }  
 }
 
 void TcpClient::sendToClient(string msg){

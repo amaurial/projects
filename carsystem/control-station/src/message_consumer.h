@@ -9,19 +9,19 @@
 #include <log4cpp/Category.hh>
 #include <yaml-cpp/yaml.h>
 #include "csrd.h"
-#include "config_tokens.hpp"
+#include "config_tokens.h"
 
 using namespace std;
 
 class MessageConsumer
 {
     public:
-        MessageConsumer(log4cpp::Category *logger);
+        MessageConsumer(log4cpp::Category *logger, YAML::Node *configurator);
         virtual ~MessageConsumer();
-        void setLogger(log4cpp::Category *logger);
-        void setConfigurator(YAML::Node* configurator);        
-        //virtual bool start();
-        //virtual bool stop();
+        //void setLogger(log4cpp::Category *logger);
+        //void setConfigurator(YAML::Node* configurator);        
+        virtual bool start();
+        virtual bool stop();
         virtual bool putMessage(const CSRD message);
     protected:
         log4cpp::Category *logger;
