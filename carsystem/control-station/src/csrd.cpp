@@ -78,7 +78,7 @@ uint8_t CSRD::createInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,ui
     messageLength = 8;
     buffer[0]=RP_STATUS;
     buffer[1]=RP_INITIALREG;
-    buffer[2]=lowByte(nodeid);
+    buffer[2]=highByte(nodeid);
     buffer[3]=lowByte(nodeid);
     buffer[4]=status;
     buffer[5]=val0;
@@ -107,8 +107,8 @@ uint8_t CSRD::createACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t elemen
     buffer[1]=RP_REPORT_ACK;
     buffer[2]=highByte(nodeid);
     buffer[3]=lowByte(nodeid);
-    buffer[4]=element;
-    buffer[5]=status;
+    buffer[4]=status;
+    buffer[5]=element;
     buffer[6]=0;
     buffer[7]=0;    
     return messageLength;

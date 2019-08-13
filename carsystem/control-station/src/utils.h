@@ -2,15 +2,37 @@
 #define __CSRD_UTILS_H
 
 #include <string>
+#include <stdint.h>
 #include "csrd.h"
 #include "nlohmann/json.hpp"
 #include "boost/algorithm/string.hpp"
 
-#define J_READ      "READ"
-#define J_WRITE     "WRITE"
-#define J_OPERATION "OPERATION"
-#define J_ACTION    "ACTION"
-#define J_UNKOWN    "UNKNOW"
+#define J_READ          "READ"
+#define J_WRITE         "WRITE"
+#define J_OPERATION     "OPERATION"
+#define J_ACTION        "ACTION"
+#define J_UNKOWN        "UNKNOW"
+#define J_FROM          "from"
+#define J_TO            "to"
+#define J_NAME          "name"
+#define J_DATE          "date"
+#define J_ID            "id"
+#define J_TYPE          "type"
+#define J_ACTION_TYPE   "action_type"
+#define J_GROUP         "group"
+#define J_ELEMENT       "element"
+#define J_NEXTSTATE     "next_state"
+#define J_PARAM_INDEX   "param_index"
+#define J_ACTION        "action"
+#define J_VALUES        "values"
+#define J_STATUS_TYPE   "status_type"
+#define J_STATUS        "status"
+#define J_PARAMS        "params"
+#define J_NODE_ID       "nodeid"
+#define J_TYPE_BROADCAST "BROADCAST"
+#define J_TYPE_ADDRESSED "ADDRESSED"
+#define J_TYPE_STATUS    "STATUS"
+#define J_TYPE_EMPTY     "EMPTY"
 
 using namespace std;
 
@@ -29,7 +51,7 @@ const string BROADCAST_MESSAGE_TEMPLATE = "{\
             \"action_type\" : \"$ACTION_TYPE\",\
             \"group\" : \"$GROUP\",\
             \"element\": \"$ELEMENT\",\
-            \"nextstate\": \"$NEXT_STATE\",\
+            \"next_state\": \"$NEXT_STATE\",\
             \"param_index\": \"$PARAM_INDEX\",\
             \"action\": \"$ACTION\",\
             \"values\": [$VAL_F , $VAL_G , $VAL_H]\
@@ -52,7 +74,7 @@ const string ADDRESSED_MESSAGE_TEMPLATE = "{\
             \"nodeid\" : \"$NODEID\",\
             \"element\": \"$ELEMENT\",\
             \"param_index\" : \"$PARAM_INDEX\",\
-            \"nextstate\": \"$NEXT_STATE\",\
+            \"next_state\": \"$NEXT_STATE\",\
             \"action\": \"$ACTION\",\
             \"values\": [$VAL_G , $VAL_H ]\
     }\
@@ -103,5 +125,16 @@ string convertAddressedMessage(uint8_t *buf, uint8_t size);
 string convertStatusMessage(uint8_t *buf, uint8_t size);
 string getStatusType(uint8_t status);
 string csrdToJson(CSRD *message);
+bool jsonToCSRD(string jsonMessage);
+bool isMessageValid(string jsonMessage);
+uint8_t lowByte(uint16_t a){
+    uint8_t b = a & 0x00ff;
+    return b;
+}
+
+uint8_t highByte(uint16_t a){
+    uint8_t b = a >> 8;
+    return b;
+}
 
 #endif

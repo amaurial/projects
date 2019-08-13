@@ -50,8 +50,7 @@ bool MosquittoPublisher::publishJson(string jsonString){
         logger->debug("[MosquittoPublisher] Failed to send mosquito message. Reason %s", mosqpp::strerror(ret));
         return false;
     }
-    return true;
-    
+    return true;    
 }
 
 void MosquittoPublisher::on_subscribe(int mid, int qos_count, const int *granted_qos)

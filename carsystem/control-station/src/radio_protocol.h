@@ -2,11 +2,12 @@
 #define __RADIO__PROTOCOL__
 
 #define MESSAGE_SIZE 8
-
+// message types
 #define RP_BROADCAST        0xff
 #define RP_ADDRESSED        0
 #define RP_STATUS           1
 #define RP_ID_RESOLUTION    2
+#define RP_UNKOWN           254
 #define BR_SERVER_AUTO_ENUM 3
 #define BR_CAR_AUTO_ENUM    4
 #define RC_ID               5
@@ -140,8 +141,8 @@ Status messages
     ACK
         B=0x04
         C and D = node id
-        E = element
-        F = status
+        E = status
+        F = element
 Action messages
 
 */
