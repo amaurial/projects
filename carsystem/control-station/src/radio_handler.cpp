@@ -184,8 +184,7 @@ void RadioHandler::run_queue_reader(void* param){
     }
 }
 
-bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
-	
+bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){	
     //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());
     
     if (radio->available()) {
@@ -228,7 +227,13 @@ void RadioHandler::printMessage(uint8_t *pbuf, int len){
 }
 
 int RadioHandler::put_to_out_queue(char *msg, int size){
-    //TODO
+    CSRD message = CSRD(logger, 0, msg, size);    
+    out_msgs.push(message);
+    return 0;
+}
+
+int RadioHandler::put_to_out_queue(CSRD msg){    
+    out_msgs.push_back(msg);
     return 0;
 }
 

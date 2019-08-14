@@ -23,7 +23,7 @@
 #define J_ELEMENT       "element"
 #define J_NEXTSTATE     "next_state"
 #define J_PARAM_INDEX   "param_index"
-#define J_ACTION        "action"
+#define J_ACTION_PARAM  "action"
 #define J_VALUES        "values"
 #define J_STATUS_TYPE   "status_type"
 #define J_STATUS        "status"
@@ -35,6 +35,7 @@
 #define J_TYPE_EMPTY     "EMPTY"
 
 using namespace std;
+using namespace nlohmann;
 
 const string BROADCAST_MESSAGE_TEMPLATE = "{\
     \"date\": \"$DATE\",\
@@ -126,15 +127,18 @@ string convertStatusMessage(uint8_t *buf, uint8_t size);
 string getStatusType(uint8_t status);
 string csrdToJson(CSRD *message);
 bool jsonToCSRD(string jsonMessage);
-bool isMessageValid(string jsonMessage);
-uint8_t lowByte(uint16_t a){
-    uint8_t b = a & 0x00ff;
-    return b;
-}
+bool isMessageValid(json jsonMessage, log4cpp::Category *logger);
+json exists(json jsonMessage, string tag, log4cpp::Category *logger);
+uint8_t createBuffer0(json jsonMessage);
+uint8_t createBuffer1(json jsonMessage);
+uint8_t createBuffer2(json jsonMessage);
+uint8_t createBuffer3(json jsonMessage);
+uint8_t createBuffer4(json jsonMessage);
+uint8_t createBuffer5(json jsonMessage);
+uint8_t createBuffer6(json jsonMessage);
+uint8_t createBuffer7(json jsonMessage);
 
-uint8_t highByte(uint16_t a){
-    uint8_t b = a >> 8;
-    return b;
-}
+uint8_t lowByte(uint16_t a);
+uint8_t highByte(uint16_t a);
 
 #endif

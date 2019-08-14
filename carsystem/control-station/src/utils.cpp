@@ -1,7 +1,5 @@
 #include "utils.h"
 
-using namespace nlohmann;
-
 string csrdToJson(CSRD *message){
     string result;
     uint8_t buf[MESSAGE_SIZE];
@@ -228,8 +226,8 @@ bool jsonToCSRD(CSRD *message, string jsonMessage, log4cpp::Category *logger){
         return false;      
     }
     
-    if (!isMessageValid(j)){
-        logger->error("Json message is invalid. [%s]", jsonMessage)
+    if (!isMessageValid(j, logger)){
+        logger->error("Json message is invalid. [%s]", jsonMessage);
         return false;
     }    
     
@@ -243,6 +241,24 @@ bool jsonToCSRD(CSRD *message, string jsonMessage, log4cpp::Category *logger){
     buffer[7] = createBuffer7(j);
 
     message->setMessage(0, buffer, MESSAGE_SIZE);
+    uint8_t to;
+    uint8_t from;
+    if (j[J_TO][J_ID].is_null){
+        to = 0;
+    }
+    else{
+        to = (uint8_t) j[J_TO][J_ID].get<int>();
+    }
+
+    if (j[J_FROM][J_ID].is_null){
+        to = 0;
+    }
+    else{
+        to = (uint8_t) j[J_FROM][J_ID].get<int>();
+    }
+
+    message->setTo(to);
+    message->setFrom(from);    
     return true;
 }
 
@@ -276,7 +292,7 @@ bool isMessageValid(json jsonMessage, log4cpp::Category *logger){
     }
     else{        
         return false;
-    }    src/utils.h
+    }
 
     if (exists(jsonMessage, J_TYPE, logger) == nullptr){        
         return false;
@@ -284,7 +300,7 @@ bool isMessageValid(json jsonMessage, log4cpp::Category *logger){
     else{
         // check for specific types
         // exception here is status message
-        string message_type = jsonMessage[J_TYPE].as<string>();;
+        string message_type = jsonMessage[J_TYPE].get<string>();
         if (message_type == J_TYPE_STATUS){
             
             if (exists(jsonMessage, J_STATUS_TYPE, logger) == nullptr){            
@@ -305,14 +321,14 @@ bool isMessageValid(json jsonMessage, log4cpp::Category *logger){
                 return false;
             }
             else{
-                string action_type = jsonMessage[J_ACTION_TYPE].as<string>();;
+                string action_type = jsonMessage[J_ACTION_TYPE].get<string>();
                 if (action_type == J_OPERATION){
                     if (exists(jsonMessage, J_NEXTSTATE, logger) == nullptr){                        
                         return false;
                     }
                 }
                 else if (action_type == J_ACTION){
-                    if (exists(jsonMessage, J_ACTION, logger) == nullptr){                        
+                    if (exists(jsonMessage, J_ACTION_PARAM, logger) == nullptr){                        
                         return false;
                     }
                 }
@@ -336,15 +352,15 @@ bool isMessageValid(json jsonMessage, log4cpp::Category *logger){
 }
 
 json exists(json jsonMessage, string tag, log4cpp::Category *logger){
-    if (jsonMessage.find(tag)){
+    if (!jsonMessage[tag].is_null()){
         return jsonMessage[tag];
     }
-    logger->error("Json message missing field: %s", tag;
+    logger->error("Json message missing field: %s", tag);
     return nullptr;
 }
 
 uint8_t createBuffer0(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
         return RP_BROADCAST;
     }
@@ -360,7 +376,7 @@ uint8_t createBuffer0(json jsonMessage){
 }
 
 uint8_t createBuffer1(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST || message_type == J_TYPE_ADDRESSED){
         string action_type = jsonMessage[J_ACTION_TYPE];
         if (action_type == J_OPERATION){
@@ -380,7 +396,7 @@ uint8_t createBuffer1(json jsonMessage){
         }
     }    
     else if (message_type == J_TYPE_STATUS){
-        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].as<int>();        
+        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();        
         return status_type;
     }
     else{
@@ -389,17 +405,17 @@ uint8_t createBuffer1(json jsonMessage){
 }
 
 uint8_t createBuffer2(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
-        uint8_t group = (uint8_t) jsonMessage[J_GROUP].as<int>();        
+        uint8_t group = (uint8_t) jsonMessage[J_GROUP].get<int>();        
         return group;
     }
     if (message_type == J_TYPE_ADDRESSED){
-        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].as<int>();        
+        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].get<int>();        
         return highByte(nodeid);
     }
     else if (message_type == J_TYPE_STATUS){
-        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].as<int>();        
+        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].get<int>();        
         return highByte(nodeid);
     }
     else{
@@ -408,18 +424,18 @@ uint8_t createBuffer2(json jsonMessage){
 }
 
 uint8_t createBuffer3(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
-        uint8_t group = (uint8_t) jsonMessage[J_ELEMENT].as<int>();        
+        uint8_t group = (uint8_t) jsonMessage[J_ELEMENT].get<int>();        
         return group;
     }
     if (message_type == J_TYPE_ADDRESSED){
-        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].as<int>();        
+        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].get<int>();        
         return lowByte(nodeid);
     }
     else if (message_type == J_TYPE_STATUS){
-        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].as<int>();        
-        return highlowByteByte(nodeid);
+        uint16_t nodeid = (uint16_t) jsonMessage[J_NODE_ID].get<int>();        
+        return lowByte(nodeid);
     }
     else{
         return RP_UNKOWN;
@@ -427,23 +443,23 @@ uint8_t createBuffer3(json jsonMessage){
 }
 
 uint8_t createBuffer4(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
-        string action_type = jsonMessage[J_ACTION_TYPE].as<string>();;
+        string action_type = jsonMessage[J_ACTION_TYPE].get<string>();
         if (action_type == J_OPERATION){
-            uint8_t next_state = (uint8_t) jsonMessage[J_NEXTSTATE].as<int>();        
+            uint8_t next_state = (uint8_t) jsonMessage[J_NEXTSTATE].get<int>();        
             return next_state;
         }
         else if (action_type == J_ACTION){
-            uint8_t action = (uint8_t) jsonMessage[J_ACTION].as<int>();        
+            uint8_t action = (uint8_t) jsonMessage[J_ACTION_PARAM].get<int>();        
             return action;
         }
         else if (action_type == J_WRITE){
-            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].as<int>();        
+            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].get<int>();        
             return param_index;
         }
         else if (action_type == J_READ){
-            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].as<int>();        
+            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].get<int>();        
             return param_index;
         }
         else{
@@ -451,11 +467,11 @@ uint8_t createBuffer4(json jsonMessage){
         }
     }
     if (message_type == J_TYPE_ADDRESSED){
-        uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].as<int>();        
+        uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].get<int>();        
         return element;
     }
     else if (message_type == J_TYPE_STATUS){        
-        uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].as<int>();
+        uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].get<int>();
         return element;
     }
     else{
@@ -464,33 +480,33 @@ uint8_t createBuffer4(json jsonMessage){
 }
 
 uint8_t createBuffer5(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
         json values = jsonMessage[J_VALUES];
         if (values[0].is_null()){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[0].as<int>();
+            uint8_t value = (uint8_t)values[0].get<int>();
             return value;
         }
     }
     if (message_type == J_TYPE_ADDRESSED){
-        string action_type = jsonMessage[J_ACTION_TYPE].as<string>();;
+        string action_type = jsonMessage[J_ACTION_TYPE].get<string>();
         if (action_type == J_OPERATION){
-            uint8_t next_state = (uint8_t) jsonMessage[J_NEXTSTATE].as<int>();        
+            uint8_t next_state = (uint8_t) jsonMessage[J_NEXTSTATE].get<int>();        
             return next_state;
         }
         else if (action_type == J_ACTION){
-            uint8_t action = (uint8_t) jsonMessage[J_ACTION].as<int>();        
+            uint8_t action = (uint8_t) jsonMessage[J_ACTION_PARAM].get<int>();        
             return action;
         }
         else if (action_type == J_WRITE){
-            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].as<int>();        
+            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].get<int>();        
             return param_index;
         }
         else if (action_type == J_READ){
-            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].as<int>();        
+            uint8_t param_index = (uint8_t) jsonMessage[J_PARAM_INDEX].get<int>();        
             return param_index;
         }
         else{
@@ -498,9 +514,9 @@ uint8_t createBuffer5(json jsonMessage){
         }
     }
     else if (message_type == J_TYPE_STATUS){
-        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].as<int>();        
+        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();        
         if (status_type == RP_REPORT_ACK){
-            uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].as<int>();        
+            uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].get<int>();        
             return element;
         }
         else{
@@ -509,7 +525,7 @@ uint8_t createBuffer5(json jsonMessage){
                 return 0;
             }
             else{
-                uint8_t value = (uint8_t)value[0].as<int>();
+                uint8_t value = (uint8_t)values[0].get<int>();
                 return value;
             }
         }
@@ -520,14 +536,14 @@ uint8_t createBuffer5(json jsonMessage){
 }
 
 uint8_t createBuffer6(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
         json values = jsonMessage[J_VALUES];
         if (values[1].is_null()){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[1].as<int>();
+            uint8_t value = (uint8_t)values[1].get<int>();
             return value;
         }
     }
@@ -537,12 +553,12 @@ uint8_t createBuffer6(json jsonMessage){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[0].as<int>();
+            uint8_t value = (uint8_t)values[0].get<int>();
             return value;
         }
     }
     else if (message_type == J_TYPE_STATUS){
-        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].as<int>();
+        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();
         uint8_t index = 1;        
         if (status_type == RP_REPORT_ACK){
             index = 0;
@@ -553,7 +569,7 @@ uint8_t createBuffer6(json jsonMessage){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[index].as<int>();
+            uint8_t value = (uint8_t)values[index].get<int>();
             return value;
         }        
     }
@@ -563,14 +579,14 @@ uint8_t createBuffer6(json jsonMessage){
 }
 
 uint8_t createBuffer7(json jsonMessage){
-    string message_type = jsonMessage[J_TYPE].as<string>();;
+    string message_type = jsonMessage[J_TYPE].get<string>();
     if (message_type == J_TYPE_BROADCAST){
         json values = jsonMessage[J_VALUES];
         if (values[2].is_null()){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[2].as<int>();
+            uint8_t value = (uint8_t)values[2].get<int>();
             return value;
         }
     }
@@ -580,12 +596,12 @@ uint8_t createBuffer7(json jsonMessage){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[1].as<int>();
+            uint8_t value = (uint8_t)values[1].get<int>();
             return value;
         }
     }
     else if (message_type == J_TYPE_STATUS){
-        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].as<int>();
+        uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();
         uint8_t index = 2;        
         if (status_type == RP_REPORT_ACK){
             index = 1;
@@ -596,11 +612,21 @@ uint8_t createBuffer7(json jsonMessage){
             return 0;
         }
         else{
-            uint8_t value = (uint8_t)value[index].as<int>();
+            uint8_t value = (uint8_t)values[index].get<int>();
             return value;
         }        
     }
     else{
         return RP_UNKOWN;
     }
+}
+
+uint8_t lowByte(uint16_t a){
+    uint8_t b = a & 0x00ff;
+    return b;
+}
+
+uint8_t highByte(uint16_t a){
+    uint8_t b = a >> 8;
+    return b;
 }

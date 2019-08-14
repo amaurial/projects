@@ -37,7 +37,8 @@ class RadioHandler
         virtual ~RadioHandler();
         bool start();
         bool stop();
-        int put_to_out_queue(char *msg, int size);        
+        int put_to_out_queue(char *msg, int size);
+        int put_to_out_queue(CSRD msg);
         int put_to_incoming_queue(char *msg, int size);
         void setConfigurator(YAML::Node* config);
         bool register_consumer(string name, MessageConsumer *consumer);
