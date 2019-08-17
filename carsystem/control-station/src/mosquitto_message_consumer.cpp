@@ -81,7 +81,7 @@ void MosquittoMessageConsumer::run(void* args){
     int rc;
     int retry = 0;
     radio->register_consumer(consumer_name, this);
-    connected = publisher->start();
+    connected = publisher->start();    
 
     while (running){
         while (!connected && retry < retries && running){
@@ -92,15 +92,16 @@ void MosquittoMessageConsumer::run(void* args){
         }
 
         if (!connected){
+            logger->debug("[MosquittoMessageConsumer] Mosquitto connection failed. Finishing.");
             running = false;            
         }
-
+        
         rc = publisher->loop();
 		if(rc){
             logger->debug("[MosquittoMessageConsumer] Reconnecting.");
 			publisher->reconnect();
 		}
-        //usleep(1000*1000*5);
+        //usleep(1000);
     }
     logger->debug("[MosquittoMessageConsumer] Stopping mosquitto consumer.");
 }

@@ -9,10 +9,12 @@ MosquittoPublisher::~MosquittoPublisher(){
 }
 
 void MosquittoPublisher::on_connect(int rc){
-    logger->debug("[MosquittoPublisher] Connected with code %d.\n", rc);
+    logger->debug("[MosquittoPublisher] Connected with code %d.", rc);
 	if(rc == 0){
 		/* Only attempt to subscribe on a successful connect. */
+        logger->debug("[MosquittoPublisher] Attempting to subscribe to topic %s", register_topic.c_str());
 		subscribe(NULL, register_topic.c_str());
+        logger->debug("[MosquittoPublisher] Subscribed to topic %s", register_topic.c_str());
 	}
 }
 

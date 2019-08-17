@@ -118,8 +118,8 @@ void TcpServer::run(void* param){
                         break;
                 }
                 logger->info("[TcpServer] Creating client for ip:%s id:%d",s, counter);
-                Client *client;                                
-                client = new TcpClient(logger, this, radio, client_sock, client_addr, counter, config);
+                Client *client;                                                
+                client = new TcpClient(logger, this, radio, client_sock, client_addr, counter, configurator);                
                 client->setIp(s);
                 free(s);
                 tempClient = client; // to be used in run_client
@@ -132,8 +132,8 @@ void TcpServer::run(void* param){
                 if (counter > MAX_COUNTER_VALUE) counter = 0;
             }
         }
-        catch(...){
-            logger->error("[TcpServer] TCP server failed while running.");
+        catch(exception& e){
+            logger->error("[TcpServer] TCP server failed while running. %s", e.what());            
         }
     }
 

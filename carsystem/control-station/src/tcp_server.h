@@ -37,8 +37,7 @@ class TcpServer: public MessageConsumer
         uint counter;     
         string consumer_name = "tcpserver";        
         std::map<int, Client*> clients;
-        pthread_t serverThread;        
-        YAML::Node *config;
+        pthread_t serverThread;                
 
         void removeClients();
         void run(void* param);

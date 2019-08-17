@@ -15,21 +15,31 @@ TcpClient::TcpClient(log4cpp::Category *logger, TcpServer *server,
     this->id = id;
     this->configurator = config;
     
-    if ((*configurator)[YAML_TCP_SERVER]){
-        if ((*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT]){
-            
-            string output_format = (*configurator)[YAML_TCP_SERVER][YAML_OUTPUT_FORMAT].as<string>();
+    YAML::Node node = (*configurator)[YAML_TCP_SERVER];
+
+    logger->debug("[TcpClient] Getting configuration");
+    if (!node){
+        logger->debug("[TcpClient] Oops. No configuration for tcpserver");
+    }
+    else{            
+        if (node[YAML_OUTPUT_FORMAT]){            
+            string output_format = node[YAML_OUTPUT_FORMAT].as<string>();            
+            logger->debug("[TcpClient] Found output format to json %s", output_format.c_str());
             if (output_format == "json"){
-                logger->debug("Setting output format to json");
+                logger->debug("[TcpClient] Setting output format to json");
                 this->json_output = true;
             }
             else{
-                logger->debug("Setting output format to hexa string");
+                logger->debug("[TcpClient] Setting output format to hexa string");
             }
-        }                    
+        }
+        else{
+            logger->debug("[TcpClient] Missing output format. Setting output format to hexa string");
+        }
+        
     }
     
-    logger->debug("Client %d created", id);   
+    logger->debug("[TcpClient] Client %d created", id);   
 
     pthread_mutex_init(&m_mutex_in_cli, NULL);
     pthread_cond_init(&m_condv_in_cli, NULL);

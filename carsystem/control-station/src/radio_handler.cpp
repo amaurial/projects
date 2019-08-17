@@ -37,15 +37,15 @@ bool RadioHandler::register_consumer(string name, MessageConsumer *consumer){
 bool RadioHandler::unregister_consumer(string name){
     try {
         if (mapConsumer.find(name) != mapConsumer.end()){
-            logger->debug("[RadioHandler] Removing consumer with id: %s", name);
+            logger->debug("[RadioHandler] Removing consumer with id: %s", name.c_str());
             mapConsumer.erase(name);
         }
         else{
-            logger->debug("[RadioHandler] Could not find consumer with id: %s", name);
+            logger->debug("[RadioHandler] Could not find consumer with id: %s", name.c_str());
         }
     }
     catch(...){
-        logger->error("[RadioHandler] Failed to remove a consumer %s", name);
+        logger->error("[RadioHandler] Failed to remove a consumer %s", name.c_str());
         return false;
     }
     return true;

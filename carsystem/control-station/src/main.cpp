@@ -166,8 +166,9 @@ int main(int argc, char * argv[])
     // start the tcp tcp server
     int port = 2020;
     if (config[YAML_TCP_SERVER]){
-        if (config[YAML_TCP_SERVER][YAML_PORT]){
+        if (config[YAML_TCP_SERVER][YAML_PORT]){            
             port = config[YAML_TCP_SERVER][YAML_PORT].as<int>();
+            logger.debug("Found tcp server port config [%d]", port);
         }
     }  
 
@@ -181,7 +182,7 @@ int main(int argc, char * argv[])
         running = false;
     }    
     
-    // start mosquito handler
+    // start mosquito handler    
     MosquittoMessageConsumer mosquittoMessageConsumer = MosquittoMessageConsumer(&logger, &config, &radio);
     mosquittoMessageConsumer.start();
   
