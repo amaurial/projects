@@ -243,18 +243,18 @@ bool jsonToCSRD(CSRD *message, string jsonMessage, log4cpp::Category *logger){
     message->setMessage(0, buffer, MESSAGE_SIZE);
     uint8_t to;
     uint8_t from;
-    if (j[J_TO][J_ID].is_null){
+    if (j[J_TO][J_ID].is_null()){
         to = 0;
     }
     else{
         to = (uint8_t) j[J_TO][J_ID].get<int>();
     }
 
-    if (j[J_FROM][J_ID].is_null){
-        to = 0;
+    if (j[J_FROM][J_ID].is_null()){
+        from = 0;
     }
     else{
-        to = (uint8_t) j[J_FROM][J_ID].get<int>();
+        from = (uint8_t) j[J_FROM][J_ID].get<int>();
     }
 
     message->setTo(to);

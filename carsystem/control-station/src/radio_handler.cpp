@@ -140,7 +140,7 @@ void RadioHandler::run_queue_reader(void* param){
     logger->debug("[RadioHandler] run_queue_reader running");        
 
     // get the max queue size
-    long max_queue_size = RADIO_IN_QUEUE_SIZE;
+    uint max_queue_size = RADIO_IN_QUEUE_SIZE;
     if ((*configurator)[YAML_LIMITS]){
         if ((*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_SIZE]){
             max_queue_size = (*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_SIZE].as<int>();
@@ -195,7 +195,7 @@ bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
                 // Should be a message for us now                                 
                 uint8_t from = radio->headerFrom();
                 uint8_t to   = radio->headerTo();
-                uint8_t id   = radio->headerId();
+                //uint8_t id   = radio->headerId();
                 uint8_t flags= radio->headerFlags();;
                 int8_t rssi  = radio->lastRssi();          
                 radio->setModeTx();
@@ -227,13 +227,13 @@ void RadioHandler::printMessage(uint8_t *pbuf, int len){
 }
 
 int RadioHandler::put_to_out_queue(char *msg, int size){
-    CSRD message = CSRD(logger, 0, msg, size);    
+    CSRD message = CSRD(logger, 0, (uint8_t *)msg, size);    
     out_msgs.push(message);
     return 0;
 }
 
 int RadioHandler::put_to_out_queue(CSRD msg){    
-    out_msgs.push_back(msg);
+    out_msgs.push(msg);
     return 0;
 }
 

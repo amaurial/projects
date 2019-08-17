@@ -3,8 +3,7 @@
 #include "mosquitto_message_consumer.h"
 
 MosquittoMessageConsumer::MosquittoMessageConsumer(log4cpp::Category *logger, YAML::Node *configurator, RadioHandler* radio):MessageConsumer(logger, configurator)
-{
-        int keepalive = 60;      
+{        
         this->radio = radio;  
 };
 

@@ -121,12 +121,13 @@ const string EMPTY_MESSAGE = "{\
     }\
 }";
 
+
 string convertBroadcastMessage(uint8_t *buf, uint8_t size);
 string convertAddressedMessage(uint8_t *buf, uint8_t size);
 string convertStatusMessage(uint8_t *buf, uint8_t size);
 string getStatusType(uint8_t status);
 string csrdToJson(CSRD *message);
-bool jsonToCSRD(string jsonMessage);
+bool jsonToCSRD(CSRD *message, string jsonMessage, log4cpp::Category *logger);
 bool isMessageValid(json jsonMessage, log4cpp::Category *logger);
 json exists(json jsonMessage, string tag, log4cpp::Category *logger);
 uint8_t createBuffer0(json jsonMessage);

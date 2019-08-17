@@ -60,8 +60,8 @@ void MosquittoPublisher::on_subscribe(int mid, int qos_count, const int *granted
 
 void MosquittoPublisher::on_message(const struct mosquitto_message *message){
     logger->debug("[MosquittoPublisher] Got a mosquitto message: %s", message->payload);
-    CSRD message = CSRD(logger);
-    if (jsonToCSRD(&message, string(message->payload), logger)){
+    CSRD radio_message = CSRD(logger);
+    if (jsonToCSRD(&radio_message, string((char *)message->payload), logger)){
         logger->debug("Message decode successfuly");
     }
     else{

@@ -14,7 +14,7 @@ LIBMOSQ = -Wl,-Bdynamic -lmosquittopp -lmosquitto
 LIB = $(LIBPTHREAD) $(LIBLOGCPP) $(LIBYAML) $(LIBRF69) $(LIBCM) $(LIBBOOST) $(LIBMOSQ)
 
 ROOTFS = /home/amauri/pi/x-tools/armv8-rpi3-linux-gnueabihf/armv8-rpi3-linux-gnueabihf/sysroot
-NOERRORFLAGS = -Wall -fpermissive -Wno-deprecated -Wno-psabi
+NOERRORFLAGS = -Wall -fpermissive -Wno-deprecated -Wno-psabi -Wno-deprecated-declarations
 INCLUDES = -Iinclude -I$(ROOTFS)/usr/include -I$(ROOTFS)/include -I$(BCM2835)/src
 CFLAGS = -std=c++11 --sysroot $(ROOTFS) -c $(NOERRORFLAGS) -lm -g $(INCLUDES)
 LDFLAGS = --sysroot $(ROOTFS) -Llib -L$(ROOTFS)/usr/lib -L$(ROOTFS)/lib -L$(BCM2835)/src

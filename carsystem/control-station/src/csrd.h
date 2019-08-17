@@ -75,7 +75,7 @@ using namespace std;
 class CSRD {
 
 public:
-    CSRD(log4cpp::Category *logger);    
+    CSRD(log4cpp::Category *logger);
     CSRD(log4cpp::Category *logger, uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);
 
     uint8_t setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);        
