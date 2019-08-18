@@ -2,7 +2,9 @@
 #include <cstring>
 #include "mosquitto_message_consumer.h"
 
-MosquittoMessageConsumer::MosquittoMessageConsumer(log4cpp::Category *logger, YAML::Node *configurator, RadioHandler* radio):MessageConsumer(logger, configurator)
+MosquittoMessageConsumer::MosquittoMessageConsumer(log4cpp::Category *logger,
+                                                   YAML::Node *configurator,
+                                                   RadioHandler* radio):MessageConsumer(logger, configurator)
 {        
         this->radio = radio;  
 };

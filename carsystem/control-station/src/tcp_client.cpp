@@ -1,9 +1,13 @@
 #include "tcp_client.h"
 #include <stdio.h>
 
-TcpClient::TcpClient(log4cpp::Category *logger, TcpServer *server,
-                     RadioHandler* radio, int client_sock, struct sockaddr_in client_addr,
-                     int id, YAML::Node *config)
+TcpClient::TcpClient(log4cpp::Category *logger,
+                     TcpServer *server,
+                     RadioHandler* radio,
+                     int client_sock,
+                     struct sockaddr_in client_addr,
+                     int id,
+                     YAML::Node *config)
 {
     //ctor
 
@@ -87,20 +91,20 @@ void TcpClient::run(void *param){
         memset(msg,0,BUFFER_SIZE);
         nbytes = recv(client_sock, msg,BUFFER_SIZE, 0);
         if (nbytes <= 0){
-            logger->debug("[%d] [TcpClient] Error while receiving data from client %d",id,nbytes);			
+            logger->debug("[%d] [TcpClient] Error while receiving data from client %d", id,nbytes);			
             running = false;
         }
         else if (nbytes > 0){
-            logger->notice("[%d] [TcpClient] Received from client:%s Bytes:%d",id, msg, nbytes);
+            logger->notice("[%d] [TcpClient] Received from client:%s Bytes:%d", id, msg, nbytes);
             try{
                 handleClientMessages(msg);
             }
             catch(const runtime_error &ex){
-                logger->debug("[%d][TcpClient] Failed to process the client message\n%s",id,ex.what());
+                logger->debug("[%d][TcpClient] Failed to process the client message\n%s", id,ex.what());
             }
         }        
     }
-    logger->info("[%d] [TcpClient] Quiting client connection ip:%s id:%d.",id, ip.c_str(),id);
+    logger->info("[%d] [TcpClient] Quiting client connection ip:%s id:%d.", id, ip.c_str(),id);
 
     usleep(2000*1000); //1sec give some time for any pending thread to finish
     try{        
@@ -142,11 +146,11 @@ void TcpClient::processRadioQueue(void *param){
                 handleRadio(message);
             }
             catch(runtime_error &ex){
-                logger->debug("[%d] [TcpClient] Failed to process the radio message",id);
+                logger->debug("[%d] [TcpClient] Failed to process the radio message", id);
                 logger->debug("%s", ex.what());
             }
             catch(const exception &ex){
-                logger->debug("[%d] [TcpClient] Failed to process the radio message",id);
+                logger->debug("[%d] [TcpClient] Failed to process the radio message", id);
                 logger->debug("%s", ex.what());
             }
         }
@@ -158,12 +162,12 @@ void TcpClient::handleRadio(CSRD message){
     try{  
         if (json_output){        
             string json_message = csrdToJson(&message);        
-            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, json_message.c_str());  
+            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s", id, json_message.c_str());  
             sendToClient(json_message);
             sendToClient("\n");
         }
         else{
-            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s",id, message.bufferToHexString().c_str());  
+            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s", id, message.bufferToHexString().c_str());  
             sendToClient(message.bufferToHexString());    
             sendToClient("\n");
         }
@@ -175,9 +179,9 @@ void TcpClient::handleRadio(CSRD message){
 
 void TcpClient::sendToClient(string msg){
     unsigned int nbytes;
-    logger->notice("[%d] [TcpClient] Send to client:%s",id, msg.c_str());
+    logger->notice("[%d] [TcpClient] Send to client:%s", id, msg.c_str());
     nbytes = write(client_sock, msg.c_str(), msg.length());
     if (nbytes != msg.length()){
-        logger->error("[TcpClient] Fail to send message %s",id, msg.c_str());
+        logger->error("[TcpClient] Fail to send message %s", id, msg.c_str());
     }
 }
