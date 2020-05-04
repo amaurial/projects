@@ -1,0 +1,4 @@
+*.layout
+**/*.o
+src/__pycache__/*
+.idea/*
