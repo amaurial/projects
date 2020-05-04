@@ -163,20 +163,20 @@ string convertStatusMessage(uint8_t *buf, uint8_t size){
     
     switch (buf[1])
     {
-        case RP_REPORT_STATUS:
+        case RP_STATUS_QUERY_STATUS:
             boost::algorithm::replace_all(result, "$ELEMENT", "");                                    
             boost::algorithm::replace_all(result, "$STATUS", to_string(buf[4]));                       
             boost::algorithm::replace_all(result, "$VAL_F", to_string(buf[5]));
             boost::algorithm::replace_all(result, "$VAL_G", to_string(buf[6]));
             boost::algorithm::replace_all(result, "$VAL_H", to_string(buf[7]));
             break;
-        case RP_REPORT_ACK:
+        case RP_STATUS_ANSWER_STATUS:
             boost::algorithm::replace_all(result, "$ELEMENT", to_string(buf[5]));
             boost::algorithm::replace_all(result, "$STATUS", to_string(buf[4]));
             boost::algorithm::replace_all(result, "$VAL_G", to_string(buf[6]));
             boost::algorithm::replace_all(result, "$VAL_H", to_string(buf[7]));
             break;
-        case RP_INITIALREG:
+        case RP_STATUS_INITIAL_REGISTER:
             boost::algorithm::replace_all(result, "$ELEMENT", "");                                    
             boost::algorithm::replace_all(result, "$STATUS", to_string(buf[4]));
             boost::algorithm::replace_all(result, "$VAL_F", to_string(buf[5]));
@@ -197,13 +197,13 @@ string convertStatusMessage(uint8_t *buf, uint8_t size){
 string getStatusType(uint8_t status){
     switch (status)
     {
-        case RP_REPORT_STATUS:
+        case RP_STATUS_QUERY_STATUS:
             return "REPORT";
             break;
-        case RP_INITIALREG:
+        case RP_STATUS_INITIAL_REGISTER:
             return "REGISTRATION";
             break;
-        case RP_REPORT_ACK:
+        case RP_STATUS_ANSWER_STATUS:
             return "ACK";
             break;
         default:
@@ -211,6 +211,69 @@ string getStatusType(uint8_t status){
             break;
     }
     return J_UNKOWN;
+}
+
+bool hexaToCSRD(CSRD *message, string hexaMessage, log4cpp::Category *logger){
+
+    if (!isHexaFormat(hexaMessage)){
+        logger->debug("Message [%s] is not in hexa string format.", hexaMessage);
+        return false;
+    }
+
+    uint8_t buf[MESSAGE_SIZE];
+    int pos = 0;
+    for (int i = 0; i < 8; i++){
+        buf[i] = toInteger(hexaMessage.substr(pos, 2));        
+        pos = i + 2;
+    }
+
+    logger->debug("Message is in hexa string format.");
+    message->setMessage(0, buf, MESSAGE_SIZE);
+    return true;
+
+}
+
+bool isHexaFormat(string message){
+    int pos = 0;
+    int val = 0;
+    // example
+    // 010003E700000000
+    // if (message.c_str()[2] != ' ' ||
+    //     message.c_str()[5] != ' ' ||
+    //     message.c_str()[8] != ' ' ||
+    //     message.c_str()[11] != ' ' ||
+    //     message.c_str()[14] != ' ' ||
+    //     message.c_str()[17] != ' ' ||
+    //     message.c_str()[20] != ' '){
+    //     return false;
+    // }
+
+    for (int i = 0; i < 8; i++){
+        val = toInteger(message.substr(pos, 2));
+        if (val == -1){
+            return false;
+        }
+
+        if (val < 0 || val > 255){
+            return false;
+        }
+        pos = i + 2;
+    }
+    return true;
+}
+
+int toInteger(string s){
+    long c;
+    c = std::stoul(s, nullptr, 16);
+    return c;
+    // int c;
+    // stringstream ss;
+    // ss << std::hex << s;
+    // ss >> c;
+    // if (c >= 0 and c <= 255){
+    //     return c;
+    // }
+    // return -1;
 }
 
 bool jsonToCSRD(CSRD *message, string jsonMessage, log4cpp::Category *logger){
@@ -515,7 +578,7 @@ uint8_t createBuffer5(json jsonMessage){
     }
     else if (message_type == J_TYPE_STATUS){
         uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();        
-        if (status_type == RP_REPORT_ACK){
+        if (status_type == RP_STATUS_ANSWER_STATUS){
             uint8_t element = (uint8_t) jsonMessage[J_ELEMENT].get<int>();        
             return element;
         }
@@ -560,7 +623,7 @@ uint8_t createBuffer6(json jsonMessage){
     else if (message_type == J_TYPE_STATUS){
         uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();
         uint8_t index = 1;        
-        if (status_type == RP_REPORT_ACK){
+        if (status_type == RP_STATUS_ANSWER_STATUS){
             index = 0;
         }
         
@@ -603,7 +666,7 @@ uint8_t createBuffer7(json jsonMessage){
     else if (message_type == J_TYPE_STATUS){
         uint8_t status_type = (uint8_t) jsonMessage[J_STATUS_TYPE].get<int>();
         uint8_t index = 2;        
-        if (status_type == RP_REPORT_ACK){
+        if (status_type == RP_STATUS_ANSWER_STATUS){
             index = 1;
         }
         

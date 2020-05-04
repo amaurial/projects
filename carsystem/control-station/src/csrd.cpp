@@ -25,6 +25,28 @@ uint8_t CSRD::setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_siz
     return s;
 }
 
+uint8_t CSRD::setMessageFromHexaString(uint16_t radioID, string hexaString){
+    
+    if (hexaString.size() < 16){
+        logger->debug("Message is not in hexa format");
+    }
+
+    uint8_t tbuf[MESSAGE_SIZE];
+    int pos = 0;
+    int c = -1;
+    for (int i = 0; i < 8; i++){        
+        c = std::stoul(hexaString.substr(pos, 2), nullptr, 16);    
+        if (c < 0 || c > 255){
+            return 0;
+        }
+        tbuf[i] = (uint8_t)c;
+        pos = i + 2;
+    }
+
+    logger->debug("Message is in hexa string format.");
+    return setMessage(radioID, tbuf, MESSAGE_SIZE);
+}
+
 time_t CSRD::getTime(){
     return time_received;
 }
@@ -77,7 +99,7 @@ uint8_t CSRD::getMessageBuffer(uint8_t *mbuffer){
 uint8_t CSRD::createInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status,uint8_t val0,uint8_t val1,uint8_t val2){   
     messageLength = 8;
     buffer[0]=RP_STATUS;
-    buffer[1]=RP_INITIALREG;
+    buffer[1]=RP_STATUS_INITIAL_REGISTER;
     buffer[2]=highByte(nodeid);
     buffer[3]=lowByte(nodeid);
     buffer[4]=status;
@@ -91,7 +113,7 @@ uint8_t CSRD::createInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,ui
 uint8_t CSRD::createStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){    
     messageLength = 6;
     buffer[0]=RP_STATUS;
-    buffer[1]=RP_REPORT_STATUS;
+    buffer[1]=RP_STATUS_QUERY_STATUS;
     buffer[2]=highByte(nodeid);
     buffer[3]=lowByte(nodeid);
     buffer[4]=status;
@@ -104,7 +126,7 @@ uint8_t CSRD::createStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t sta
 uint8_t CSRD::createACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uint8_t status){    
     messageLength = 6;
     buffer[0]=RP_STATUS;
-    buffer[1]=RP_REPORT_ACK;
+    buffer[1]=RP_STATUS_ANSWER_STATUS;
     buffer[2]=highByte(nodeid);
     buffer[3]=lowByte(nodeid);
     buffer[4]=status;
@@ -565,6 +587,45 @@ uint8_t CSRD::createSaveParam(uint16_t nodeid, uint8_t serverid, uint8_t idx, ui
     return messageLength;
 }
 
+uint8_t CSRD::createQueryState(uint8_t serverAddr, uint16_t nodeid, uint8_t element){
+    messageLength = 5;
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_QUERY_STATE;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = 0;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return messageLength;
+}
+
+uint8_t CSRD::createQueryAllStates(uint8_t serverAddr, uint16_t nodeid){   
+    messageLength = 4; 
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_QUERY_ALL_STATES;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return messageLength;
+}
+
+uint8_t CSRD::createAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state){
+    messageLength = 6;
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_ANSWER_STATE;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = state;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return messageLength;
+}
+
 uint16_t CSRD::getNodeId(){   
    return word(buffer[1],buffer[2]);
 }
@@ -690,6 +751,18 @@ bool CSRD::isStatus(){
     return (buffer[0] == RP_STATUS);        
 }
 
+bool CSRD::isQueryState(){
+    return (isStatus() && buffer[1] == RP_STATUS_QUERY_STATE);        
+}
+
+bool CSRD::isQueryAllStates(){
+    return (isStatus() && buffer[1] == RP_STATUS_QUERY_ALL_STATES);        
+}
+
+bool CSRD::isAnswerState(){
+    return (isStatus() && buffer[1] == RP_STATUS_ANSWER_STATE);        
+}
+
 bool CSRD::isOperation(){
     return (buffer[1] == RP_OPERATION);        
 }
@@ -771,7 +844,7 @@ uint8_t CSRD::getState(){
     if (!isOperation()){
         return RP_FILLER;
     }
-    if (isAddressed()){
+    else if (isAddressed()){
         return buffer[5];
     }
     return buffer[4];

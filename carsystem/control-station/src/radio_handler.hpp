@@ -24,9 +24,9 @@
 #include "message_consumer.h"
 
 #define READ_TIMEOUT 5
-#define RADIO_IN_QUEUE_SIZE 100000
-#define QUEUE_READER_SLEEP 500000
-#define RADIO_SLEEP 1000
+#define RADIO_IN_QUEUE_SIZE 1000
+#define QUEUE_READER_SLEEP 5000
+#define RADIO_SLEEP 500
 
 using namespace std;
 
@@ -49,8 +49,11 @@ class RadioHandler
         log4cpp::Category *logger;
         YAML::Node* configurator;
         RH_RF69 radio1;
-        RH_RF69 radio2;        
+        bool radio1_activated = false;
+        bool radio2_activated = false;
+        RH_RF69 radio2;
         uint8_t buffer[RH_RF69_MAX_MESSAGE_LEN];
+        uint8_t buffer_out[MESSAGE_SIZE];
         map<string, MessageConsumer*> mapConsumer;
 
         pthread_t radioReader;
@@ -62,10 +65,15 @@ class RadioHandler
         pthread_cond_t  m_condv;
         pthread_mutex_t m_mutex_in;
         pthread_cond_t  m_condv_in;
+        pthread_mutex_t radio1_mutex;
+        pthread_cond_t  radio1_cond_mutex;
+        pthread_mutex_t radio2_mutex;
+        pthread_cond_t  radio2_cond_mutex;
         
         void run_in(void* param);
         void run_out(void* param);
         void run_queue_reader(void* param);
+        bool send_message(RH_RF69 *radio, string radioName, CSRD *message);
 
         static void* thread_entry_in(void *classPtr){
             ((RadioHandler*)classPtr)->run_in(nullptr);

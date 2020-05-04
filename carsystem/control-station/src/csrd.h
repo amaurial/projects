@@ -79,6 +79,7 @@ public:
     CSRD(log4cpp::Category *logger, uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);
 
     uint8_t setMessage(uint16_t radioID, uint8_t *mbuffer, uint8_t mbuffer_size);        
+    uint8_t setMessageFromHexaString(uint16_t radioID, string hexaString);        
     uint8_t getMessageBuffer(uint8_t *mbuffer);
     uint8_t getRadioMessageBuffer(uint8_t *mbuffer);
     uint8_t getMessageLength(){return messageLength;};    
@@ -125,6 +126,9 @@ public:
     bool isStopCar();
     bool isRCMove();
     bool isRCTurn();
+    bool isQueryState();
+    bool isQueryAllStates();
+    bool isAnswerState();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -185,6 +189,9 @@ public:
     uint8_t createCarBreakLightOnOff(uint16_t carid, uint8_t serverid);   
     uint8_t createLowBattery(uint8_t serverAddr,uint16_t nodeid);
     uint8_t createStopCar(uint16_t carid, uint8_t serverAddr);
+    uint8_t createQueryState(uint8_t serverAddr,uint16_t nodeid,uint8_t element);
+    uint8_t createAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state);
+    uint8_t createQueryAllStates(uint8_t serverAddr, uint16_t nodeid);  
 
     void dumpBuffer();    
     void resetToDefault();    

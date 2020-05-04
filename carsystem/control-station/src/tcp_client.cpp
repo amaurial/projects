@@ -115,11 +115,39 @@ void TcpClient::run(void *param){
     catch(...){
         logger->error("[TcpClient] Failed to stop the tcp client.");
     }
-
 }
 
 void TcpClient::handleClientMessages(char* msgptr){
     // TODO
+    // Check if the format is HEXA
+    // 01 00 03 E7 00 00 00 00
+
+    vector<string> tokens;
+    string token;
+    stringstream ss(msgptr);   
+    while (getline(ss, token, '\n'))
+    {
+        tokens.push_back(token);
+    }
+    
+    for (auto token:tokens){        
+        CSRD message = CSRD(logger); 
+        //if (hexaToCSRD(&message, token, logger) == false){
+        if (message.setMessageFromHexaString(0, token) == 0){
+            // try json
+            if (jsonToCSRD(&message, token, logger)){
+                // put in the radio queue
+                radio->put_to_out_queue(message);
+            }
+            else{
+                logger->debug("Message is not in json nor in hexa format. Skipping message. [%s]", token);
+            }
+        }
+        else{
+            // put in the radio queue
+            radio->put_to_out_queue(message);
+        }
+    }    
 }
 
 /*
@@ -162,12 +190,12 @@ void TcpClient::handleRadio(CSRD message){
     try{  
         if (json_output){        
             string json_message = csrdToJson(&message);        
-            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s", id, json_message.c_str());  
+            logger->debug("[%d] [TcpClient] Tcp Client received radio json message: %s", id, json_message.c_str());  
             sendToClient(json_message);
             sendToClient("\n");
         }
         else{
-            logger->debug("[%d] [TcpClient] Tcp Client received radio message: %s", id, message.bufferToHexString().c_str());  
+            logger->debug("[%d] [TcpClient] Tcp Client received radio hexa message: %s", id, message.bufferToHexString().c_str());  
             sendToClient(message.bufferToHexString());    
             sendToClient("\n");
         }

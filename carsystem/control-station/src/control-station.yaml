@@ -5,7 +5,7 @@ radio1:
   cspin: 8
   irqpin: 25
   promiscuous: true
-  power: 14
+  power: 15
   readtimeout: 5
 radio2:
   frequency: 915.00
@@ -14,7 +14,7 @@ radio2:
   cspin: 7
   irqpin: 16
   promiscuous: true
-  power: 14
+  power: 15
   readtimeout: 5
 logger:
   level: DEBUG
@@ -28,8 +28,8 @@ tcpserver:
   output_format: json
 limits:
   radio_read_sleep: 1000
-  radio_in_queue_thread_sleep: 100000
-  radio_out_queue_thread_sleep: 10000000
+  radio_in_queue_thread_sleep: 1000
+  radio_out_queue_thread_sleep: 1000
 mosquitto:
   broker_address: pc
   port: 1883

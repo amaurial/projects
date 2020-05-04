@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Destroy any previous container.
+docker stop CT-NG >&- 2>&-
+docker rm CT-NG >&- 2>&-
+
+#docker run -it --name=CT-NG ct-ng "$@"
+docker run --name=CT-NG --network=host -v /home/amauri/projects/carsystem/control-station:/root/project -it ct-ng bash

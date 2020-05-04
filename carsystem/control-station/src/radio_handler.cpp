@@ -7,7 +7,11 @@ RadioHandler::RadioHandler(log4cpp::Category *logger)
     pthread_mutex_init(&m_mutex, NULL);
     pthread_cond_init(&m_condv, NULL);
     pthread_mutex_init(&m_mutex_in, NULL);
-    pthread_cond_init(&m_condv_in, NULL);          
+    pthread_cond_init(&m_condv_in, NULL);
+    pthread_mutex_init(&radio1_mutex, NULL);
+    pthread_cond_init(&radio1_cond_mutex, NULL);
+    pthread_mutex_init(&radio2_mutex, NULL);
+    pthread_cond_init(&radio2_cond_mutex, NULL);
 }
 
 RadioHandler::~RadioHandler()
@@ -17,6 +21,10 @@ RadioHandler::~RadioHandler()
     pthread_cond_destroy(&m_condv);
     pthread_mutex_destroy(&m_mutex_in);
     pthread_cond_destroy(&m_condv_in);
+    pthread_mutex_destroy(&radio1_mutex);
+    pthread_cond_destroy(&radio1_cond_mutex);
+    pthread_mutex_destroy(&radio2_mutex);
+    pthread_cond_destroy(&radio2_cond_mutex);
 }
 
 void RadioHandler::setConfigurator(YAML::Node* config){
@@ -61,14 +69,16 @@ bool RadioHandler::start(){
     }
 
     if (!startRadio(&radio1, YAML_RADIO1)){
-        logger->error("Can't start radio %s. Exiting.", YAML_RADIO1);
+        logger->error("Can't start radio %s. Exiting.", YAML_RADIO1);        
         return false;
     }
+    radio1_activated = true;
 
     if (!startRadio(&radio2, YAML_RADIO2)){
         logger->error("Can't start radio %s. Exiting.", YAML_RADIO2);
         return false;
     }
+    radio2_activated = true;
 
     running = true;    
     
@@ -105,10 +115,26 @@ void RadioHandler::run_in(void* param){
         }                    
     }
 
+    logger->debug("[RadioHandler] run_in thread sleep configuration is %l micro seconds", thread_sleep);   
+
+    long t = 0;
+
     while (running){
         checkMessages(&radio1, YAML_RADIO1);
-        checkMessages(&radio2, YAML_RADIO2);    
+        //checkMessages(&radio2, YAML_RADIO2);    
         usleep(thread_sleep);    
+        // TODO: Erase it after test
+        if (t > 5000){
+            logger->debug("[RadioHandler] run_in still checking radios. Creating broadcast register.");
+            CSRD message = CSRD(logger);            
+            message.createBroadcastRequestRegister(1);
+            put_to_out_queue(message);
+            t = 0;
+        }
+        else
+        {
+            t++;
+        }        
     }
 }
 
@@ -126,8 +152,23 @@ void RadioHandler::run_out(void* param){
         }                    
     }
 
-    while (running){        
-        //logger->debug("[RadioHandler] run_out");        
+    logger->debug("[RadioHandler] run_out thread sleep configuration is %l micro seconds", thread_sleep);   
+
+    while (running){                
+        if (!out_msgs.empty()){
+            // send message for all registered consumers
+            logger->debug("Radio queue has %d messages.", out_msgs.size());
+            CSRD message = out_msgs.front();
+            out_msgs.pop();
+            if (radio1_activated){                
+                send_message(&radio1, YAML_RADIO1, &message);
+                radio1.setModeRx();
+            }                                                     
+            if (radio2_activated){                
+                //send_message(&radio2, YAML_RADIO2, &message);
+                //radio2.setModeRx();
+            }                                                     
+        }             
         usleep(thread_sleep);
     }
 }
@@ -151,9 +192,11 @@ void RadioHandler::run_queue_reader(void* param){
     long thread_sleep = QUEUE_READER_SLEEP;
     if ((*configurator)[YAML_LIMITS]){
         if ((*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_THREAD_SLEEP]){
-            max_queue_size = (*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_THREAD_SLEEP].as<int>();
+            thread_sleep = (*configurator)[YAML_LIMITS][YAML_RADIO_IN_QUEUE_THREAD_SLEEP].as<int>();
         }                    
     }
+
+    logger->debug("[RadioHandler] run_queue_reader thread sleep configuration is %l micro seconds", thread_sleep);   
 
     while (running){
         if (!in_msgs.empty()){
@@ -176,51 +219,142 @@ void RadioHandler::run_queue_reader(void* param){
                     in_msgs.pop();
                 }
             }            
-        }
-        // else{            
-        //     usleep(thread_sleep);
-        // }  
+        }        
         usleep(thread_sleep);       
     }
 }
 
 bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){	
     //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());
+        
+    uint8_t len = RH_RF69_MAX_MESSAGE_LEN;
+    uint8_t from;
+    uint8_t to;
+    uint8_t flags;
+    int8_t rssi;
+    bool got_message = false;  
+    memset(buffer, '\0', RH_RF69_MAX_MESSAGE_LEN);
+
+    if (radioName == YAML_RADIO1){
+        pthread_mutex_lock(&radio1_mutex);        
+        //pthread_cond_wait(&radio1_cond_mutex, &radio1_mutex);
+    }
+    else if (radioName == YAML_RADIO2){
+        pthread_mutex_lock(&radio2_mutex);
+        //pthread_cond_wait(&radio2_cond_mutex, &radio2_mutex);
+    }
+    else{
+        logger->debug("Invalid radio name %s", radioName.c_str());    
+        return false;
+    }
+    //logger->debug("[checkMessages] Got lock for radio name %s", radioName.c_str());       
+
+    if (radio->recv(buffer, &len)) {
+        if (len >0){
+            // Should be a message for us now                                 
+            logger->debug("%s received message: [%s]", radioName.c_str(), buffer);
+            from = radio->headerFrom();
+            to   = radio->headerTo();
+            //uint8_t id   = radio->headerId();
+            flags= radio->headerFlags();;
+            rssi  = radio->lastRssi();                      
+            got_message = true;
+        }
+    }
+
+    if (radioName == YAML_RADIO1){
+        //pthread_cond_signal(&radio1_cond_mutex);
+        pthread_mutex_unlock(&radio1_mutex);
+    }
+
+    if (radioName == YAML_RADIO2){
+        //pthread_cond_signal(&radio2_cond_mutex);
+        pthread_mutex_unlock(&radio2_mutex);
+    }
+
+    //logger->debug("[checkMessages] Unlock for radio name %s", radioName.c_str());    
+
+    if (got_message){    
+        CSRD message = CSRD(logger, 0, buffer, len);
+        message.setTo(to);
+        message.setFrom(from);
+        message.setRssi(rssi);
+        message.setFlags(flags);
+        in_msgs.push(message);  
+        message.dumpBuffer(); 
+        return true;                         
+    }
+     
     
-    if (radio->available()) {
-        uint8_t len = RH_RF69_MAX_MESSAGE_LEN;         
-        memset(buffer, '\0', RH_RF69_MAX_MESSAGE_LEN);
-        if (radio->recv(buffer, &len)) {
-            if (len >0){
-                // Should be a message for us now                                 
-                uint8_t from = radio->headerFrom();
-                uint8_t to   = radio->headerTo();
-                //uint8_t id   = radio->headerId();
-                uint8_t flags= radio->headerFlags();;
-                int8_t rssi  = radio->lastRssi();          
-                radio->setModeTx();
-                radio->setModeRx();
-                //logger->debug("Radio: %s len: %02d from: %d to: %d ssi: %ddB id: %d",radioName.c_str(), len, from, to, rssi, id);
-                CSRD message = CSRD(logger, 0, buffer, len);
-                message.setTo(to);
-                message.setFrom(from);
-                message.setRssi(rssi);
-                message.setFlags(flags);
-                in_msgs.push(message);  
-                message.dumpBuffer();          
-                logger->debug("%s received message: [%s]", radioName.c_str(), buffer);                            
-            }           
-        }         
-    }    
     return false;
 }
 
+bool RadioHandler::send_message(RH_RF69 *radio, string radioName, CSRD *message){
+    
+    if (radioName == YAML_RADIO1 and !radio1_activated){
+        logger->debug("%s is deactivated. Not sending message.", radioName.c_str());
+        return false;
+    }
+
+    if (radioName == YAML_RADIO2 and !radio2_activated){
+        logger->debug("%s is deactivated. Not sending message.", radioName.c_str());
+        return false;
+    }    
+
+    //logger->debug("[send_message] Got lock for radio name %s", radioName.c_str());
+
+    memset(buffer_out, '\0', MESSAGE_SIZE);
+    uint8_t msize = message->getMessageBuffer(buffer_out);
+    if (msize < 1){
+        logger->debug("Message is empty. Not sending.");    
+        return false;
+    }
+
+    printMessage(buffer_out, msize);    
+
+    if (radioName == YAML_RADIO1){
+        pthread_mutex_lock(&radio1_mutex);
+        //pthread_cond_wait(&radio1_cond_mutex, &radio1_mutex);
+    }
+    else if (radioName == YAML_RADIO2){
+        pthread_mutex_lock(&radio2_mutex);
+        //pthread_cond_wait(&radio2_cond_mutex, &radio2_mutex);
+    }
+    else{
+        logger->debug("Invalid radio name %s", radioName.c_str());    
+        return false;
+    }    
+    
+    radio->setModeRx();    
+    bool message_sent = radio->send(buffer_out, msize);    
+    radio->waitPacketSent();    
+
+    if (radioName == YAML_RADIO1){
+        //pthread_cond_signal(&radio1_cond_mutex);
+        pthread_mutex_unlock(&radio1_mutex);
+    }
+
+    if (radioName == YAML_RADIO2){
+        //pthread_cond_signal(&radio2_cond_mutex);
+        pthread_mutex_unlock(&radio2_mutex);
+    }
+
+    if (message_sent){
+        logger->debug("Message sent via %s.", radioName.c_str());    
+    }
+    else{
+        logger->debug("Message not sent.");
+    }
+    return message_sent;
+}
+
 void RadioHandler::printMessage(uint8_t *pbuf, int len){
+    char temp[3];    
     stringstream ss;
 
     for (int i = 0; i < len; i++){
-        ss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << pbuf[i];
-        ss << " ";
+        sprintf(temp,"%02X", pbuf[i]);
+        ss << temp << " ";
     }
 
     logger->debug("message: %s",ss.str().c_str());
@@ -327,22 +461,32 @@ bool RadioHandler::startRadio(RH_RF69 *radio, string radioName){
             return false;
         }
         else {        
-            logger->debug("Radio: %s seen OK!", radioName.c_str());
+            logger->debug("Radio: %s seems OK!", radioName.c_str());
         }
-
-        radio->available();        
+        
+        logger->debug("Setting configuration.");
+        radio->available();
+        logger->debug("Setting power to %d.", power);
         radio->setTxPower((uint8_t)power);        
+        logger->debug("Setting modulation to GFSK_Rb250Fd250");
         radio->setModemConfig(RH_RF69::GFSK_Rb250Fd250);
+        logger->debug("Setting frequency to %d.", frequency);
         radio->setFrequency(frequency);
+        logger->debug("Setting timeout to %d.", radio_readtimeout);
         radio->setWaitTimeout((uint16_t)radio_readtimeout);
         // set Network ID (by sync words)
         uint8_t syncwords[2];
         syncwords[0] = 0x10;
         syncwords[1] = 0x10;; //(uint8_t)group;   
-        cout << "sync words:" << syncwords[0] << ";" << syncwords[1] << endl;     
+        logger->debug("Setting sync words %d%d", syncwords[0], syncwords[1]);        
         radio->setSyncWords(syncwords, sizeof(syncwords));
+        radio->setEncryptionKey(nullptr);
         radio->setPromiscuous(promiscuos);  
         radio->setModeRx();
+        radio->setHeaderId(id);
+        radio->setHeaderFrom(id);        
+        logger->debug("Radio activated.");
+
     }
     catch (const exception &ex){
         cerr << ex.what() << '\n';
