@@ -1,0 +1,6 @@
+tcp_server: 192.168.1.83
+tcp_port: 2020
+mqtt_server: 192.168.1.169
+mqtt_publish_topic: "csrd/control_station/out"
+mqtt_register_topic: "csrd/control_station/in"
+

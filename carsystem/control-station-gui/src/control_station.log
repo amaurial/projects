@@ -1,0 +1,1815 @@
+2020-04-28 16:33:34,521 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 16:33:34,522 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 16:33:34,522 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 16:33:34,522 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 16:33:34,523 - control_station - INFO - Starting tcp read thread.
+2020-04-28 16:33:34,523 - control_station - INFO - Starting tcp write thread.
+2020-04-28 16:33:34,523 - control_station - INFO - Starting queue consumer threads
+2020-04-28 16:33:34,523 - control_station - INFO - Running input queue consumer.
+2020-04-28 16:33:47,470 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 16:33:47,470 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 16:33:47,597 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 16:35:56,951 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 16:35:56,951 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 16:35:56,951 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 16:35:56,952 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 16:35:56,952 - control_station - INFO - Starting tcp read thread.
+2020-04-28 16:35:56,952 - control_station - INFO - Starting tcp write thread.
+2020-04-28 16:35:56,952 - control_station - INFO - Starting queue consumer threads
+2020-04-28 16:35:56,953 - control_station - INFO - Running input queue consumer.
+2020-04-28 16:36:18,335 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 16:36:20,509 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:31:08,668 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:31:08,669 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:31:08,669 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:31:08,669 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:31:08,669 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:31:08,670 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:31:08,670 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:31:08,670 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:31:29,641 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:31:32,335 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:38:02,586 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:38:02,586 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:38:02,586 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:38:02,587 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:38:02,587 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:38:02,587 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:38:02,587 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:38:02,588 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:38:11,776 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:38:12,407 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:40:09,559 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:40:09,559 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:40:09,559 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:40:09,560 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:40:09,560 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:40:09,560 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:40:09,560 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:40:09,561 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:40:14,708 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:40:16,241 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:41:28,932 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:41:28,932 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:41:28,932 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:41:28,933 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:41:28,933 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:41:28,933 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:41:28,934 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:41:28,934 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:41:34,075 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:41:35,959 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:46:57,659 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:46:57,659 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:46:57,659 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:46:57,660 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:46:57,660 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:46:57,660 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:46:57,660 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:46:57,661 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:46:57,874 - control_station - INFO - Parsing [s]
+2020-04-28 17:47:03,706 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:47:04,895 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:49:00,803 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:49:00,804 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:49:00,804 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:49:00,804 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:49:00,805 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:49:00,805 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:49:00,805 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:49:00,805 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:49:05,161 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:49:05,162 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:49:09,019 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 17:49:09,674 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:51:02,103 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:51:02,103 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:51:02,103 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:51:02,104 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:51:02,104 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:51:02,104 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:51:02,104 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:51:02,105 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:51:04,464 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:51:10,477 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:56:31,023 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:56:31,023 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:56:31,023 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:56:31,024 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:56:31,024 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:56:31,024 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:56:31,024 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:56:31,025 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:31,325 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:31,328 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 17:56:34,341 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:56:34,341 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,341 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:56:34,342 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:56:34,342 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,342 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,342 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,342 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,342 - control_station - INFO - Car registered already.
+2020-04-28 17:56:34,342 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,847 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:56:34,847 - control_station - INFO - Car registered already.
+2020-04-28 17:56:34,847 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 17:56:35,960 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 17:56:36,348 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 17:59:52,067 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 17:59:52,067 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 17:59:52,067 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 17:59:52,068 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 17:59:52,068 - control_station - INFO - Starting tcp read thread.
+2020-04-28 17:59:52,068 - control_station - INFO - Starting tcp write thread.
+2020-04-28 17:59:52,069 - control_station - INFO - Starting queue consumer threads
+2020-04-28 17:59:52,069 - control_station - INFO - Running input queue consumer.
+2020-04-28 17:59:55,405 - control_station - INFO - Parsing [b'01']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'03']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'E7']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'00']
+2020-04-28 17:59:55,406 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:00:05,812 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 18:00:07,427 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 18:01:30,885 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 18:01:30,886 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 18:01:30,886 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 18:01:30,886 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 18:01:30,887 - control_station - INFO - Starting tcp read thread.
+2020-04-28 18:01:30,887 - control_station - INFO - Starting tcp write thread.
+2020-04-28 18:01:30,887 - control_station - INFO - Starting queue consumer threads
+2020-04-28 18:01:30,887 - control_station - INFO - Running input queue consumer.
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:01:32,653 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:01:39,796 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 18:01:40,183 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 18:03:45,100 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 18:03:45,101 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 18:03:45,101 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 18:03:45,101 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 18:03:45,102 - control_station - INFO - Starting tcp read thread.
+2020-04-28 18:03:45,102 - control_station - INFO - Starting tcp write thread.
+2020-04-28 18:03:45,102 - control_station - INFO - Starting queue consumer threads
+2020-04-28 18:03:45,102 - control_station - INFO - Running input queue consumer.
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:46,991 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:46,991 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:03:46,994 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:03:49,489 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:49,490 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:49,490 - control_station - INFO - Car registered already.
+2020-04-28 18:03:49,490 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:03:50,998 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:03:50,998 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:50,998 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:03:50,998 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:03:50,998 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:50,999 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:50,999 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:50,999 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:03:50,999 - control_station - INFO - Car registered already.
+2020-04-28 18:03:50,999 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:03:51,279 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 18:03:53,501 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 18:06:29,089 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 18:06:29,090 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 18:06:29,090 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 18:06:29,090 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 18:06:29,091 - control_station - INFO - Starting tcp read thread.
+2020-04-28 18:06:29,091 - control_station - INFO - Starting tcp write thread.
+2020-04-28 18:06:29,091 - control_station - INFO - Starting queue consumer threads
+2020-04-28 18:06:29,091 - control_station - INFO - Running input queue consumer.
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:30,413 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:30,414 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:30,414 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:30,415 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:06:30,416 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:32,418 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:32,419 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:06:32,419 - control_station - INFO - Car registered already.
+2020-04-28 18:06:32,419 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:06:34,330 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 18:06:36,426 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 18:07:19,704 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 18:07:19,704 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 18:07:19,704 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 18:07:19,705 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 18:07:19,705 - control_station - INFO - Starting tcp read thread.
+2020-04-28 18:07:19,705 - control_station - INFO - Starting tcp write thread.
+2020-04-28 18:07:19,706 - control_station - INFO - Starting queue consumer threads
+2020-04-28 18:07:19,706 - control_station - INFO - Running input queue consumer.
+2020-04-28 18:07:21,039 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:21,040 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:21,041 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:21,042 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:23,042 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:23,042 - control_station - INFO - Car registered already.
+2020-04-28 18:07:23,042 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:23,043 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:24,049 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:24,049 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:24,049 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:24,049 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:24,050 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:24,050 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:24,050 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:24,050 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:24,050 - control_station - INFO - Car registered already.
+2020-04-28 18:07:24,050 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:24,050 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:28,059 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:28,059 - control_station - INFO - Car registered already.
+2020-04-28 18:07:28,060 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:28,061 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:29,076 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,077 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,077 - control_station - INFO - Car registered already.
+2020-04-28 18:07:29,077 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:29,077 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,581 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:29,582 - control_station - INFO - Car registered already.
+2020-04-28 18:07:29,582 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:29,583 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:33,087 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:33,088 - control_station - INFO - Car registered already.
+2020-04-28 18:07:33,088 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:33,088 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:36,093 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:36,094 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:36,094 - control_station - INFO - Car registered already.
+2020-04-28 18:07:36,094 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:36,095 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:40,607 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:40,607 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:40,607 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:40,607 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:40,607 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:40,608 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:40,608 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:40,608 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:40,608 - control_station - INFO - Car registered already.
+2020-04-28 18:07:40,608 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:40,608 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,109 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,109 - control_station - INFO - Car registered already.
+2020-04-28 18:07:42,110 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:42,111 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,614 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,615 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:42,615 - control_station - INFO - Car registered already.
+2020-04-28 18:07:42,615 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:42,615 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:43,623 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:43,623 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:43,624 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:43,624 - control_station - INFO - Car registered already.
+2020-04-28 18:07:43,624 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:43,625 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:45,630 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:45,631 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:45,631 - control_station - INFO - Car registered already.
+2020-04-28 18:07:45,631 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:45,631 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:47,636 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:47,637 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:47,637 - control_station - INFO - Car registered already.
+2020-04-28 18:07:47,637 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:47,638 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:51,142 - control_station - INFO - Parsing [b'01']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'03']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'E7']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:51,143 - control_station - INFO - Parsing [b'00']
+2020-04-28 18:07:51,143 - control_station - INFO - Car registered already.
+2020-04-28 18:07:51,143 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 18:07:51,143 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 18:07:54,363 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 18:07:54,363 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 18:07:55,150 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 21:29:52,161 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 21:29:52,161 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 21:29:52,161 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 21:29:52,162 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 21:29:52,162 - control_station - INFO - Starting tcp read thread.
+2020-04-28 21:29:52,162 - control_station - INFO - Starting tcp write thread.
+2020-04-28 21:29:52,162 - control_station - INFO - Starting queue consumer threads
+2020-04-28 21:29:52,163 - control_station - INFO - Running input queue consumer.
+2020-04-28 21:29:53,841 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:29:53,843 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:29:55,343 - control_station - INFO - Car registered already.
+2020-04-28 21:29:55,343 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:29:55,344 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:29:57,348 - control_station - INFO - Car registered already.
+2020-04-28 21:29:57,348 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:29:57,348 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:30:26,364 - control_station - INFO - Car registered already.
+2020-04-28 21:30:26,364 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:30:26,366 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:30:28,369 - control_station - INFO - Car registered already.
+2020-04-28 21:30:28,370 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:30:28,371 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:30:28,374 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 21:30:28,374 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 21:30:30,376 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 21:33:38,970 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 21:33:38,971 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 21:33:38,971 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 21:33:38,971 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 21:33:38,972 - control_station - INFO - Starting tcp read thread.
+2020-04-28 21:33:38,972 - control_station - INFO - Starting tcp write thread.
+2020-04-28 21:33:38,972 - control_station - INFO - Starting queue consumer threads
+2020-04-28 21:33:38,972 - control_station - INFO - Running input queue consumer.
+2020-04-28 21:33:41,414 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:33:41,415 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:33:45,916 - control_station - INFO - Car registered already.
+2020-04-28 21:33:45,916 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:33:45,917 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:03,424 - control_station - INFO - Car registered already.
+2020-04-28 21:34:03,424 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:03,424 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:05,933 - control_station - INFO - Car registered already.
+2020-04-28 21:34:05,933 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:05,934 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:07,445 - control_station - INFO - Car registered already.
+2020-04-28 21:34:07,446 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:07,446 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:09,450 - control_station - INFO - Car registered already.
+2020-04-28 21:34:09,450 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:09,451 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:12,451 - control_station - INFO - Car registered already.
+2020-04-28 21:34:12,452 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:12,452 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:15,965 - control_station - INFO - Car registered already.
+2020-04-28 21:34:15,966 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:15,967 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:17,970 - control_station - INFO - Car registered already.
+2020-04-28 21:34:17,970 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:17,970 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:20,972 - control_station - INFO - Car registered already.
+2020-04-28 21:34:20,972 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:20,974 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:24,485 - control_station - INFO - Car registered already.
+2020-04-28 21:34:24,486 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:24,486 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:26,487 - control_station - INFO - Car registered already.
+2020-04-28 21:34:26,487 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:34:26,489 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:34:32,575 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 21:34:32,575 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 21:34:33,496 - control_station - INFO - Finishing tcp read thread.
+2020-04-28 21:37:38,336 - control_station - INFO - Reading tcp connection properties.
+2020-04-28 21:37:38,336 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-04-28 21:37:38,336 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-04-28 21:37:38,337 - control_station - INFO - Starting TCP read and write threads.
+2020-04-28 21:37:38,337 - control_station - INFO - Starting tcp read thread.
+2020-04-28 21:37:38,338 - control_station - INFO - Starting tcp write thread.
+2020-04-28 21:37:38,338 - control_station - INFO - Starting queue consumer threads
+2020-04-28 21:37:38,338 - control_station - INFO - Running input queue consumer.
+2020-04-28 21:37:39,378 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:37:39,380 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:37:42,884 - control_station - INFO - Car registered already.
+2020-04-28 21:37:42,884 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:37:42,885 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:37:44,888 - control_station - INFO - Car registered already.
+2020-04-28 21:37:44,889 - control_station - INFO - Sending message [010003E700FFFFFF
+]
+2020-04-28 21:37:44,889 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-04-28 21:39:45,175 - control_station - INFO - Stopping input queue consumer.
+2020-04-28 21:39:45,175 - control_station - INFO - Finishing tcp write thread.
+2020-04-28 21:43:11,263 - control_station - INFO - Finishing tcp read thread.
+2020-04-29 14:35:01,019 - control_station - DEBUG - Send action clicked
+2020-04-29 14:35:04,477 - control_station - DEBUG - Send action clicked
+2020-04-29 14:35:13,516 - control_station - DEBUG - Send action clicked
+2020-04-30 22:11:57,036 - control_station - DEBUG - No item selected
+2020-04-30 22:12:16,931 - control_station - DEBUG - Car selected 446
+2020-04-30 22:12:25,301 - control_station - DEBUG - Car selected 448
+2020-05-02 19:17:25,298 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:17:25,298 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:17:25,298 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:17:25,299 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:17:25,299 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:17:25,299 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:17:25,299 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:17:25,300 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:17:28,761 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:28,762 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:28,763 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:28,763 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:17:32,768 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:32,768 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:32,768 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:32,769 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:36,776 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:36,776 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:36,776 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:36,776 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:37,281 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:37,281 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:37,281 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:37,282 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:39,286 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:39,286 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:39,286 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:39,286 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:40,787 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:40,788 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:40,788 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:40,789 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:45,805 - control_station - DEBUG - Handling register message.
+2020-05-02 19:17:45,805 - control_station - DEBUG - Car registered already.
+2020-05-02 19:17:45,805 - control_station - DEBUG - Message is not in hexastring format [message]
+2020-05-02 19:17:45,805 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:17:55,918 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:17:55,918 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:17:59,305 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:22:00,646 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:22:00,646 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:22:00,646 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:22:00,647 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:22:00,647 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:22:00,647 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:22:00,647 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:22:00,648 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:24:40,074 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:24:40,074 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:24:40,074 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:24:40,075 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:24:40,075 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:24:40,075 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:24:40,075 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:24:40,075 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:24:41,750 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:41,750 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:41,751 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:41,752 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:41,752 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:41,752 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:42,265 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:42,265 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:42,265 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:42,266 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:42,266 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:42,266 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:45,267 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:45,267 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:45,267 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:45,268 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:45,268 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:45,268 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:49,780 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:49,780 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:49,780 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:49,781 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:49,781 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:49,781 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:54,785 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:54,785 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:54,786 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:54,786 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:54,788 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:54,788 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:57,786 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:24:57,786 - control_station - DEBUG - Handling register message.
+2020-05-02 19:24:57,787 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:24:57,787 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:24:57,788 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:24:57,788 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:24:59,188 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:24:59,189 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:24:59,189 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:24:59,189 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:24:59,297 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:24:59,339 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:29:44,441 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:29:44,441 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:29:44,441 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:29:44,442 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:29:44,442 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:29:44,443 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:29:44,443 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:29:44,443 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:30:30,671 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:30:30,671 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:30:30,671 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:30:30,671 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:30:30,672 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:30:30,672 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:30:30,672 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:30:30,672 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:30:31,803 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:31,803 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:31,803 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:31,804 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:31,805 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:31,806 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:30:34,310 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:34,310 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:34,310 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:34,311 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:34,312 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:34,312 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:34,815 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:34,815 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:34,815 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:34,815 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:34,815 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:34,815 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:35,319 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:35,319 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:35,319 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:35,319 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:35,320 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:35,321 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:38,332 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:38,332 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:38,333 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:38,333 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:38,333 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:38,333 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:38,836 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:38,836 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:38,836 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:38,836 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:38,837 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:38,837 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:42,341 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:42,341 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:42,341 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:42,342 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:42,343 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:42,343 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:44,349 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:30:44,349 - control_station - DEBUG - Handling register message.
+2020-05-02 19:30:44,349 - control_station - DEBUG - Car registered already.
+2020-05-02 19:30:44,349 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:30:44,350 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:30:44,350 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:30:48,005 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:30:48,005 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:30:48,005 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:30:48,005 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:30:48,854 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:30:48,895 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:37:16,670 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:37:16,670 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:37:16,670 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:37:16,671 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:37:16,671 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:37:16,672 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:37:16,672 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:37:16,672 - control_station - INFO - Running input queue consumer.
+2020-05-02 19:37:20,200 - control_station - DEBUG - Input queue size is 2
+2020-05-02 19:37:20,200 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:37:20,200 - control_station - DEBUG - Handling register message.
+2020-05-02 19:37:20,200 - control_station - DEBUG - Answer register message.
+2020-05-02 19:37:20,201 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:37:20,202 - control_station - DEBUG - Input queue size is 1
+2020-05-02 19:37:20,202 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:37:20,202 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:37:20,202 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:37:20,203 - control_station - DEBUG - Queue is empty.
+2020-05-02 19:37:20,713 - control_station - DEBUG - Input queue size is 1
+2020-05-02 19:37:20,713 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:37:20,714 - control_station - DEBUG - Handling register message.
+2020-05-02 19:37:20,714 - control_station - DEBUG - Answer register message.
+2020-05-02 19:37:20,714 - control_station - DEBUG - Car registered already.
+2020-05-02 19:37:20,714 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:37:20,714 - control_station - DEBUG - Queue is empty.
+2020-05-02 19:37:20,715 - control_station - DEBUG - Input queue size is 1
+2020-05-02 19:37:20,715 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:37:20,715 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:37:20,716 - control_station - DEBUG - Queue is empty.
+2020-05-02 19:37:22,719 - control_station - DEBUG - Input queue size is 1
+2020-05-02 19:37:22,719 - control_station - DEBUG - Received message [b'010003E700000000']
+2020-05-02 19:37:22,720 - control_station - DEBUG - Handling register message.
+2020-05-02 19:37:22,720 - control_station - DEBUG - Answer register message.
+2020-05-02 19:37:22,720 - control_station - DEBUG - Car registered already.
+2020-05-02 19:37:22,720 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:37:22,720 - control_station - DEBUG - Input queue size is 1
+2020-05-02 19:37:22,720 - control_station - DEBUG - Received message [b'\n']
+2020-05-02 19:37:22,720 - control_station - DEBUG - Message is not in hexastring format [b'\n']
+2020-05-02 19:37:22,720 - control_station - DEBUG - Queue is empty.
+2020-05-02 19:37:25,522 - control_station - INFO - Stopping input queue consumer.
+2020-05-02 19:37:25,522 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:37:26,226 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 19:41:41,028 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 19:41:41,028 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 19:41:41,028 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 19:41:41,029 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 19:41:41,029 - control_station - INFO - Starting tcp read thread.
+2020-05-02 19:41:41,030 - control_station - INFO - Starting tcp write thread.
+2020-05-02 19:41:41,030 - control_station - INFO - Starting queue consumer threads
+2020-05-02 19:41:41,030 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 19:41:41,295 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:41:41,295 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:41:41,295 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:41:41,295 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:41:41,296 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:41:41,297 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:41,297 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 19:41:41,298 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:41:41,298 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:41:41,298 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:43,803 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:43,803 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:41:43,803 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:41:43,803 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:41:43,803 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:41:43,804 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:41:43,804 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:43,805 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:43,805 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:41:43,805 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:41:43,805 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:46,805 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:41:46,805 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:41:46,806 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:41:46,806 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:41:46,806 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:41:46,806 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:41:46,806 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:46,806 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:41:46,806 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:41:46,806 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:50,311 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:50,311 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:41:50,311 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:41:50,311 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:41:50,311 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:41:50,311 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:41:50,312 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:50,313 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:50,313 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:41:50,313 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:41:50,313 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:41:51,318 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:41:51,318 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:41:51,318 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:41:51,318 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:41:51,318 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:41:51,318 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:41:51,318 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:41:51,318 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:41:51,319 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:41:51,319 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:42,827 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:42,827 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:42:42,827 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:42:42,828 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:42:42,828 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:42:42,828 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:42:42,828 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:42,829 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:42,829 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:42:42,829 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:42:42,829 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:44,832 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:44,832 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:42:44,832 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:42:44,832 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:42:44,832 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:42:44,832 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:42:44,833 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:44,833 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:42:44,833 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:42:44,833 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:49,345 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:49,345 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:42:49,345 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:42:49,345 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:42:49,345 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:42:49,345 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:42:49,346 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:49,347 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:49,347 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:42:49,347 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:42:49,347 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:42:49,850 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:42:49,850 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:42:49,850 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:42:49,850 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:42:49,850 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:37,359 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:37,359 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:37,359 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:37,359 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:37,359 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:37,359 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:37,359 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:37,361 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:37,361 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:37,361 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:37,361 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:39,364 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:43:39,364 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:39,364 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:39,364 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:39,364 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:39,365 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:39,365 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:39,365 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:39,365 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:39,365 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:41,380 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:41,380 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:41,380 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:41,380 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:41,380 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:41,380 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:41,380 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:41,382 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:41,382 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:41,382 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:41,382 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:44,378 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:43:44,378 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:44,378 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:44,378 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:44,378 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:44,378 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:44,378 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:44,379 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:44,379 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:44,379 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:44,891 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:44,892 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:44,892 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:44,892 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:44,892 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:44,892 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:44,892 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:44,893 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:44,893 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:44,893 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:44,894 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:45,395 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:43:45,396 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:45,397 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:45,397 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:45,397 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:45,397 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:45,397 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:45,397 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:45,397 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:45,397 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:47,903 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:47,903 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:47,903 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:47,903 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:47,904 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:47,904 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:47,904 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:47,905 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:47,905 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:47,905 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:47,905 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:48,406 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:48,406 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:48,407 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:48,407 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:48,407 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:48,407 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:48,407 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:48,407 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:48,407 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:48,407 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:51,913 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:51,914 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:51,914 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:51,914 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:51,914 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:51,914 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:51,914 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:51,915 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:51,915 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:51,916 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:51,916 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:53,919 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 19:43:53,920 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 19:43:53,920 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 19:43:53,920 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 19:43:53,921 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 19:43:58,425 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-02 19:43:58,425 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 19:43:58,926 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 20:21:58,679 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 20:21:58,679 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 20:21:58,680 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 20:21:58,680 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 20:21:58,680 - control_station - INFO - Starting tcp read thread.
+2020-05-02 20:21:58,681 - control_station - INFO - Starting tcp write thread.
+2020-05-02 20:21:58,681 - control_station - INFO - Starting queue consumer threads
+2020-05-02 20:21:58,681 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 20:21:59,741 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:21:59,742 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:21:59,742 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:21:59,742 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:21:59,743 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:21:59,744 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:21:59,744 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 20:21:59,744 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:21:59,744 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:21:59,744 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:22:08,248 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:22:08,248 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:22:08,248 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:22:08,248 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:22:08,248 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:22:08,248 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:22:08,249 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:22:08,250 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:22:08,250 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:22:08,250 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:22:08,250 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:22:12,750 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 20:22:12,751 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:22:12,751 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:22:12,751 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:22:12,751 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:22:12,751 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:22:12,751 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:22:12,752 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:22:12,752 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:22:12,752 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:39,417 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 20:23:39,418 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 20:23:39,418 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 20:23:39,418 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 20:23:39,419 - control_station - INFO - Starting tcp read thread.
+2020-05-02 20:23:39,419 - control_station - INFO - Starting tcp write thread.
+2020-05-02 20:23:39,419 - control_station - INFO - Starting queue consumer threads
+2020-05-02 20:23:39,420 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 20:23:39,522 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:39,522 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:23:39,523 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:39,523 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:23:39,523 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:23:39,523 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:23:39,523 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:23:39,523 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:23:39,523 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:23:39,524 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:39,524 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:41,034 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:41,034 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:41,035 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:23:41,035 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:23:41,035 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:23:41,035 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:23:41,035 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:23:41,035 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:41,036 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:23:41,036 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:23:41,036 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:43,038 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 20:23:43,038 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:23:43,038 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:23:43,038 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:23:43,038 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:23:43,038 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:23:43,039 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:43,039 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:43,039 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:23:43,039 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:23:43,039 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:43,541 - control_station - DEBUG - [handle_message] Received message [b'0000000000000000']
+2020-05-02 20:23:43,541 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:43,587 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:43,588 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:23:43,588 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:23:43,588 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:23:47,046 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:47,047 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:23:47,047 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:23:47,047 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:23:47,047 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:23:47,047 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:23:47,047 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:47,047 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:23:47,048 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:23:47,048 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:23:47,048 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:24:04,056 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:24:04,056 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:24:04,056 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:24:04,056 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:24:04,056 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:24:04,056 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:24:04,057 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:24:04,057 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:24:04,057 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:24:04,057 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:24:07,067 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 20:24:07,067 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:24:07,068 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:24:07,068 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:24:07,068 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:24:07,069 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:33:00,799 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 20:33:00,799 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 20:33:00,799 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 20:33:00,800 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 20:33:00,800 - control_station - INFO - Starting tcp read thread.
+2020-05-02 20:33:00,800 - control_station - INFO - Starting tcp write thread.
+2020-05-02 20:33:00,800 - control_station - INFO - Starting queue consumer threads
+2020-05-02 20:33:00,801 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 20:33:03,484 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:33:03,484 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:33:03,484 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 20:33:03,485 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:33:03,485 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:33:03,486 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:33:03,486 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:33:03,486 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:33:03,486 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:33:03,486 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 20:33:03,486 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:33:03,486 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 20:40:58,814 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-02 20:40:58,814 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 20:40:58,814 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 20:42:12,857 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 20:42:12,857 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 20:42:12,857 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 20:42:12,858 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 20:42:12,858 - control_station - INFO - Starting tcp read thread.
+2020-05-02 20:42:12,858 - control_station - INFO - Starting tcp write thread.
+2020-05-02 20:42:12,858 - control_station - INFO - Starting queue consumer threads
+2020-05-02 20:42:12,859 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 20:42:16,780 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:42:16,780 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 20:42:16,780 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 20:42:16,780 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 20:42:16,780 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 20:42:16,782 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 20:42:16,782 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 20:42:16,783 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 20:42:16,783 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 20:42:16,783 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 20:49:05,598 - control_station - INFO - Finishing tcp read thread.
+2020-05-02 20:49:05,599 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-02 20:49:05,599 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 21:20:17,942 - control_station - INFO - Reading tcp connection properties.
+2020-05-02 21:20:17,942 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-02 21:20:17,942 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-02 21:20:17,943 - control_station - INFO - Starting TCP read and write threads.
+2020-05-02 21:20:17,943 - control_station - INFO - Starting tcp read thread.
+2020-05-02 21:20:17,943 - control_station - INFO - Starting tcp write thread.
+2020-05-02 21:20:17,944 - control_station - INFO - Starting queue consumer threads
+2020-05-02 21:20:17,944 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-02 21:20:19,056 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 21:20:19,056 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 21:20:19,056 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 21:20:19,056 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 21:20:19,057 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 21:20:19,058 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 21:20:19,058 - control_station - INFO - Sending message [010503E700000000]
+2020-05-02 21:20:19,058 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 21:20:19,059 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 21:20:19,059 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 21:20:19,278 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 21:20:19,278 - control_station - DEBUG - [handle_message] Received message [b'0000000000000000']
+2020-05-02 21:20:19,278 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 21:20:19,320 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 21:20:19,320 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 21:20:19,320 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 21:20:19,321 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 21:20:23,419 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-02 21:20:23,419 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-02 21:20:23,419 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-02 21:20:23,419 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-02 21:20:23,419 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-02 21:20:23,419 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-02 21:20:23,420 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-02 21:20:23,420 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-02 21:20:23,420 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-02 21:20:23,420 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-02 21:20:58,933 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-02 21:20:58,933 - control_station - INFO - Finishing tcp write thread.
+2020-05-02 21:59:38,893 - control_station - INFO - Finishing tcp read thread.
+2020-05-03 19:44:10,492 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 19:44:10,492 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 19:44:10,492 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 19:44:10,493 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 19:44:10,493 - control_station - INFO - Starting tcp read thread.
+2020-05-03 19:44:10,493 - control_station - INFO - Starting tcp write thread.
+2020-05-03 19:44:10,493 - control_station - INFO - Starting queue consumer threads
+2020-05-03 19:44:10,494 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 19:44:10,637 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 19:44:10,637 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:44:10,637 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:44:10,637 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:44:10,638 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:44:10,640 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:44:10,640 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:44:10,640 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:44:10,640 - control_station - INFO - Sending message [010503E700000000]
+2020-05-03 19:44:10,640 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:06,025 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 19:46:06,026 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 19:46:06,026 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 19:46:06,026 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 19:46:06,027 - control_station - INFO - Starting tcp read thread.
+2020-05-03 19:46:06,027 - control_station - INFO - Starting tcp write thread.
+2020-05-03 19:46:06,027 - control_station - INFO - Starting queue consumer threads
+2020-05-03 19:46:06,027 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 19:46:06,514 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:06,514 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 19:46:06,514 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:06,515 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:06,515 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:06,515 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:06,515 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:06,515 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:06,515 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:06,515 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:06,516 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:07,432 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:07,432 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:07,432 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:07,432 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:07,432 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:07,433 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:07,433 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:07,433 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:07,434 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:07,434 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:07,434 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:08,199 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:08,199 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:08,199 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:08,199 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:08,199 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:08,199 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:08,199 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:08,200 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:08,200 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:08,200 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:08,200 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:09,682 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:09,682 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:09,682 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:09,682 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:09,682 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:09,682 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:09,683 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:09,683 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:09,683 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:09,683 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:09,683 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:13,247 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:13,248 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:13,248 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:13,248 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:13,248 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:13,248 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:13,248 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:13,248 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:13,248 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:13,249 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:13,249 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:13,752 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:13,752 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:13,753 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:13,753 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:13,753 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:13,753 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:13,754 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:13,754 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:13,754 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:13,754 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:18,277 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 19:46:18,277 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:18,278 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:18,278 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:18,278 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:18,278 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:20,645 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:20,645 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:20,646 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:20,646 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:20,646 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:20,646 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:20,646 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:20,646 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:20,647 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:20,647 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:20,647 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:23,226 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 19:46:23,226 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:23,226 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:23,226 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:23,226 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:23,226 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:23,226 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:23,227 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:23,227 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:23,227 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:23,227 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:23,468 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:23,468 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:23,469 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:23,469 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:23,469 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:23,469 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:23,469 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:23,470 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:23,470 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:23,470 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:23,471 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:23,471 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:24,145 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:24,146 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:24,146 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:24,146 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:24,146 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:24,146 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:24,147 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:24,147 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:24,147 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:24,147 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:27,170 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:27,170 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:27,170 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:27,171 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:27,171 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:27,171 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:27,171 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:27,171 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:27,171 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:27,171 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:27,505 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:27,505 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 19:46:27,505 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 19:46:27,505 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 19:46:27,506 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 19:46:27,506 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 19:46:27,506 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 19:46:27,506 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:46:27,506 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 19:46:27,507 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 19:46:27,507 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 19:47:29,936 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 19:47:29,937 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 19:47:29,937 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 19:47:29,937 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 19:47:29,938 - control_station - INFO - Starting tcp read thread.
+2020-05-03 19:47:29,938 - control_station - INFO - Starting tcp write thread.
+2020-05-03 19:47:29,938 - control_station - INFO - Starting queue consumer threads
+2020-05-03 19:47:29,938 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 19:47:43,564 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 19:47:43,565 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 19:47:43,565 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 19:47:43,565 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 19:47:43,565 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 19:47:43,565 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 19:47:57,109 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 19:47:57,110 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 19:47:57,111 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 19:47:57,111 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 19:47:57,111 - control_station - INFO - Starting tcp read thread.
+2020-05-03 19:47:57,112 - control_station - INFO - Starting tcp write thread.
+2020-05-03 19:47:57,112 - control_station - INFO - Starting queue consumer threads
+2020-05-03 19:47:57,112 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 19:49:30,214 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 19:49:30,214 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 19:50:20,842 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 19:50:20,843 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 19:50:20,843 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 19:50:20,843 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 19:50:20,844 - control_station - INFO - Starting tcp read thread.
+2020-05-03 19:50:20,844 - control_station - INFO - Starting tcp write thread.
+2020-05-03 19:50:20,844 - control_station - INFO - Starting queue consumer threads
+2020-05-03 19:50:20,844 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 19:51:13,030 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 19:51:13,030 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 19:51:23,169 - control_station - INFO - Finishing tcp read thread.
+2020-05-03 20:04:21,374 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 20:04:21,374 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 20:04:21,374 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 20:04:21,375 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 20:04:21,375 - control_station - INFO - Starting tcp read thread.
+2020-05-03 20:04:21,376 - control_station - INFO - Starting tcp write thread.
+2020-05-03 20:04:21,376 - control_station - INFO - Starting queue consumer threads
+2020-05-03 20:04:21,376 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 20:04:24,401 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:04:24,402 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:04:24,402 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:04:24,402 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:04:24,402 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:04:24,404 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:24,404 - control_station - INFO - Sending message [010503E700000000]
+2020-05-03 20:04:24,404 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:04:24,404 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:04:24,404 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:29,106 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:29,106 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:04:29,106 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:04:29,106 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:04:29,106 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:04:29,106 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:04:29,107 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:29,108 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:29,108 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:04:29,108 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:04:29,108 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:32,159 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:32,159 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:04:32,159 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:04:32,159 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:04:32,159 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:04:32,160 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:32,160 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:04:32,161 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:32,161 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:04:32,161 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:04:32,161 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:33,783 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:33,783 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:04:33,783 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:04:33,783 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:04:33,784 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:04:33,784 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:04:33,784 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:33,785 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:33,785 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:04:33,785 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:04:33,785 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:04:35,557 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:04:35,558 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:04:35,558 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:04:35,558 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:04:35,558 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:05:22,570 - control_station - INFO - [run_input_queue] Stopping input queue consumer.
+2020-05-03 20:05:22,570 - control_station - INFO - Finishing tcp write thread.
+2020-05-03 20:33:33,373 - control_station - INFO - Reading tcp connection properties.
+2020-05-03 20:33:33,373 - control_station - INFO - Host: 192.168.1.83 Port: 2020
+2020-05-03 20:33:33,373 - control_station - INFO - Trying to establish connection to 192.168.1.83 on 2020
+2020-05-03 20:33:33,374 - control_station - INFO - Starting TCP read and write threads.
+2020-05-03 20:33:33,374 - control_station - INFO - Starting tcp read thread.
+2020-05-03 20:33:33,374 - control_station - INFO - Starting tcp write thread.
+2020-05-03 20:33:33,374 - control_station - INFO - Starting queue consumer threads
+2020-05-03 20:33:33,375 - control_station - INFO - [run_input_queue] Running input queue consumer.
+2020-05-03 20:33:34,374 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:33:34,375 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:33:34,375 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:33:34,375 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:33:34,375 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:33:34,377 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:34,377 - control_station - INFO - Sending message [010503E700000000]
+2020-05-03 20:33:34,377 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:33:34,378 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:33:34,378 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:36,499 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:36,499 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:33:36,499 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:33:36,500 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:33:36,500 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:33:36,500 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:36,500 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:33:36,501 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:36,501 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:33:36,501 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:33:36,501 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:53,004 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:33:53,004 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:33:53,004 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:33:53,004 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:33:53,004 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:33:53,004 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:53,004 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:33:53,005 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:33:53,005 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:33:53,005 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:54,637 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:54,637 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:33:54,637 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:33:54,637 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:33:54,637 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:33:54,637 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:54,637 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:33:54,639 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:54,639 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:33:54,639 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:33:54,639 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:33:56,401 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:33:56,401 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:33:56,401 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:33:56,401 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:33:56,401 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:33:56,401 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:33:56,402 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:33:56,402 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:33:56,402 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:33:56,402 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:00,650 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:00,650 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:00,651 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:00,651 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:00,651 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:00,651 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:00,651 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:00,652 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:00,652 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:00,652 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:00,652 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:01,598 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:01,598 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:01,598 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:01,598 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:01,599 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:01,599 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:01,599 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:01,599 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:01,599 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:01,599 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:02,333 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:02,334 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:02,334 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:02,334 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:02,334 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:02,334 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:02,334 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:02,335 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:02,335 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:02,335 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:02,335 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:03,754 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:03,754 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:03,754 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:03,755 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:03,755 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:03,755 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:03,755 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:03,755 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:03,755 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:03,755 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:07,320 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:07,320 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:07,320 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:07,321 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:07,321 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:07,321 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:07,321 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:07,322 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:07,322 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:07,322 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:07,323 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:07,825 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:07,825 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:07,825 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:07,825 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:07,825 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:07,825 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:07,826 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:07,826 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:07,826 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:07,826 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:12,327 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:12,327 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:12,327 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:12,327 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:12,328 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:12,328 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:12,328 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:12,329 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:12,329 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:12,329 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:12,329 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:15,832 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:15,833 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:15,833 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:15,833 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:15,833 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:15,833 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:15,833 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:15,833 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:15,834 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:15,834 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:17,907 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:17,907 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:17,907 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:17,907 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:17,907 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:17,908 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:17,908 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:17,909 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:17,909 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:17,909 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:17,909 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:18,574 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:18,574 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:18,574 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:18,574 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:18,574 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:18,574 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:18,575 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:18,575 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:18,575 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:18,575 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:21,587 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:21,587 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:21,587 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:21,587 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:21,587 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:21,587 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:21,587 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:21,588 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:21,589 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:21,589 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:21,589 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:21,920 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:21,920 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:21,920 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:21,920 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:21,920 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:21,921 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:21,921 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:21,921 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:21,921 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:21,921 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:25,345 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:25,345 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:25,345 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:25,345 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:25,345 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:25,345 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:25,345 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:25,347 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:25,347 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:25,347 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:25,347 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:27,915 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:27,915 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:27,915 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:27,915 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:27,915 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:27,915 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:27,916 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:27,916 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:27,916 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:27,916 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:28,167 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:28,167 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:28,167 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:28,167 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:28,167 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:28,168 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:28,168 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:28,169 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:28,169 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:28,169 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:28,169 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:35,877 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:35,877 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:35,877 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:35,877 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:35,877 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:37,811 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:37,811 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:37,811 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:37,811 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:37,811 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:37,811 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:37,812 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:37,813 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:37,813 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:37,813 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:37,813 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:42,421 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:42,422 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:42,422 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:42,422 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:42,422 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:42,422 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:42,422 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:42,422 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:42,423 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:42,423 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:45,312 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:45,312 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:45,312 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:45,312 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:45,313 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:45,313 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:45,313 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:45,314 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:45,314 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:45,314 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:45,315 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:49,914 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:49,914 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:49,914 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:49,914 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:49,915 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:49,915 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:49,915 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:49,915 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:49,915 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:49,915 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:54,657 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:54,657 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:54,657 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:54,657 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:54,657 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:54,657 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:54,658 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:54,659 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:54,659 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:54,659 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:54,659 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:34:57,709 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:34:57,709 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:34:57,709 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:34:57,709 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:34:57,709 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:34:57,709 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:34:57,709 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:34:57,710 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:34:57,710 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:34:57,710 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:00,288 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:00,289 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:00,289 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:00,289 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:00,289 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:00,289 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:00,289 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:00,290 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:00,291 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:00,291 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:00,291 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:00,582 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:35:00,582 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:00,583 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:00,583 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:00,583 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:00,583 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:00,583 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:00,583 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:00,583 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:00,583 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:03,161 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:03,161 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:03,161 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:03,161 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:03,161 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:03,162 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:03,162 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:03,163 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:03,163 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:03,163 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:03,163 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:03,403 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:03,404 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:03,404 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:03,404 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:03,404 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:04,078 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:04,079 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:04,079 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:04,079 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:04,079 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:04,079 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:04,079 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:04,080 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:04,081 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:04,081 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:04,081 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:07,111 - control_station - DEBUG - [run_input_queue] Input queue size is 2
+2020-05-03 20:35:07,111 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:07,112 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:07,112 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:07,113 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:07,113 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:07,113 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:07,113 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:07,113 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:07,113 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:07,435 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:07,435 - control_station - DEBUG - [handle_message] Received message [b'010003E700000000']
+2020-05-03 20:35:07,435 - control_station - DEBUG - [handle_message] Handling register message.
+2020-05-03 20:35:07,435 - control_station - DEBUG - [handle_message] Answer register message.
+2020-05-03 20:35:07,435 - control_station - DEBUG - [handle_message] Car registered already.
+2020-05-03 20:35:07,435 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:07,435 - control_station - INFO - Sending message [010003E700FFFFFF]
+2020-05-03 20:35:07,437 - control_station - DEBUG - [run_input_queue] Input queue size is 1
+2020-05-03 20:35:07,437 - control_station - DEBUG - [handle_message] Received message [b'\n']
+2020-05-03 20:35:07,437 - control_station - DEBUG - [handle_message] Message is not in hexastring format [b'\n']
+2020-05-03 20:35:07,437 - control_station - DEBUG - [run_input_queue] Queue is empty.
+2020-05-03 20:35:43,211 - control_station - INFO - Finishing tcp write thread.

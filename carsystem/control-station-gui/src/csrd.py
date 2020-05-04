@@ -1,9 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 import datetime
 from radio_protocol import *
 
-
-class STATES(Enum):
+class STATES(IntEnum):
     OFF = 0
     ON = 1
     STOPING = 2
@@ -16,7 +15,7 @@ class STATES(Enum):
     ALL_BLINKING = 9
 
 
-class ACTIONS(Enum):
+class ACTIONS(IntEnum):
     AC_LOWBATTERY = 0
     AC_RESTORE_DEFAULT_PARAMS = 1
     AC_SET_PARAM = 2
@@ -29,7 +28,7 @@ class ACTIONS(Enum):
     AC_FAIL = 9
 
 
-class STATUS(Enum):
+class STATUS(IntEnum):
     ACTIVE = 0
     INACTIVE = 1
     CHARGING = 2
@@ -39,7 +38,7 @@ class STATUS(Enum):
     WAITING_REGISTRATION = 6
 
 
-class STATUS_TYPE(Enum):
+class STATUS_TYPE(IntEnum):
     STT_QUERY_STATUS = 1
     STT_ANSWER_STATUS = 2
     STT_QUERY_VALUE = 3
@@ -47,7 +46,7 @@ class STATUS_TYPE(Enum):
     STT_QUERY_VALUE_FAIL = 5
 
 
-class CARPARTS(Enum):
+class CARPARTS(IntEnum):
     LEFT_LIGHT = 0
     RIGHT_LIGHT = 1
     BREAK_LIGHT = 2
@@ -62,13 +61,17 @@ class CARPARTS(Enum):
 
 class CSRD:
 
-"""
-The buffer here is made of integers (int8 or unsigned char)cd pro
-"""
-    def __init__(self, logger, radioID=0, mbuffer=[], mbuffer_size=0):
+    """
+    The buffer here is made of integers (int8 or unsigned char)cd pro
+    """
+    def __init__(self,
+                 logger,
+                 radioID = 0,
+                 mbuffer=[RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN],
+                 mbuffer_size=8):
         self.logger = logger
         self.radioID = radioID
-        self.buffer = []
+        self.buffer = [RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN, RP_UNKOWN]
         self.messageLength = 0
         self.params = []
         self.nodenumber = 0
@@ -82,10 +85,13 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
         self.setMessage(radioID, mbuffer, mbuffer_size)
 
     def resetBuffer(self):
+        if self.messageLength == 0:
+            return
         for i in range(0, MESSAGE_SIZE):
             self.buffer[i] = 0
 
     def setMessage(self, radioID, mbuffer, mbuffer_size):
+        s = MESSAGE_SIZE
         if mbuffer_size < MESSAGE_SIZE:
             s = mbuffer_size
 
@@ -97,6 +103,29 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
         self.radioID = radioID
         self.time_received = datetime.datetime.now()
         return s
+
+    def setMessageFromHexaString(self, radioID, hexaString):
+        # the message is supposed to be in the format
+        # 010003E700000000 - a pair for each value, totalizing 8 bytes
+
+        if len(hexaString) < 16:
+            return 0
+
+        tempbuffer = [0, 0, 0, 0, 0, 0, 0, 0]
+        pos = 0
+        for i in range(0, 8):
+            s = hexaString[pos:(pos+2)]
+            try:
+                v = int(s, 16)
+            except Exception as e:
+                v = -1
+
+            if v < 0 or v > 255:
+                return 0
+            else:
+                tempbuffer[i] = v
+            pos += 2
+        return self.setMessage(radioID, tempbuffer, MESSAGE_SIZE)
 
     def getMessageBuffer(self, mbuffer):
         for i in range(0, self.messageLength):
@@ -148,6 +177,15 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
     def isStatus(self):
         return self.buffer[0] == RP_STATUS
 
+    def isQueryState(self):
+        return self.isStatus() and self.buffer[1] == RP_STATUS_QUERY_STATE
+
+    def isQueryAllStates(self):
+        return self.isStatus() and self.buffer[1] == RP_STATUS_QUERY_ALL_STATES
+
+    def isAnswerState(self):
+        return self.isStatus() and self.buffer[1] == RP_STATUS_ANSWER_STATE
+
     def isOperation(self):
         return self.buffer[1] == RP_OPERATION
 
@@ -162,6 +200,9 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
 
     def isBroadcastRegister(self):
         return self.isBroadcast() and self.isAction() and self.buffer[4] == RP_AC_REGISTER
+
+    def isInitialRegister(self):
+        return self.isStatus() and self.buffer[1] == RP_STATUS_INITIAL_REGISTER
 
     def isMyGroup(self, mygroup):
         return self.getGroup() == 0 or self.getGroup() == mygroup
@@ -424,7 +465,7 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
     def createInitialRegisterMessage(self, nodeid, status, val0, val1, val2):
         self.messageLength = 8
         self.buffer[0] = RP_STATUS
-        self.buffer[1] = RP_INITIALREG
+        self.buffer[1] = RP_STATUS_INITIAL_REGISTER
         self.buffer[2] = self.highByte(nodeid)
         self.buffer[3] = self.lowByte(nodeid)
         self.buffer[4] = status
@@ -496,7 +537,7 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
     def createStatusMessage(self, serverAddr, nodeid, status):
         self.messageLength = 6
         self.buffer[0] = RP_STATUS
-        self.buffer[1] = RP_REPORT_STATUS
+        self.buffer[1] = RP_STATUS_QUERY_STATUS
         self.buffer[2] = self.highByte(nodeid)
         self.buffer[3] = self.lowByte(nodeid)
         self.buffer[4] = status
@@ -508,7 +549,7 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
     def createACKMessage(self, nodeid, element, status):
         self.messageLength = 6
         self.buffer[0] = RP_STATUS
-        self.buffer[1] = RP_REPORT_ACK
+        self.buffer[1] = RP_STATUS_ANSWER_STATUS
         self.buffer[2] = self.highByte(nodeid)
         self.buffer[3] = self.lowByte(nodeid)
         self.buffer[4] = status
@@ -769,16 +810,52 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
         self.buffer[7] = 0
         return self.messageLength
 
+    def createQueryState(self, nodeid, element):
+        self.messageLength = 5
+        self.buffer[0] = RP_STATUS
+        self.buffer[1] = RP_STATUS_QUERY_STATE
+        self.buffer[2] = self.highByte(nodeid)
+        self.buffer[3] = self.lowByte(nodeid)
+        self.buffer[4] = element
+        self.buffer[5] = 0
+        self.buffer[6] = 0
+        self.buffer[7] = 0
+        return self.messageLength
+
+    def createQueryAllStates(self, nodeid):
+        self.messageLength = 4
+        self.buffer[0] = RP_STATUS
+        self.buffer[1] = RP_STATUS_QUERY_STATE
+        self.buffer[2] = self.highByte(nodeid)
+        self.buffer[3] = self.lowByte(nodeid)
+        self.buffer[4] = 0
+        self.buffer[5] = 0
+        self.buffer[6] = 0
+        self.buffer[7] = 0
+        return self.messageLength
+
+    def createAnswerState(self, nodeid, element, state):
+        self.messageLength = 6
+        self.buffer[0] = RP_STATUS
+        self.buffer[1] = RP_STATUS_QUERY_STATE
+        self.buffer[2] = self.highByte(nodeid)
+        self.buffer[3] = self.lowByte(nodeid)
+        self.buffer[4] = element
+        self.buffer[5] = state
+        self.buffer[6] = 0
+        self.buffer[7] = 0
+        return self.messageLength
+
     def dumpBuffer(self):
         self.logger.debug("CSRD buffer: %X %X %X %X %X %X %X %X",
-                      self.buffer[0],
-                      self.buffer[1],
-                      self.buffer[2],
-                      self.buffer[3],
-                      self.buffer[4],
-                      self.buffer[5],
-                      self.buffer[6],
-                      self.buffer[7])
+                          self.buffer[0],
+                          self.buffer[1],
+                          self.buffer[2],
+                          self.buffer[3],
+                          self.buffer[4],
+                          self.buffer[5],
+                          self.buffer[6],
+                          self.buffer[7])
 
     def resetToDefault(self):
         self.nodenumber = 999
@@ -791,7 +868,15 @@ The buffer here is made of integers (int8 or unsigned char)cd pro
         self.params[RP_PARAM_BREAK_RATE] = 20  # 0 = 433 MHz 1 = 868 MHz  2 = 915 MHz
 
     def bufferToHexString(self):
-        return ""
+        s = "%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X" % (self.buffer[0],
+                                                          self.buffer[1],
+                                                          self.buffer[2],
+                                                          self.buffer[3],
+                                                          self.buffer[4],
+                                                          self.buffer[5],
+                                                          self.buffer[6],
+                                                          self.buffer[7])
+        return s
 
     def bufferToJson(self):
         return ""
