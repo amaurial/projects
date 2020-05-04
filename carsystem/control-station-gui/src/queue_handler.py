@@ -17,6 +17,7 @@ class QueueHandler:
         self.threads = []
         self.event = threading.Event()
         self.registered = facilities["cars"]
+        self.wait_seconds = 0.001
 
     def run_input_queue(self, event):
         self.logger.info("[run_input_queue] Running input queue consumer.")
@@ -27,7 +28,7 @@ class QueueHandler:
                 self.handle_message(msg)
                 if self.input_queue.empty():
                     self.logger.debug("[run_input_queue] Queue is empty.")
-            event.wait(0.001)
+            event.wait(self.wait_seconds)
         self.logger.info("[run_input_queue] Stopping input queue consumer.")
 
     def handle_message(self, message):

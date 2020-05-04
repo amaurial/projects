@@ -45,6 +45,7 @@ class TcpClient(Connection):
         super().__init__(facilities, input_queue, output_queue)
         self.connection_type = ConnectionType.TCP
         self.conn = None
+        self.wait_seconds = 0.001
 
     def read(self):
         self.logger.info("Starting tcp read thread.")
@@ -65,7 +66,7 @@ class TcpClient(Connection):
                 s = s + '\n'
                 self.conn.sendall(s.encode('ascii'))
 
-            time.sleep(0.0001)
+            time.sleep(self.wait_seconds)
         self.logger.info("Finishing tcp write thread.")
 
     def connect(self):
@@ -83,7 +84,7 @@ class TcpClient(Connection):
         try:
             self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.conn.connect((host, port))
-            self.conn..settimeout(2)
+            self.conn.settimeout(2)
             # start threads
             self.running = 1
             self.logger.info("Starting TCP read and write threads.")
