@@ -1,5 +1,5 @@
 /*
-* This code is for the remote control car with remote  controller
+* This code is for the remote control car with remote controller
 */
 #include "Arduino.h"
 #include <SPI.h>

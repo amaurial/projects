@@ -34,6 +34,14 @@
 #define RP_INITIALREG          0
 #define RP_REPORT_STATUS       1
 #define RP_REPORT_ACK          2
+#define RP_STATUS_INITIAL_REGISTER 0
+#define RP_STATUS_QUERY_STATUS     1
+#define RP_STATUS_ANSWER_STATUS    2
+#define RP_STATUS_QUERY_VALUE      3
+#define RP_STATUS_ANSWER_VALUE     4
+#define RP_STATUS_QUERY_STATE      5
+#define RP_STATUS_ANSWER_STATE     6
+#define RP_STATUS_QUERY_ALL_STATES     7
 
 #define PARAMETERS_SIZE         11
 
@@ -122,6 +130,19 @@ Status messages
         B=0x03
         C and D = node id
         E=element
+    Query answer
+        B=0x04
+        C and D = node id
+        E=element
+    Query state
+        B=0x05
+        C and D = node id
+        E=element        
+    Answer state
+        B=0x06
+        C and D = node id
+        E=element  
+        F=state      
 	F=param1
 	G=param2
 	H=param3

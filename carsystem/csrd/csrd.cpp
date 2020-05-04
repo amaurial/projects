@@ -64,7 +64,8 @@ bool CSRD::sendMessage(uint8_t *sbuffer,uint8_t len,uint8_t serverAddr){
                 Serial.println(F("Packages in buffer.Wait to send"));
 				dumpBuffer(sbuffer);
         #endif // CSRD_DEBUG
-        driver->waitPacketSent();
+        //driver->setModeRx();
+        driver->waitPacketSent();        
         #ifdef CSRD_DEBUG
                 Serial.println(F("Sent"));
         #endif // CSRD_DEBUG
@@ -143,7 +144,7 @@ bool CSRD::sendInitialRegisterMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t
     
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_STATUS;
-    buf[1]=RP_INITIALREG;
+    buf[1]=RP_STATUS_INITIAL_REGISTER;
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=status;
@@ -163,7 +164,7 @@ bool CSRD::sendStatusMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t status){
     
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_STATUS;
-    buf[1]=RP_REPORT_STATUS;
+    buf[1]=RP_STATUS_QUERY_STATUS;
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=status;
@@ -177,7 +178,7 @@ bool CSRD::sendACKMessage(uint8_t serverAddr,uint16_t nodeid,uint8_t element,uin
     
     uint8_t buf[MESSAGE_SIZE];
     buf[0]=RP_STATUS;
-    buf[1]=RP_REPORT_ACK;
+    buf[1]=RP_STATUS_ANSWER_STATUS;
     buf[2]=highByte(nodeid);
     buf[3]=lowByte(nodeid);
     buf[4]=element;
@@ -679,6 +680,42 @@ bool CSRD::sendSaveParam(uint16_t nodeid, uint8_t serverid, uint8_t idx, uint8_t
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
+bool CSRD::sendQueryState(uint8_t serverAddr, uint16_t nodeid, uint8_t element){    
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_QUERY_STATE;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = 0;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return sendMessage(buf, MESSAGE_SIZE, serverAddr);
+}
+
+bool CSRD::sendQueryAllStates(uint8_t serverAddr, uint16_t nodeid){    
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_QUERY_ALL_STATES;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return sendMessage(buf, MESSAGE_SIZE, serverAddr);
+}
+
+bool CSRD::sendAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state){    
+    buffer[0] = RP_STATUS;
+    buffer[1] = RP_STATUS_ANSWER_STATE;
+    buffer[2] = highByte(nodeid);
+    buffer[3] = lowByte(nodeid);
+    buffer[4] = element;
+    buffer[5] = state;
+    buffer[6] = 0;    
+    buffer[7] = 0;    
+    return sendMessage(buf, MESSAGE_SIZE, serverAddr);
+}
+
 uint16_t CSRD::getNodeId(){   
    return word(buffer[1],buffer[2]);
 }
@@ -826,6 +863,18 @@ bool CSRD::isSaveParam(){
 
 bool CSRD::isStatus(){
     return (buffer[0] == RP_STATUS);        
+}
+
+bool CSRD::isQueryState(){
+    return (isStatus() && buffer[1] == RP_STATUS_QUERY_STATE);        
+}
+
+bool CSRD::isQueryAllStates(){
+    return (isStatus() && buffer[1] == RP_STATUS_QUERY_ALL_STATES);        
+}
+
+bool CSRD::isAnswerState(){
+    return (isStatus() && buffer[1] == RP_STATUS_ANSWER_STATE);        
 }
 
 bool CSRD::isOperation(){

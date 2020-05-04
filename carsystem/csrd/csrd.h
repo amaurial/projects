@@ -113,6 +113,9 @@ public:
     bool isStopCar();
     bool isRCMove();
     bool isRCTurn();
+    bool isQueryState();
+    bool isQueryAllStates();
+    bool isAnswerState();
 
     uint8_t getGroup();
     uint8_t getElement();
@@ -173,6 +176,9 @@ public:
     bool sendCarBreakLightOnOff(uint16_t carid, uint8_t serverid);   
     bool sendLowBattery(uint8_t serverAddr,uint16_t nodeid);
     bool sendStopCar(uint16_t carid, uint8_t serverAddr);
+    bool sendQueryState(uint8_t serverAddr,uint16_t nodeid,uint8_t element);
+    bool sendAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state);
+    bool sendQueryAllStates(uint8_t serverAddr,uint16_t nodeid);    
     void resetToDefault();
     uint8_t getLength(){return length;};
 

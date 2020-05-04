@@ -10,21 +10,21 @@
 #define IRPIN A0
 #define MOTORPIN A4
 
-#define STOP_FORCE 150//500 ;0 to 255
-#define DISTANCE 20//200 // maior mais longe 0 to 255
-#define RATE_DOWN 2
-#define RATE_UP 2
-#define MAX_LEVEL 60//700 percentage
-#define VARIATION_ALLOWED 5//100 ; 0 to 255
-#define MOTOR_TURNOFF 10//150 // percentage
-float SENSITIVITY = 0.5; // in percentage
+#define STOP_FORCE 100//0 to 255
+#define DISTANCE 75// maior mais longe 0 to 255
+#define RATE_DOWN 10
+#define RATE_UP 3
+#define MAX_LEVEL 40// percentage
+#define VARIATION_ALLOWED 10//0 to 255
+#define MOTOR_TURNOFF 20 // percentage
+float SENSITIVITY = 1.5; // in percentage
 int motor = MAX_LEVEL;
 int lastlevel = 0;
 int force = 0;
 int p, d = 0;
 uint32_t t=0, val=0;
 float r=0;
-uint16_t wait = 250;//milli
+uint16_t wait = 180;//milli
 uint32_t actual_time;
 
 void setup() {
@@ -69,25 +69,25 @@ void speedcontrol(unsigned int f) {
   
     
     if (f >= STOP_FORCE) {
-      r = 0.90 * motor;
+      r = 0.50 * motor;
       motor = (int)r;
     }
     else {
       d = f + DISTANCE;
       if (abs(d - STOP_FORCE) < VARIATION_ALLOWED ) {
         // do nothing
-        motor++;
+        motor--;
       }
       else if ( d < STOP_FORCE) {
         if (motor < MOTOR_TURNOFF) motor = MOTOR_TURNOFF;
         motor = motor + RATE_UP;
       }
-      else if (d > STOP_FORCE) {
-        if (motor > MOTOR_TURNOFF){
+      else if (d >= STOP_FORCE) {
+        if (motor >= MOTOR_TURNOFF){
           motor = motor - RATE_DOWN;
         }
       }
-      else motor++;
+      //else motor--;
     }
       
     if (motor > MAX_LEVEL) motor = MAX_LEVEL;
