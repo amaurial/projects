@@ -56,10 +56,7 @@ TcpClient::~TcpClient()
 }
 
 void TcpClient::start(void *param){
-    running = true;
-    //stringstream ss;
-    //ss << "Hello";ss << "\n";
-    //sendToClient(ss.str());    
+    running = true;    
     run(nullptr);
 }
 
@@ -182,7 +179,7 @@ void TcpClient::processRadioQueue(void *param){
                 logger->debug("%s", ex.what());
             }
         }
-        usleep(10000);
+        usleep(1000);
     }
 }
 

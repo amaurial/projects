@@ -124,7 +124,7 @@ void RadioHandler::run_in(void* param){
         //checkMessages(&radio2, YAML_RADIO2);    
         usleep(thread_sleep);    
         // TODO: Erase it after test
-        if (t > 5000){
+        if (t > 1000){
             logger->debug("[RadioHandler] run_in still checking radios. Creating broadcast register.");
             CSRD message = CSRD(logger);            
             message.createBroadcastRequestRegister(1);
@@ -162,7 +162,6 @@ void RadioHandler::run_out(void* param){
             out_msgs.pop();
             if (radio1_activated){                
                 send_message(&radio1, YAML_RADIO1, &message);
-                radio1.setModeRx();
             }                                                     
             if (radio2_activated){                
                 //send_message(&radio2, YAML_RADIO2, &message);
@@ -225,8 +224,6 @@ void RadioHandler::run_queue_reader(void* param){
 }
 
 bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){	
-    //logger->debug("Checking radio %s with timeout %d", radioName.c_str(), READ_TIMEOUT);//radio->getWaitTimeout());
-        
     uint8_t len = RH_RF69_MAX_MESSAGE_LEN;
     uint8_t from;
     uint8_t to;
@@ -234,21 +231,33 @@ bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
     int8_t rssi;
     bool got_message = false;  
     memset(buffer, '\0', RH_RF69_MAX_MESSAGE_LEN);
+    
+    struct timespec timeoutTime;
+    clock_gettime(CLOCK_REALTIME, &timeoutTime);
+    timeoutTime.tv_sec += 1;
 
     if (radioName == YAML_RADIO1){
-        pthread_mutex_lock(&radio1_mutex);        
+        int retVal = pthread_mutex_timedlock(&radio1_mutex, &timeoutTime);
+        if (retVal != 0){
+            logger->debug("Timeout on acquiring lock on %s", radioName);
+            return false;
+        }
         //pthread_cond_wait(&radio1_cond_mutex, &radio1_mutex);
     }
     else if (radioName == YAML_RADIO2){
-        pthread_mutex_lock(&radio2_mutex);
+        int retVal = pthread_mutex_timedlock(&radio2_mutex, &timeoutTime);
+        if (retVal != 0){
+            logger->debug("Timeout on acquiring lock on %s", radioName);
+            return false;
+        }
         //pthread_cond_wait(&radio2_cond_mutex, &radio2_mutex);
     }
     else{
         logger->debug("Invalid radio name %s", radioName.c_str());    
         return false;
     }
-    //logger->debug("[checkMessages] Got lock for radio name %s", radioName.c_str());       
 
+    radio->setModeRx();
     if (radio->recv(buffer, &len)) {
         if (len >0){
             // Should be a message for us now                                 
@@ -272,8 +281,6 @@ bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
         pthread_mutex_unlock(&radio2_mutex);
     }
 
-    //logger->debug("[checkMessages] Unlock for radio name %s", radioName.c_str());    
-
     if (got_message){    
         CSRD message = CSRD(logger, 0, buffer, len);
         message.setTo(to);
@@ -284,7 +291,6 @@ bool RadioHandler::checkMessages(RH_RF69 *radio, string radioName){
         message.dumpBuffer(); 
         return true;                         
     }
-     
     
     return false;
 }
@@ -299,25 +305,33 @@ bool RadioHandler::send_message(RH_RF69 *radio, string radioName, CSRD *message)
     if (radioName == YAML_RADIO2 and !radio2_activated){
         logger->debug("%s is deactivated. Not sending message.", radioName.c_str());
         return false;
-    }    
-
-    //logger->debug("[send_message] Got lock for radio name %s", radioName.c_str());
+    }
 
     memset(buffer_out, '\0', MESSAGE_SIZE);
     uint8_t msize = message->getMessageBuffer(buffer_out);
     if (msize < 1){
         logger->debug("Message is empty. Not sending.");    
         return false;
-    }
+    }    
 
-    printMessage(buffer_out, msize);    
+    struct timespec timeoutTime;
+    clock_gettime(CLOCK_REALTIME, &timeoutTime);
+    timeoutTime.tv_sec += 1;
 
     if (radioName == YAML_RADIO1){
-        pthread_mutex_lock(&radio1_mutex);
+        int retVal = pthread_mutex_timedlock(&radio1_mutex, &timeoutTime);
+        if (retVal != 0){
+            logger->debug("Timeout on acquiring lock on %s", radioName);
+            return false;
+        }
         //pthread_cond_wait(&radio1_cond_mutex, &radio1_mutex);
     }
     else if (radioName == YAML_RADIO2){
-        pthread_mutex_lock(&radio2_mutex);
+        int retVal = pthread_mutex_timedlock(&radio2_mutex, &timeoutTime);
+        if (retVal != 0){
+            logger->debug("Timeout on acquiring lock on %s", radioName);
+            return false;
+        }
         //pthread_cond_wait(&radio2_cond_mutex, &radio2_mutex);
     }
     else{
@@ -325,6 +339,8 @@ bool RadioHandler::send_message(RH_RF69 *radio, string radioName, CSRD *message)
         return false;
     }    
     
+    printMessage(buffer_out, msize);    
+
     radio->setModeRx();    
     bool message_sent = radio->send(buffer_out, msize);    
     radio->waitPacketSent();    
