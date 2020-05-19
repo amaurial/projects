@@ -35,12 +35,12 @@ uint8_t CSRD::setMessageFromHexaString(uint16_t radioID, string hexaString){
     int pos = 0;
     int c = -1;
     for (int i = 0; i < 8; i++){        
-        c = std::stoul(hexaString.substr(pos, 2), nullptr, 16);    
+        c = std::stoul(hexaString.substr(pos, 2).c_str(), nullptr, 16);    
         if (c < 0 || c > 255){
             return 0;
         }
         tbuf[i] = (uint8_t)c;
-        pos = i + 2;
+        pos += 2;
     }
 
     logger->debug("Message is in hexa string format.");

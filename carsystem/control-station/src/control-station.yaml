@@ -30,6 +30,7 @@ limits:
   radio_read_sleep: 1000
   radio_in_queue_thread_sleep: 1000
   radio_out_queue_thread_sleep: 1000
+  broadcast_register_tick: 10000
 mosquitto:
   broker_address: pc
   port: 1883

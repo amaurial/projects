@@ -27,6 +27,7 @@
 #define RADIO_IN_QUEUE_SIZE 1000
 #define QUEUE_READER_SLEEP 5000
 #define RADIO_SLEEP 500
+#define SEND_BROADCAST_TICK 10000
 
 using namespace std;
 

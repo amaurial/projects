@@ -115,6 +115,13 @@ void RadioHandler::run_in(void* param){
         }                    
     }
 
+    long send_broadcast_tick = SEND_BROADCAST_TICK;
+    if ((*configurator)[YAML_LIMITS]){
+        if ((*configurator)[YAML_LIMITS][YAML_SEND_BROADCAST_REG]){
+            send_broadcast_tick = (*configurator)[YAML_LIMITS][YAML_SEND_BROADCAST_REG].as<int>();
+        }                    
+    }
+
     logger->debug("[RadioHandler] run_in thread sleep configuration is %l micro seconds", thread_sleep);   
 
     long t = 0;
@@ -124,7 +131,7 @@ void RadioHandler::run_in(void* param){
         //checkMessages(&radio2, YAML_RADIO2);    
         usleep(thread_sleep);    
         // TODO: Erase it after test
-        if (t > 1000){
+        if (t > send_broadcast_tick){
             logger->debug("[RadioHandler] run_in still checking radios. Creating broadcast register.");
             CSRD message = CSRD(logger);            
             message.createBroadcastRequestRegister(1);
@@ -158,8 +165,8 @@ void RadioHandler::run_out(void* param){
         if (!out_msgs.empty()){
             // send message for all registered consumers
             logger->debug("Radio queue has %d messages.", out_msgs.size());
-            CSRD message = out_msgs.front();
-            out_msgs.pop();
+            CSRD message = out_msgs.front();            
+            out_msgs.pop();                    
             if (radio1_activated){                
                 send_message(&radio1, YAML_RADIO1, &message);
             }                                                     
@@ -356,11 +363,12 @@ bool RadioHandler::send_message(RH_RF69 *radio, string radioName, CSRD *message)
     }
 
     if (message_sent){
-        logger->debug("Message sent via %s.", radioName.c_str());    
+        logger->debug("Message sent via %s.", radioName.c_str());         
     }
     else{
         logger->debug("Message not sent.");
     }
+    message->dumpBuffer();   
     return message_sent;
 }
 

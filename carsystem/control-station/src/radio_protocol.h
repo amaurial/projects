@@ -69,7 +69,6 @@
 #define RP_OFF          2
 #define RP_FILLER       0xfe
 
-
 /*message format
 8 bytes
 <A><B><C><D><E><F><G><H>

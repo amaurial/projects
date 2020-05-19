@@ -35,5 +35,6 @@
 #define YAML_RETRIES         "retries"
 #define YAML_RETRY_INTERVAL  "retry_interval"
 #define YAML_KEEP_ALIVE      "keep_alive"
+#define YAML_SEND_BROADCAST_REG "broadcast_register_tick"
 
 #endif // CONFIG_H
