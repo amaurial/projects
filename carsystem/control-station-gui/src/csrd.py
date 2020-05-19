@@ -5,7 +5,7 @@ from radio_protocol import *
 class STATES(IntEnum):
     OFF = 0
     ON = 1
-    STOPING = 2
+    STOPPING = 2
     ACCELERATING = 3
     BLINKING = 4
     EMERGENCY = 5
@@ -57,6 +57,7 @@ class CARPARTS(IntEnum):
     IR_RECEIVE = 7
     IR_SEND = 8
     BOARD = 9
+    ALL = 255
 
 
 class CSRD:
@@ -83,6 +84,28 @@ class CSRD:
         self.flags = 0
         self.time_received = 0
         self.setMessage(radioID, mbuffer, mbuffer_size)
+        self.elements = {0: "LEFT LIGHT",
+                         1: "RIGHT LIGHT",
+                         2: "BREAK LIGHT",
+                         3: "REED",
+                         4: "SIRENE",
+                         5: "FRONT LIGHT",
+                         6: "MOTOR",
+                         7: "IR RECEIVE",
+                         8: "IR SEND",
+                         9: "BOARD",
+                         255: "ALL"}
+        self.states = {0: "OFF",
+                       1: "ON",
+                       2: "STOPPING",
+                       3: "ACCELERATING",
+                       4: "BLINKING",
+                       5: "EMERGENCY",
+                       6: "NORMAL",
+                       7: "NIGHT",
+                       8: "DAY",
+                       9: "ALL_BLINKING",
+                       254: "UNKOWN"}
 
     def resetBuffer(self):
         if self.messageLength == 0:
@@ -286,6 +309,8 @@ class CSRD:
 
     def getState(self):
         if not self.isOperation():
+            if self.isAnswerState():
+                return self.buffer[5]
             return RP_FILLER
         elif self.isAddressed():
             return self.buffer[5]
@@ -337,6 +362,8 @@ class CSRD:
         return self.buffer[1]
 
     def getNodeId(self):
+        if self.isStatus():
+            return self.word(self.buffer[2], self.buffer[3])
         return self.word(self.buffer[1], self.buffer[2])
 
     def getAngle(self):
@@ -557,6 +584,138 @@ class CSRD:
         self.buffer[6] = 0
         self.buffer[7] = 0
         return self.messageLength
+
+    def createMotorOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.MOTOR,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createMotorOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.MOTOR,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createSireneLightOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.SIRENE_LIGHT,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createSireneLightOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.SIRENE_LIGHT,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createSireneLightBlink(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.SIRENE_LIGHT,
+                                             STATES.BLINKING,
+                                             0, 0)
+
+    def createFrontLightOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.FRONT_LIGHT,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createFrontLightOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.FRONT_LIGHT,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createFrontLightBlink(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.FRONT_LIGHT,
+                                             STATES.BLINKING,
+                                             0, 0)
+
+    def createBreakLightOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BREAK_LIGHT,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createBreakLightOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BREAK_LIGHT,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createBreakLightBlink(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BREAK_LIGHT,
+                                             STATES.BLINKING,
+                                             0, 0)
+
+    def createRightLightOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.RIGHT_LIGHT,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createRightLightOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.RIGHT_LIGHT,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createRightLightBlink(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.RIGHT_LIGHT,
+                                             STATES.BLINKING,
+                                             0, 0)
+
+    def createLeftLightOn(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.LEFT_LIGHT,
+                                             STATES.ON,
+                                             0, 0)
+
+    def createLeftLightOff(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.LEFT_LIGHT,
+                                             STATES.OFF,
+                                             0, 0)
+
+    def createLeftLightBlink(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.LEFT_LIGHT,
+                                             STATES.BLINKING,
+                                             0, 0)
+
+    def createBoardDay(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BOARD,
+                                             STATES.DAY,
+                                             0, 0)
+
+    def createBoardNight(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BOARD,
+                                             STATES.NIGHT,
+                                             0, 0)
+
+    def createBoardNormal(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BOARD,
+                                             STATES.NORMAL,
+                                             0, 0)
+
+    def createBoardEmergency(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BOARD,
+                                             STATES.EMERGENCY,
+                                             0, 0)
+
+    def createBoardAllBlinking(self, nodeid):
+        return self.createAddressedOPMessage(nodeid,
+                                             CARPARTS.BOARD,
+                                             STATES.ALL_BLINKING,
+                                             0, 0)
 
     def createServerAutoEnum(self, nodeid):
         self.messageLength = 3
@@ -825,7 +984,7 @@ class CSRD:
     def createQueryAllStates(self, nodeid):
         self.messageLength = 4
         self.buffer[0] = RP_STATUS
-        self.buffer[1] = RP_STATUS_QUERY_STATE
+        self.buffer[1] = RP_STATUS_QUERY_ALL_STATES
         self.buffer[2] = self.highByte(nodeid)
         self.buffer[3] = self.lowByte(nodeid)
         self.buffer[4] = 0
@@ -877,6 +1036,81 @@ class CSRD:
                                                           self.buffer[6],
                                                           self.buffer[7])
         return s
+
+    def getNiceMessage(self):
+
+        s = ""
+        try:
+            if self.isAddressed():
+                s = "Addressed"
+                if self.isAction():
+                    s += " Action"
+                elif self.isRead():
+                    s += " Read"
+                elif self.isWrite():
+                    s += " Write"
+                elif self.isOperation():
+                    s += " Operation"
+                else:
+                    s += " Unknown"
+
+                s += " to node " + str(self.getNodeId())
+                s += " element " + self.elements[self.getElement()]
+                if self.isOperation():
+                    s += " next state " + self.states[self.getState()]
+                elif self.isAction():
+                    s += " Action " + self.getAction()
+                else:
+                    s += " Param idx " + self.getParamIdx()
+            elif self.isBroadcast():
+                s = "Broadcast"
+                if self.isAction():
+                    s += " Action"
+                elif self.isRead():
+                    s += " Read"
+                elif self.isWrite():
+                    s += " Write"
+                elif self.isOperation():
+                    s += " Operation"
+                else:
+                    s += " Unknown"
+
+                s += " to group " + str(self.getGroup())
+                s += " element " + self.elements[self.getElement()]
+                if self.isOperation():
+                    s += " next state " + self.states[self.getState()]
+                elif self.isAction():
+                    s += " Action " + self.getAction()
+                    if self.isBroadcastRegister():
+                        s += " Broadcast register"
+                else:
+                    s += " Param idx " + self.getParamIdx()
+            elif self.isStatus():
+                s += "Status"
+                if self.isInitialRegister():
+                    s += " Initial Registration"
+                    s += " " + str(self.getNodeId())
+                    s += " " + str(self.getStatus())
+                elif self.isAnswerState():
+                    s += " answer to node " + str(self.getNodeId())
+                    s += " element " + self.elements[self.getElement()]
+                    s += " state " + self.states[self.getState()]
+                elif self.isQueryAllStates():
+                    s += " to node " + str(self.getNodeId())
+                    s += " query all states"
+                elif self.isQueryState():
+                    s += " query to node " + str(self.getNodeId())
+                    s += " element " + self.elements[self.getElement()]
+                    s += " next state " + self.states[self.getState()]
+                else:
+                    s += "other state"
+        except Exception as e:
+            s = f"Failed to print nice {s} error {e}"
+
+        return s
+
+    def printNice(self):
+        self.logger.debug(self.getNiceMessage())
 
     def bufferToJson(self):
         return ""

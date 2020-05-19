@@ -12,6 +12,7 @@ class Car:
         self.sirene_light_state = csrd.STATES.OFF
         self.board_state = csrd.STATES.NORMAL
         self.reed_state = csrd.STATES.OFF
+        self.motor_state = csrd.STATES.OFF
         self.updated = False
 
     def set_update(self, update):
@@ -73,3 +74,9 @@ class Car:
 
     def get_reed_state(self):
         return self.reed_state
+
+    def set_motor_state(self, state):
+        self.motor_state = state
+
+    def get_motor_state(self):
+        return self.motor_state

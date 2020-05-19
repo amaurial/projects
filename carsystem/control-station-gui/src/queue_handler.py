@@ -25,26 +25,37 @@ class QueueHandler:
             while not self.input_queue.empty():
                 self.logger.debug(f"[run_input_queue] Input queue size is {self.input_queue.qsize()}")
                 msg = self.input_queue.get()
-                self.handle_message(msg)
+                msg = msg.decode('ascii')
+                self.logger.debug(f"[run_input_queue] Received message [{msg}]")
+                messages = msg.split('\n')
+                for m in messages:
+                    self.handle_message(m)
                 if self.input_queue.empty():
                     self.logger.debug("[run_input_queue] Queue is empty.")
+
             event.wait(self.wait_seconds)
         self.logger.info("[run_input_queue] Stopping input queue consumer.")
 
     def handle_message(self, message):
-        if str(message) == '\n':
+        if str(message) == '\n' or len(message) < 1:
             return
 
-        self.logger.debug(f"[handle_message] Received message [{message}]")
         csrd_message = csrd.CSRD(self.logger)
         if csrd_message.setMessageFromHexaString(0, message) == 0:
             self.logger.debug(f"[handle_message] Message is not in hexastring format [{message}]")
 
+        self.add_radio_to_list(csrd_message.bufferToHexString() + " - " + csrd_message.getNiceMessage())
+
+        csrd_message.printNice()
+
         if csrd_message.isInitialRegister():
-            self.logger.debug("[handle_message] Handling register message.")
+
+            label = self.builder.get_object("label_total_registrations")
+
+            self.logger.debug(f"[handle_message] Handling register message {message}.")
             node_number = csrd_message.getNodeNumber()
             out_message = csrd.CSRD(self.logger)
-            self.logger.debug("[handle_message] Answer register message.")
+            self.logger.debug(f"[handle_message] Answer register message {message}.")
             out_message.createInitialRegisterMessage(node_number,
                                                      csrd.STATUS.ACTIVE,
                                                      255,
@@ -56,15 +67,17 @@ class QueueHandler:
                 c = car.Car()
                 c.set_id(node_number)
                 self.registered[str(node_number)] = c
-                # request all states
-                out_message_2 = csrd.CSRD(self.logger)
-                out_message_2.createQueryAllStates(node_number)
-                self.output_queue.put(out_message_2)
             else:
                 self.logger.debug("[handle_message] Car registered already.")
 
+            # request all states
+            out_message_2 = csrd.CSRD(self.logger)
+            out_message_2.createQueryAllStates(node_number)
+            self.output_queue.put(out_message_2)
+            label.set_text(str(len(self.registered)))
+
         if csrd_message.isAnswerState():
-            self.logger.debug("[handle_message] Handling answer state message.")
+            self.logger.debug(f"[handle_message] Handling answer state message {message}.")
             node_number = csrd_message.getNodeNumber()
             element = csrd_message.getElement()
             state = csrd_message.getState()
@@ -73,7 +86,7 @@ class QueueHandler:
     def setElementState(self, node_number, element, state):
         if node_number in self.registered.keys():
 
-            self.logger.debug(f"Setting state. ID [id] state [state] element [element]")
+            self.logger.debug(f"Setting state. ID [{id}] state [{state}] element [{element}]")
             self.registered[node_number].set_update(True)
             if element == csrd.CARPARTS.BREAK_LIGHT:
                 self.registered[node_number].set_break_light_state(state)
@@ -103,6 +116,19 @@ class QueueHandler:
         item.add(label)
         listbox.add(item)
         listbox.show_all()
+
+    def add_radio_to_list(self, message):
+        listbox = self.builder.get_object("list_radio_messages")
+        item = Gtk.ListBoxRow()
+        label = Gtk.Label(message)
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_halign(Gtk.Align.START)
+        item.add(label)
+        listbox.add(item)
+        listbox.show_all()
+
+    def put_message_to_output_queue(self, message):
+        self.output_queue.put(message)
 
     def start(self):
         self.logger.info("Starting queue consumer threads")

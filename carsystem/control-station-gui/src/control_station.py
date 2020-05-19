@@ -44,11 +44,11 @@ object_facilities["configuration"] = config
 input_queue = queue.Queue()
 output_queue = queue.Queue()
 
-connection = connection.TcpClient(object_facilities, input_queue, output_queue)
-object_facilities["connection"] = connection
-
 builder = Gtk.Builder()
 object_facilities["builder"] = builder
+
+connection = connection.TcpClient(object_facilities, input_queue, output_queue)
+object_facilities["connection"] = connection
 
 queue_consumer = queue_handler.QueueHandler(object_facilities, input_queue, output_queue)
 object_facilities["queue_consumer"] = queue_consumer

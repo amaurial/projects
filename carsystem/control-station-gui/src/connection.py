@@ -2,9 +2,11 @@ from enum import Enum
 import socket
 import threading
 import time
+import datetime
 
 tag_tcp_server = "tcp_server"
 tag_tcp_port = "tcp_port"
+
 
 class ConnectionType(Enum):
     NONE = 0
@@ -19,8 +21,11 @@ class Connection:
         self.output_queue = output_queue
         self.config = facilities["configuration"]
         self.logger = facilities["logger"]
+        self.builder = facilities["builder"]
         self.running = 0
         self.threads = []
+        self.host = ""
+        self.port = 0
 
     def getConnectionType(self):
         return self.connection_type
@@ -30,9 +35,6 @@ class Connection:
 
     def stop(self):
         self.running = 0
-        for t in self.threads:
-            t.stop()
-
 
     def isConnected(self):
         if self.running == 0:
@@ -49,22 +51,33 @@ class TcpClient(Connection):
 
     def read(self):
         self.logger.info("Starting tcp read thread.")
+        label = self.builder.get_object("label_status_2")
+
         while self.running:
-            recv_data = self.conn.recv(1024)  # Should be ready to read
-            if recv_data:
-                self.input_queue.put(recv_data)
+            try:
+                recv_data = self.conn.recv(1024)  # Should be ready to read
+                if recv_data:
+                    self.input_queue.put(recv_data)
+                    now = datetime.datetime.now()
+                    label.set_text("Last input message time " + now.strftime("%d-%m-%Y %H:%M:%S"))
+            except socket.timeout:
+                pass
 
         self.logger.info("Finishing tcp read thread.")
 
     def write(self):
         self.logger.info("Starting tcp write thread.")
+        label = self.builder.get_object("label_status_3")
         while self.running:
             while not self.output_queue.empty():
                 item = self.output_queue.get()
-                s = item.bufferToHexString();
+                s = item.bufferToHexString()
                 self.logger.info(f"Sending message [%s]", s)
                 s = s + '\n'
                 self.conn.sendall(s.encode('ascii'))
+
+                now = datetime.datetime.now()
+                label.set_text("Last output message time " + now.strftime("%d-%m-%Y %H:%M:%S"))
 
             time.sleep(self.wait_seconds)
         self.logger.info("Finishing tcp write thread.")
@@ -72,19 +85,19 @@ class TcpClient(Connection):
     def connect(self):
 
         self.logger.info("Reading tcp connection properties.")
-        host = self.config.getProperty(tag_tcp_server)
-        port = self.config.getProperty(tag_tcp_port)
+        self.host = self.config.getProperty(tag_tcp_server)
+        self.port = self.config.getProperty(tag_tcp_port)
 
-        self.logger.info(f"Host: {host} Port: {port}")
+        self.logger.info(f"Host: {self.host} Port: {self.port}")
 
-        if host is None or port is None:
+        if self.host is None or self.port is None:
             return False
 
-        self.logger.info(f"Trying to establish connection to {host} on {port}")
+        self.logger.info(f"Trying to establish connection to {self.host} on {self.port}")
         try:
             self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.conn.connect((host, port))
-            self.conn.settimeout(2)
+            self.conn.connect((self.host, self.port))
+            self.conn.settimeout(10)
             # start threads
             self.running = 1
             self.logger.info("Starting TCP read and write threads.")
@@ -100,6 +113,12 @@ class TcpClient(Connection):
             return False
 
         return True
+
+    def get_host(self):
+        return self.host
+
+    def get_port(self):
+        return self.port
 
 
 class MQTTClient(Connection):
