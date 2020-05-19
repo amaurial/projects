@@ -680,39 +680,42 @@ bool CSRD::sendSaveParam(uint16_t nodeid, uint8_t serverid, uint8_t idx, uint8_t
     return sendMessage(buf,MESSAGE_SIZE,serverid);
 }
 
-bool CSRD::sendQueryState(uint8_t serverAddr, uint16_t nodeid, uint8_t element){    
-    buffer[0] = RP_STATUS;
-    buffer[1] = RP_STATUS_QUERY_STATE;
-    buffer[2] = highByte(nodeid);
-    buffer[3] = lowByte(nodeid);
-    buffer[4] = element;
-    buffer[5] = 0;
-    buffer[6] = 0;    
-    buffer[7] = 0;    
+bool CSRD::sendQueryState(uint8_t serverAddr, uint16_t nodeid, uint8_t element){  
+    uint8_t buf[MESSAGE_SIZE];  
+    buf[0] = RP_STATUS;
+    buf[1] = RP_STATUS_QUERY_STATE;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = 0;
+    buf[6] = 0;    
+    buf[7] = 0;    
     return sendMessage(buf, MESSAGE_SIZE, serverAddr);
 }
 
 bool CSRD::sendQueryAllStates(uint8_t serverAddr, uint16_t nodeid){    
-    buffer[0] = RP_STATUS;
-    buffer[1] = RP_STATUS_QUERY_ALL_STATES;
-    buffer[2] = highByte(nodeid);
-    buffer[3] = lowByte(nodeid);
-    buffer[4] = 0;
-    buffer[5] = 0;
-    buffer[6] = 0;    
-    buffer[7] = 0;    
+    uint8_t buf[MESSAGE_SIZE];  
+    buf[0] = RP_STATUS;
+    buf[1] = RP_STATUS_QUERY_ALL_STATES;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;    
+    buf[7] = 0;    
     return sendMessage(buf, MESSAGE_SIZE, serverAddr);
 }
 
-bool CSRD::sendAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state){    
-    buffer[0] = RP_STATUS;
-    buffer[1] = RP_STATUS_ANSWER_STATE;
-    buffer[2] = highByte(nodeid);
-    buffer[3] = lowByte(nodeid);
-    buffer[4] = element;
-    buffer[5] = state;
-    buffer[6] = 0;    
-    buffer[7] = 0;    
+bool CSRD::sendAnswerState(uint8_t serverAddr, uint16_t nodeid, uint8_t element, uint8_t state){ 
+    uint8_t buf[MESSAGE_SIZE];    
+    buf[0] = RP_STATUS;
+    buf[1] = RP_STATUS_ANSWER_STATE;
+    buf[2] = highByte(nodeid);
+    buf[3] = lowByte(nodeid);
+    buf[4] = element;
+    buf[5] = state;
+    buf[6] = 0;    
+    buf[7] = 0;    
     return sendMessage(buf, MESSAGE_SIZE, serverAddr);
 }
 

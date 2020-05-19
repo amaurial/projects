@@ -34,7 +34,7 @@ IRsend irsend;
 #define DEBUG_CAR 1;
 
 //PINS
-#define FRONT_LIGHT_PIN           7//A1
+#define FRONT_LIGHT_PIN           9
 #define LEFT_LIGHT_PIN            5
 #define RIGHT_LIGHT_PIN           4
 #define SIRENE_LIGHT_PIN          A3 //AUX2
@@ -80,7 +80,7 @@ typedef struct ELEMENTS {
   byte actual_pwm_val;
 };
 //number of elements
-#define NUM_ELEMENTS 9    // the elements: motor, lights, ir sensor, reed sensor
+#define NUM_ELEMENTS 10 // the elements: motor, lights, ir sensor, reed sensor
 struct ELEMENTS elements[NUM_ELEMENTS];
 
 //dynamic values
@@ -147,6 +147,7 @@ void controlAux(ELEMENTS * element);
 void controlReed(ELEMENTS * element);
 void controlIRSend(ELEMENTS * element);
 void controlIRReceive(ELEMENTS * element);
+void controlBoardDummy(ELEMENTS * element);
 
 /*
 Print nice status messages
@@ -268,8 +269,8 @@ void loop() {
     actime = millis();  
         
     //carry the active actions
-    //if (status == ACTIVE) {
-      for (byte i = 0; i < NUM_ELEMENTS; i++) {
+    //if (status == ACTIVE) {      
+      for (byte i = 0; i < (NUM_ELEMENTS); i++) {
         elements[i].controller(&elements[i]);
       }
     //} 
@@ -541,43 +542,53 @@ void checkQueryState(){
   }
   else{   
     #ifdef DEBUG_CAR   
-      Serial.println(F("SQA LEFT_LIGHT"));
+      Serial.print(F("SQA LEFT_LIGHT"));
+      Serial.println(elements[LEFT_LIGHT].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, LEFT_LIGHT , elements[LEFT_LIGHT].state);     
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA RIGHT_LIGHT"));
+      Serial.print(F("SQA RIGHT_LIGHT "));
+      Serial.println(elements[RIGHT_LIGHT].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, RIGHT_LIGHT , elements[RIGHT_LIGHT].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA BREAK_LIGHT"));
+      Serial.print(F("SQA BREAK_LIGHT "));
+      Serial.println(elements[BREAK_LIGHT].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, BREAK_LIGHT , elements[BREAK_LIGHT].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA REED"));
+      Serial.print(F("SQA REED "));
+      Serial.println(elements[REED].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, REED , elements[REED].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA SIRENE_LIGHT"));
+      Serial.print(F("SQA SIRENE_LIGHT "));
+      Serial.println(elements[SIRENE_LIGHT].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, SIRENE_LIGHT , elements[SIRENE_LIGHT].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA FRONT_LIGHT"));
+      Serial.print(F("SQA FRONT_LIGHT "));
+      Serial.println(elements[FRONT_LIGHT].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, FRONT_LIGHT , elements[FRONT_LIGHT].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA MOTOR"));
+      Serial.print(F("SQA MOTOR "));
+      Serial.println(elements[MOTOR].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, MOTOR , elements[MOTOR].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA IR_RECEIVE"));
+      Serial.print(F("SQA IR_RECEIVE "));
+      Serial.println(elements[IR_RECEIVE].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, IR_RECEIVE , elements[IR_RECEIVE].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA IR_SEND"));
+      Serial.print(F("SQA IR_SEND "));
+      Serial.println(elements[IR_SEND].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, IR_SEND , elements[IR_SEND].state);    
     #ifdef DEBUG_CAR
-      Serial.println(F("SQA BOARD"));
+      Serial.print(F("SQA BOARD "));
+      Serial.println(elements[BOARD].state);
     #endif
     car.sendAnswerState(car.getSender(), nodeid, BOARD , elements[BOARD].state);    
   }
@@ -669,8 +680,17 @@ void setNextOperation(){
     }      
 }
 
+void controlBoardDummy(ELEMENTS * element) {
+  // Dummy function to keep the things organized with other elements
+}
+
 void controlBoard(states s){
-  switch (s) {
+  
+  #ifdef DEBUG_CAR
+      Serial.println(F("Control board"));
+    #endif
+  elements[BOARD].state = s;
+  switch (s) {        
         case (EMERGENCY):
           //save actual state
           
@@ -683,7 +703,7 @@ void controlBoard(states s){
           elements[SIRENE_LIGHT].next = BLINKING;
           elements[BREAK_LIGHT].next = BLINKING;          
           elements[FRONT_LIGHT].next = BLINKING;
-          elements[MOTOR].next = OFF;
+          elements[MOTOR].next = OFF;          
 
           break;
 
@@ -978,6 +998,7 @@ void initElements() {
   elements[REED].total_params = 4;
   elements[IR_RECEIVE].total_params = 5;
   elements[IR_SEND].total_params = 2;
+  elements[BOARD].total_params = 2;
   setInitParams();
 
   //set initial state
@@ -1063,6 +1084,14 @@ void initElements() {
   elements[i].port = IR_SEND_PIN;
   elements[i].controller = &controlIRSend; 
   elements[i].total_params = 2;
+
+  //BOARD
+  i = BOARD;  
+  elements[i].obj = BOARD;
+  elements[i].port = CHARGER_PIN;
+  elements[i].controller = &controlBoardDummy; 
+  elements[i].total_params = 2;
+  elements[i].state = NORMAL;
   #ifdef DEBUG_CAR
     Serial.println(F("all set"));
   #endif
